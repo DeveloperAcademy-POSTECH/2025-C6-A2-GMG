@@ -1,0 +1,48 @@
+# === Xcode 기본 빌드 산출물 ===
+DerivedData/
+build/
+*.xcuserstate
+
+# === 사용자 환경/세션 ===
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# === Swift Package Manager ===
+Packages/
+Package.pins
+Package.resolved
+.swiftpm/
+.build/
+
+# === macOS 시스템 파일 ===
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+__MACOSX/
+*.swp
+*.swo
+
+# === Logs & Diagnostics ===
+*.log
+*.crash
+*.xccrashpoint
+*.dSYM
+*.dSYM.zip
+
+# === User Config (에디터, IDE 등) ===
+*.orig
+*.rej
+*.swp
+*.bak
+*.tmp
+*.lock
+*.idea/
+.vscode/
+
+# === Preview & SwiftUI Cache ===
+# SwiftUI preview 캐시와 canvas 정보
+*.preview-thumbnails
+*.preview-thumbnails/
+*.canvas
