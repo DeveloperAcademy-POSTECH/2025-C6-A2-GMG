@@ -5,7 +5,8 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>DOSGothic.ttf</string>
-		<string>neodgm.ttf</string>
+		<string>NeoDunggeunmo.ttf</string>
+		<string>NeoDunggeunmoPro-Regular.ttf</string>
 	</array>
 </dict>
 </plist>
