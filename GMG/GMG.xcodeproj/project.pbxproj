@@ -48,7 +48,9 @@
 				32C5AB532EA213420007BEFD /* GMG */,
 				32C5AB522EA213420007BEFD /* Products */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		32C5AB522EA213420007BEFD /* Products */ = {
 			isa = PBXGroup;
