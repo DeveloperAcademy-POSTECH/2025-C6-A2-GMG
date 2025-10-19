@@ -72,7 +72,9 @@
 				32F1740C2EA3BC3700851F42 /* GMGTests */,
 				32C5AB522EA213420007BEFD /* Products */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		32C5AB522EA213420007BEFD /* Products */ = {
 			isa = PBXGroup;
