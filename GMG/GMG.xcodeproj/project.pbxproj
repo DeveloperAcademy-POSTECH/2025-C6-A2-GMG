@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E3F07A262EA374F400BE6775 /* AudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = E3F07A252EA374F400BE6775 /* AudioKit */; };
+		E3F07A292EA3757400BE6775 /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = E3F07A282EA3757400BE6775 /* AudioKitEX */; };
+		E3F07A2C2EA3759000BE6775 /* SoundpipeAudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = E3F07A2B2EA3759000BE6775 /* SoundpipeAudioKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		32C5AB512EA213420007BEFD /* GMG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GMG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3F07A262EA374F400BE6775 /* AudioKit in Frameworks */,
+				E3F07A292EA3757400BE6775 /* AudioKitEX in Frameworks */,
+				E3F07A2C2EA3759000BE6775 /* SoundpipeAudioKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +89,9 @@
 			);
 			name = GMG;
 			packageProductDependencies = (
+				E3F07A252EA374F400BE6775 /* AudioKit */,
+				E3F07A282EA3757400BE6775 /* AudioKitEX */,
+				E3F07A2B2EA3759000BE6775 /* SoundpipeAudioKit */,
 			);
 			productName = GMG;
 			productReference = 32C5AB512EA213420007BEFD /* GMG.app */;
@@ -109,6 +121,11 @@
 			);
 			mainGroup = 32C5AB482EA213420007BEFD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E3F07A242EA374F400BE6775 /* XCRemoteSwiftPackageReference "AudioKit" */,
+				E3F07A272EA3757400BE6775 /* XCRemoteSwiftPackageReference "AudioKitEX" */,
+				E3F07A2A2EA3759000BE6775 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 32C5AB522EA213420007BEFD /* Products */;
 			projectDirPath = "";
@@ -270,6 +287,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GMG/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "녹음을 위해 마이크 접근이 필요합니다.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -316,6 +334,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GMG/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "녹음을 위해 마이크 접근이 필요합니다.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -370,6 +389,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E3F07A242EA374F400BE6775 /* XCRemoteSwiftPackageReference "AudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.5;
+			};
+		};
+		E3F07A272EA3757400BE6775 /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/AudioKitEX";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.2;
+			};
+		};
+		E3F07A2A2EA3759000BE6775 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/SoundpipeAudioKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E3F07A252EA374F400BE6775 /* AudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3F07A242EA374F400BE6775 /* XCRemoteSwiftPackageReference "AudioKit" */;
+			productName = AudioKit;
+		};
+		E3F07A282EA3757400BE6775 /* AudioKitEX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3F07A272EA3757400BE6775 /* XCRemoteSwiftPackageReference "AudioKitEX" */;
+			productName = AudioKitEX;
+		};
+		E3F07A2B2EA3759000BE6775 /* SoundpipeAudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3F07A2A2EA3759000BE6775 /* XCRemoteSwiftPackageReference "SoundpipeAudioKit" */;
+			productName = SoundpipeAudioKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 32C5AB492EA213420007BEFD /* Project object */;
 }
