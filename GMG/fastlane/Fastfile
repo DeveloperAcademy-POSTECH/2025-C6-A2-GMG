@@ -1,0 +1,70 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+
+  desc "Default custom lane"
+  lane :custom_lane do
+    # Custom actions go here
+  end
+
+  desc "Add device + update provisioning profile"
+  lane :add_device do |options|
+    device_name = options[:name]
+    device_udid = options[:udid]
+
+    if device_name.nil? || device_udid.nil?
+      UI.user_error!("Usage: fastlane add_device name:'Device Name' udid:'UDID'")
+    end
+
+    register_devices(
+      devices: {
+        device_name => device_udid
+      }
+    )
+
+    match(
+      type: "development",
+      force_for_new_devices: true
+    )
+  end
+
+  desc "Renew FASTLANE_SESSION and update .env"
+  lane :renew_session do
+    UI.header "Renewing FASTLANE_SESSION..."
+
+    # 로그인 + 세션 생성
+    Spaceship::Portal.login(ENV["APPLE_ID"])
+    Spaceship::Portal.client.team_id = ENV["FASTLANE_TEAM_ID"] if ENV["FASTLANE_TEAM_ID"]
+    new_session = Spaceship::Portal.client.store_cookie
+
+    # .env 파일 찾아서 세션 갱신
+    env_path = File.expand_path("../.env", __FILE__)
+    env_lines = File.read(env_path).split("\n")
+    updated_lines = env_lines.map do |line|
+      if line.start_with?("FASTLANE_SESSION=")
+        "FASTLANE_SESSION='#{new_session}'"
+      else
+        line
+      end
+    end
+    File.write(env_path, updated_lines.join("\n"))
+
+    UI.success "FASTLANE_SESSION updated in .env"
+  end
+
+end
