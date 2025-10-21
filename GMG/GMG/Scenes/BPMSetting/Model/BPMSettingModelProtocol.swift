@@ -4,7 +4,6 @@ import Foundation
 
 protocol BPMSettingModelProtocol {
     var bpm: Int { get }
-    var step: Int { get }
     
     var tapTimestamps: [TimeInterval] { get }
     var maxTapHistory: Int { get }

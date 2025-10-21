@@ -4,7 +4,6 @@ import Foundation
 
 struct BPMSettingModel: Equatable {
     let bpm: Int
-    let step: Int // BPM 증가 단위
     let tapTimestamps: [TimeInterval] // tap으로 bpm 설정 시 평균 낼 최근 tap interval
     let maxTapHistory: Int = 5 // 최근 5번의 Tap의 평균을 내서 bpm으로 설정
     
@@ -39,7 +38,6 @@ struct BPMSettingModel: Equatable {
 extension BPMSettingModel {
     func copy(
         bpm: Int? = nil,
-        step: Int? = nil,
         tapTimestamps: [TimeInterval]? = nil,
         isLongPressed: Bool? = nil,
         longPressStep: Int? = nil,
@@ -47,7 +45,6 @@ extension BPMSettingModel {
     ) -> BPMSettingModel {
         BPMSettingModel(
             bpm: bpm ?? self.bpm,
-            step: step ?? self.step,
             tapTimestamps: tapTimestamps ?? self.tapTimestamps,
             isLongPressed: isLongPressed ?? self.isLongPressed,
             longPressStep: longPressStep ?? self.longPressStep,
@@ -57,7 +54,6 @@ extension BPMSettingModel {
     
     static let initial = BPMSettingModel(
             bpm: 100,
-            step: 1,
             tapTimestamps: [],
             isLongPressed: false,
             longPressStep: 10,
