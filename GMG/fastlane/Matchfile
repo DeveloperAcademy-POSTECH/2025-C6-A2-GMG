@@ -1,0 +1,11 @@
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+
+type(ENV["MATCH_TYPE"] || "development")  # development 또는 appstore
+
+app_identifier([ENV["APP_IDENTIFIER"]])
+username(ENV["APPLE_ID"])
+git_branch(ENV["MATCH_GIT_BRANCH"] || "master")
+
+# 로그 깔끔하게
+verbose(false)
