@@ -46,4 +46,7 @@ __MACOSX/
 *.preview-thumbnails
 *.preview-thumbnails/
 *.canvas
+
+.env
+.env/*
 fastlane/.env
