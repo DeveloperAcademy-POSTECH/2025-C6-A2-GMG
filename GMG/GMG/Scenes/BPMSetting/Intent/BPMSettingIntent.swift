@@ -14,13 +14,7 @@ enum BPMSettingIntent {
     case longPressMinusTick
     case longPressMinusEnd
     
-    case changePressState
-    case longPressIncrease
-    
     case tapBeat (now: TimeInterval)
     case resetTap
     case commitTapBPM
-    
-    case setBPM (Int)
-    case setStep (Int)
 }

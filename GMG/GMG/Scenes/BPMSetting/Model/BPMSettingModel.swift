@@ -11,7 +11,7 @@ struct BPMSettingModel: Equatable {
     let longPressStep: Int
     let shortPressStep: Int
     
-    let minBPM: Int = 40
+    let minBPM: Int = 10
     let maxBPM: Int = 400
     
     var isValid: Bool { bpm >= minBPM && bpm <= maxBPM }
