@@ -3,3 +3,9 @@
 struct BPM {
     let value: Int
 }
+
+extension BPM: CustomStringConvertible {
+    var description: String {
+        String(describing: value)
+    }
+}

@@ -16,7 +16,7 @@ class ScoreFactory {
     ) -> Score {
         Score(
             bpm: BPM(value: 96),
-            timeSignature: TimeSignature(numerator: 4, denumerator: .quarter),
+            timeSignature: TimeSignature.fourFour,
             key: Key(root: .C, type: .major),
             humFileURL: .temporaryDirectory,
             measures: []
