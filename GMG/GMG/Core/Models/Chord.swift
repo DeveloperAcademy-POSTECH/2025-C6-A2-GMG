@@ -4,3 +4,9 @@ struct Chord {
     let root: NoteName
     let quality: ChordQuality
 }
+
+extension Chord: CustomStringConvertible {
+    var description: String {
+        "\(root)\(quality)"
+    }
+}
