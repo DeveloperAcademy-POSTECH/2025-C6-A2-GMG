@@ -24,6 +24,8 @@ platform :ios do
 
   desc "Add device + update provisioning profile"
   lane :add_device do |options|
+    app_store_connect_api_key()
+
     device_name = options[:name]
     device_udid = options[:udid]
 
