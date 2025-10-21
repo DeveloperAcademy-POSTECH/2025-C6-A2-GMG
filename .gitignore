@@ -47,6 +47,12 @@ __MACOSX/
 *.preview-thumbnails/
 *.canvas
 
+# === 환경 변수 파일 ===
 .env
-.env/*
-fastlane/.env
+.env.*
+
+# === Fastlane 환경 변수 파일 ===
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
