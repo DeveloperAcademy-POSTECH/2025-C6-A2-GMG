@@ -17,8 +17,8 @@ struct CDCase: View {
                 .scaledToFit()
                 .frame(width: 160)
                 .offset(x: 10)
+                .blur(radius: 0.5)
         }
-        .blur(radius: 1)
         .clipShape(Rectangle())
         .overlay {
             Image(.cdCaseCover)
