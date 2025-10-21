@@ -74,7 +74,7 @@ extension WaveformUseView {
 
         var body: some View {
             ZStack {
-                Image("WavefromBackground")
+                Image("WaveformBackground")
                     .resizable()
                     .scaledToFit()
                     .background(Color.white)
