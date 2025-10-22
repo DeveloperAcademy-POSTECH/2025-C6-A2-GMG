@@ -2,17 +2,38 @@
 
 import Foundation
 
-enum BPMSettingIntent {
-    case tapPlus
-    case tapMinus
+final class BPMSettingIntent: BPMSettingIntentProtocol {
+    weak var model: (any BPMSettingActionProtocol)?
+
+    init(model: (any BPMSettingActionProtocol)? = nil) {
+        self.model = model
+    }
+
+    func setBPM(_ value: Int) {
+        model?.setBPM(value)
+    }
     
-    case longPressPlusStart
-    case longPressPlusEnd
+    func tapPlus() {
+        model?.tapPlus(step: 1)
+    }
     
-    case longPressMinusStart
-    case longPressMinusEnd
+    func tapMinus() {
+        model?.tapMinus(step: 1)
+    }
     
-    case tapBeat (now: TimeInterval)
-    case resetTap
-    case commitTapBPM
+    func tapBeat() {
+        model?.tapBeat(at: Date().timeIntervalSince1970)
+    }
+    
+    func startLongPress() {
+        model?.setLongPressed(true)
+    }
+    
+    func stopLongPress() {
+        model?.setLongPressed(false)
+    }
+    
+    func tickWhileLongPressing() {
+        model?.longPressTick()
+    }
 }

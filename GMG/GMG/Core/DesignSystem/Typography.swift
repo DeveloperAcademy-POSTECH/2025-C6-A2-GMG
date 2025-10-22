@@ -24,6 +24,8 @@ enum Typography {
         case M11
         case M12
         case M13
+        case M14
+        case M15
 
         static let FontName: String = "DOSGothic"
 
@@ -42,6 +44,8 @@ enum Typography {
             case .M11: return 28
             case .M12: return 30
             case .M13: return 32
+            case .M14: return 34
+            case .M15: return 36
             }
         }
 
@@ -64,6 +68,8 @@ enum Typography {
         case R11
         case R12
         case R13
+        case R14
+        case R15
 
         static let FontName: String = "NeoDunggeunmoPro-Regular"
 
@@ -82,6 +88,8 @@ enum Typography {
             case .R11: return 28
             case .R12: return 30
             case .R13: return 32
+            case .R14: return 34
+            case .R15: return 36
             }
         }
 

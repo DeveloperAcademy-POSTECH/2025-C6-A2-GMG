@@ -2,17 +2,12 @@
 
 import Foundation
 
-protocol BPMSettingIntentProtocol: AnyObject {
+protocol BPMSettingIntentProtocol {
+    func setBPM(_ value: Int)
     func tapPlus()
     func tapMinus()
-    
-    func longPressPlusStart()
-    func longPressPlusEnd()
-    
-    func longPressMinusStart()
-    func longPressMinusEnd()
-    
-    func tapBeat (now: TimeInterval)
-    func resetTap()
-    func commitTapBPM()
+    func tapBeat()
+    func startLongPress()
+    func stopLongPress()
+    func tickWhileLongPressing()
 }

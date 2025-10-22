@@ -2,19 +2,17 @@
 
 import Foundation
 
-protocol BPMSettingModelProtocol {
+protocol BPMSettingStateProtocol {
     var bpm: BPM { get }
-    
-    var tapTimestamps: [TimeInterval] { get }
-    var maxTapHistory: Int { get }
-    
-    var isLongPressed: Bool { get }
-    var longPressStep: Int { get }
-    var shortPressStep: Int { get }
-    
-    var minBPM: Int { get }
-    var maxBPM: Int { get }
-    
+    var sliderValue: Double { get }
     var isValid: Bool { get }
-    var computedBPMFromTaps: Int? { get }
+}
+
+protocol BPMSettingActionProtocol: AnyObject {
+    func setBPM(_ value: Int)
+    func tapPlus(step: Int)
+    func tapMinus(step: Int)
+    func tapBeat(at time: TimeInterval)
+    func setLongPressed(_ isOn: Bool)
+    func longPressTick()
 }
