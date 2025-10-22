@@ -3,7 +3,7 @@
 import Foundation
 
 protocol BPMSettingModelProtocol {
-    var bpm: Int { get }
+    var bpm: BPM { get }
     
     var tapTimestamps: [TimeInterval] { get }
     var maxTapHistory: Int { get }
