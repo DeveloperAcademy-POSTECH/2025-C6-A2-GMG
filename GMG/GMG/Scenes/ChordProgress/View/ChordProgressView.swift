@@ -69,7 +69,7 @@ extension ChordProgressView {
                     Text("C Key")
                 }
                 .font(Typography.DOSGothic.M6)
-                .foregroundStyle(Color.text1)
+                .foregroundStyle(.text1)
                 
                 Spacer()
                 
@@ -109,7 +109,7 @@ extension ChordProgressView {
     }
     
     struct MeasureView: View {
-        let numerator: Int = 6
+        let numerator: Int = 4
         
         private var chordColums: [GridItem] {
             Array(repeating: GridItem(.flexible(), spacing: 0), count: numerator)
@@ -120,20 +120,26 @@ extension ChordProgressView {
                 // Measure Index
                 Text("1")
                     .font(Typography.DOSGothic.M2)
-                    .foregroundStyle(Color.text1)
+                    .foregroundStyle(.text1)
                     .padding(.horizontal, 18)
                     .padding(.bottom, 1)
                 
                 // Chod List
-                LazyVGrid(columns: chordColums) {
-                    ChordCellView()
-                    ChordCellView()
-                    ChordCellView()
-                    ChordCellView()
-                    ChordCellView()
-                    ChordCellView()
+                LazyVGrid(columns: chordColums, spacing: 0) {
+                    ChordCellView(
+                        chord: .init(root: .A, quality: .min)
+                    )
+                    ChordCellView(
+                        chord: .init(root: .A, quality: .maj6)
+                    )
+                    ChordCellView(
+                        chord: .init(root: .A, quality: .seven)
+                    )
+                    ChordCellView(
+                        chord: .init(root: .A, quality: .maj)
+                        , isSelected: true
+                    )
                 }
-                .border(.red)
                 .frame(width: .infinity)
                 
                 
@@ -144,11 +150,20 @@ extension ChordProgressView {
     }
     
     struct ChordCellView: View {
+        var chord: Chord
+        var isSelected: Bool = false
+        
         var body: some View {
             VStack {
-                Text("1")
+                Text("\(chord.description)")
+                    .font(Typography.DOSGothic.M10)
+                    .foregroundStyle(.text1)
             }
+            .frame(maxWidth: .infinity)
             .frame(height: 66)
+            .background(isSelected ? .green2 : .green3)
+            .border(.black.opacity(0.1), width: 1)
+            
         }
     }
     
