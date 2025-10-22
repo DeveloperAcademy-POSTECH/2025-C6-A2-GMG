@@ -7,6 +7,6 @@ struct Chord {
 
 extension Chord: CustomStringConvertible {
     var description: String {
-        "\(root)\(quality)"
+        "\(root)\(quality.description)"
     }
 }
