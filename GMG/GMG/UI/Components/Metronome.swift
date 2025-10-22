@@ -9,19 +9,19 @@ import SwiftUI
 import AVFoundation
 
 struct Metronome: View {
-    let bpm: Int
-    let isPlaying: Bool
-    let selectedTimeSig: TimeSignature
+    let bpm: BPM //bpm
+    let isPlaying: Bool //메트로놈 플레이 여부
+    let selectedTimeSig: TimeSignature //박자
 
-    @State private var startDate: Date? = nil
-    @State private var lastStepPlayed: Int = -1
+    @State private var startDate: Date? = nil //isPlaying이 true가 되는 순간의 현재 시간을 저장해서 그 이후 경과 시간을 계산하는 기준점으로 사용
+    @State private var lastStepPlayed: Int = -1 //직전에 재생한 박자의 인덱스를 저장하는 상태
 
-    @State private var highPlayer: AVAudioPlayer? = nil
-    @State private var lowPlayer: AVAudioPlayer? = nil
+    @State private var highPlayer: AVAudioPlayer? = nil //메트로놈 강박 Player
+    @State private var lowPlayer: AVAudioPlayer? = nil //메트로놈 약박 Player
 
     // 박자에서 분자 뽑아내서 표시할 메트로놈 cd의 갯수 확정하기
     private var beatsPerBar: Int { selectedTimeSig.numerator }
-    private var beatInterval: Double { 60.0 / Double(max(1, bpm)) }
+    private var beatInterval: Double { 60.0 / Double(max(1, bpm.value)) }
 
     //지금 몇 번째 비트를 치고 있는지 계산해주는 역할
     private var currentBeatToShow: Int {
@@ -62,7 +62,7 @@ struct Metronome: View {
         }
     }
 
-    // 소리 중 강박을 구분을 위한 인텍스 설정
+    // 소리 중 강박을 구분을 위한 인텍스 설정 (3/4, 4/4 박자는 첫 번째 박만 강박이지만, 6/8 박자의 경우 1, 4번 박에 강박을 줘야 함) *강박: Metronome 재생 중 기준을 잡는 높은 음
     private func shouldUseHigh(beatIndex: Int) -> Bool {
         if selectedTimeSig.numerator == 6 && selectedTimeSig.denumerator == .eighth {
             return beatIndex == 0 || beatIndex == 3
@@ -71,27 +71,28 @@ struct Metronome: View {
         }
     }
 
-    // 박자별 음성 재생
+    // 위에서 구분한 Index에 따라 박자별 High or Low 음성 재생
     private func playClick(for beatIndex: Int) {
         if shouldUseHigh(beatIndex: beatIndex) {
-            guard let p = highPlayer else {
+            guard let audioPlayer = highPlayer else {
                 print("[Metronome] highPlayer is nil")
                 return
             }
-            p.currentTime = 0
-            p.play()
+            audioPlayer.currentTime = 0
+            audioPlayer.play()
         } else {
-            guard let p = lowPlayer else {
+            guard let audioPlayer = lowPlayer else {
                 print("[Metronome] lowPlayer is nil")
                 return
             }
-            p.currentTime = 0
-            p.play()
+            audioPlayer.currentTime = 0
+            audioPlayer.play()
         }
     }
 
     var body: some View {
         
+        //TimelineView를 사용해 beatInterval마다 뷰가 업데이트 되도록 구성함
         TimelineView(.periodic(from: .now, by: beatInterval)) { context in
             BeatBar(beatsPerBar: beatsPerBar, currentBeat: currentBeatToShow)
             .animation(.spring(response: 0.28, dampingFraction: 0.85, blendDuration: 0.2), value: beatsPerBar)
@@ -109,6 +110,7 @@ struct Metronome: View {
             configureAudioSession()
             loadPlayers()
         }
+        //박자가 변경될 때 자연스럽게 CD 갯수가 바뀌는 애니메이션
         .onChange(of: selectedTimeSig) { _, _ in
             withAnimation(.spring(response: 0.28, dampingFraction: 0.85, blendDuration: 0.2)) {
                 if isPlaying { startDate = Date(); lastStepPlayed = -1 }
@@ -120,7 +122,7 @@ struct Metronome: View {
                 lastStepPlayed = -1
             }
         }
-        .onChange(of: bpm) { _, _ in
+        .onChange(of: bpm.value) { _, _ in
             if isPlaying { startDate = Date(); lastStepPlayed = -1 }
         }
     }
@@ -148,5 +150,5 @@ extension Metronome {
 }
 
 #Preview {
-    Metronome(bpm: 120, isPlaying: false, selectedTimeSig: .fourFour)
+    Metronome(bpm: BPM(value: 120), isPlaying: false, selectedTimeSig: .fourFour)
 }
