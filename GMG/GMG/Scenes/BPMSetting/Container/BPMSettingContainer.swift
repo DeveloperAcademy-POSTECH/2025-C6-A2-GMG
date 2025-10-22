@@ -108,3 +108,5 @@ final class BPMSettingContainer: ObservableObject, BPMSettingIntentProtocol {
         initTimers()
     }
 }
+
+extension BPMSettingContainer: BPMSettingContainerProtocol {}
