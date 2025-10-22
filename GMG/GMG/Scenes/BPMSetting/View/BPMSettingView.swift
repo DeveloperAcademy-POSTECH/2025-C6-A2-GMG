@@ -18,9 +18,11 @@ struct BPMSettingView<Container: BPMSettingContainerProtocol & ObservableObject>
         
         Metronome()
         
-        BPMTapButton()
-        
-        BPMTapDescription()
+        VStack(spacing: 10) {
+            BPMTapButton()
+            
+            BPMTapDescription()
+        }
         
     }
 }
@@ -31,15 +33,14 @@ extension BPMSettingView {
             RoundedRectangle(cornerRadius: 24)
                 .padding(.horizontal, 81)
                 .padding(.bottom, 10)
-                .foregroundStyle(.green)
+                
         }
     }
     
     struct BPMTapDescription: View {
         var body: some View {
             Text("원하는 박자를 \"Tap\" 해보세요")
-                .font(Typography.DOSGothic.M9)
-                .foregroundStyle(.gray6)
+                .font(Typography.NeoDonggeunmoPro.R4)
         }
     }
 }

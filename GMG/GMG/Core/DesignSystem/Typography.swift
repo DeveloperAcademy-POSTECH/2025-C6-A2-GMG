@@ -50,7 +50,7 @@ enum Typography {
         }
     }
 
-    enum NeoDonggeunmoPro: CustomFont {
+    enum NeoDunggeunmoPro: CustomFont {
         case R1
         case R2
         case R3
