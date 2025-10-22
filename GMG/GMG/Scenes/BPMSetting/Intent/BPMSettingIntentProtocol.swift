@@ -7,11 +7,9 @@ protocol BPMSettingIntentProtocol: AnyObject {
     func tapMinus()
     
     func longPressPlusStart()
-    func longPressPlusTick()
     func longPressPlusEnd()
     
     func longPressMinusStart()
-    func longPressMinusTick()
     func longPressMinusEnd()
     
     func tapBeat (now: TimeInterval)

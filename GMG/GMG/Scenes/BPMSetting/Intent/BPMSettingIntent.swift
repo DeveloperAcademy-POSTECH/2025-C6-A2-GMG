@@ -7,11 +7,9 @@ enum BPMSettingIntent {
     case tapMinus
     
     case longPressPlusStart
-    case longPressPlusTick
     case longPressPlusEnd
     
     case longPressMinusStart
-    case longPressMinusTick
     case longPressMinusEnd
     
     case tapBeat (now: TimeInterval)
