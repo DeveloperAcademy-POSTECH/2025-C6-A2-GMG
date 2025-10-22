@@ -2,24 +2,28 @@ import SwiftUI
 
 struct ChordProgressView: View {
     var body: some View {
-        VStack(spacing: 0) {
-            NavigationHeader(onClickHome: {}, onClickSave: {})
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 24)
+        ZStack {
+            Color.backgroundLight1.ignoresSafeArea()
             
-            // ToolbarView
-            ToolbarView(onClickTrash: {}, onClickUndo: {}, onClickRedo: {})
-                .padding(.horizontal, 16)
-                .padding(.bottom, 18)
-            
-            // TimelineView
-            TimelineView()
-            
-            // TransportView
-            TransportView()
-            
-            Spacer()
+            VStack(spacing: 0) {
+                NavigationHeader(onClickHome: {}, onClickSave: {})
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 24)
+                
+                // ToolbarView
+                ToolbarView(onClickTrash: {}, onClickUndo: {}, onClickRedo: {})
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 18)
+                
+                // TimelineView
+                TimelineView()
+                
+                // TransportView
+                TransportView()
+                
+                Spacer()
+            }
         }
     }
 }
@@ -104,6 +108,8 @@ extension ChordProgressView {
                 MeasureView()
                 
                 MeasureView()
+                
+                MeasureView()
             }
         }
     }
@@ -124,27 +130,44 @@ extension ChordProgressView {
                     .padding(.horizontal, 18)
                     .padding(.bottom, 1)
                 
-                // Chod List
-                LazyVGrid(columns: chordColums, spacing: 0) {
-                    ChordCellView(
-                        chord: .init(root: .A, quality: .min)
-                    )
-                    ChordCellView(
-                        chord: .init(root: .A, quality: .maj6)
-                    )
-                    ChordCellView(
-                        chord: .init(root: .A, quality: .seven)
-                    )
-                    ChordCellView(
-                        chord: .init(root: .A, quality: .maj)
-                        , isSelected: true
-                    )
+                VStack(spacing: 0){
+                    LazyVGrid(columns: chordColums, spacing: 0) {
+                        ChordCellView(
+                            chord: .init(root: .A, quality: .min),
+                            showsTrailingDivider: true
+                        )
+                        ChordCellView(
+                            chord: .init(root: .A, quality: .maj6),
+                            showsTrailingDivider: true
+                        )
+                        ChordCellView(
+                            chord: .init(root: .A, quality: .seven),
+                            showsTrailingDivider: true
+                        )
+                        ChordCellView(
+                            chord: .init(root: .A, quality: .maj),
+                            isSelected: true,
+                            showsTrailingDivider: false
+                        )
+                    }
+                    .overlay(alignment: .bottom) {
+                         Rectangle()
+                             .fill(Color.black.opacity(0.1))
+                             .frame(height: 1)
+                     }
+                    
+                    // Hum wave
+                    HumWaveView()
                 }
-                .frame(width: .infinity)
-                
-                
-                // Hum wave
-                HumWaveView()
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.green3)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }
     }
@@ -152,7 +175,8 @@ extension ChordProgressView {
     struct ChordCellView: View {
         var chord: Chord
         var isSelected: Bool = false
-        
+        var showsTrailingDivider: Bool = false
+
         var body: some View {
             VStack {
                 Text("\(chord.description)")
@@ -161,9 +185,15 @@ extension ChordProgressView {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 66)
-            .background(isSelected ? .green2 : .green3)
-            .border(.black.opacity(0.1), width: 1)
-            
+            .background(isSelected ? Color.green2 : Color.clear)
+            .contentShape(Rectangle())
+            .overlay(alignment: .trailing) {
+                if showsTrailingDivider {
+                    Rectangle()
+                        .fill(.black.opacity(0.1))
+                        .frame(width: 1)
+                }
+            }
         }
     }
     
@@ -172,6 +202,9 @@ extension ChordProgressView {
             HStack {
                 Text("Home Wave")
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: 46)
+            .background(.gray1)
         }
     }
     
