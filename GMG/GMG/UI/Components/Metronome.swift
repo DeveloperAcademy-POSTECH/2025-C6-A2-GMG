@@ -8,23 +8,6 @@
 import SwiftUI
 import AVFoundation
 
-
-//MARK: 해당 브랜치에서는 아직 TimeSignature이 반영되어 있지 않아서 이대로 작업했습니다 이후에 class diagram PR 병합되면 조정하겠습니다.
-enum TimeSignature: String, CaseIterable, Identifiable {
-    case threeFour = "3/4"
-    case fourFour  = "4/4"
-    case sixEight  = "6/8"
-
-    var id: String { rawValue }
-    var beatsPerBar: Int {
-        switch self {
-        case .threeFour: return 3
-        case .fourFour:  return 4
-        case .sixEight:  return 6
-        }
-    }
-}
-
 struct Metronome: View {
     let bpm: Int
     let isPlaying: Bool
@@ -36,8 +19,8 @@ struct Metronome: View {
     @State private var highPlayer: AVAudioPlayer? = nil
     @State private var lowPlayer: AVAudioPlayer? = nil
 
-    // 4/4 같은 박자에서 메트로놈의 갯수(4개) 뽑아내기 -> Class Diagram 반영 시 numerate 이용
-    private var beatsPerBar: Int { selectedTimeSig.beatsPerBar }
+    // 박자에서 분자 뽑아내서 표시할 메트로놈 cd의 갯수 확정하기
+    private var beatsPerBar: Int { selectedTimeSig.numerator }
     private var beatInterval: Double { 60.0 / Double(max(1, bpm)) }
 
     //지금 몇 번째 비트를 치고 있는지 계산해주는 역할
@@ -67,7 +50,7 @@ struct Metronome: View {
             highPlayer?.volume = 1.0
             highPlayer?.prepareToPlay()
         } else {
-            print("[Metronome] Missing resource: MetronomeHigh.aif (check target membership)")
+            print("[Metronome] Missing resource: Metronome_High.wav (check target membership)")
         }
         
         if let url = Bundle.main.url(forResource: "Metronome_Low", withExtension: "wav") {
@@ -75,16 +58,15 @@ struct Metronome: View {
             lowPlayer?.volume = 1.0
             lowPlayer?.prepareToPlay()
         } else {
-            print("[Metronome] Missing resource: MetronomeLow.aif (check target membership)")
+            print("[Metronome] Missing resource: Metronome_Low.wav (check target membership)")
         }
     }
 
     // 소리 중 강박을 구분을 위한 인텍스 설정
     private func shouldUseHigh(beatIndex: Int) -> Bool {
-        switch selectedTimeSig {
-        case .sixEight:
+        if selectedTimeSig.numerator == 6 && selectedTimeSig.denumerator == .eighth {
             return beatIndex == 0 || beatIndex == 3
-        case .threeFour, .fourFour:
+        } else {
             return beatIndex == 0
         }
     }
@@ -109,6 +91,7 @@ struct Metronome: View {
     }
 
     var body: some View {
+        
         TimelineView(.periodic(from: .now, by: beatInterval)) { context in
             BeatBar(beatsPerBar: beatsPerBar, currentBeat: currentBeatToShow)
             .animation(.spring(response: 0.28, dampingFraction: 0.85, blendDuration: 0.2), value: beatsPerBar)
