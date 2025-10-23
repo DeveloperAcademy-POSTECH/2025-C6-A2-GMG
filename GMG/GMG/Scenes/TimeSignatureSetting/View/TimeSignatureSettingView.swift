@@ -18,11 +18,23 @@ struct TimeSignatureSettingView: View {
 
 extension TimeSignatureSettingView {
     
+    struct TimeSignatureSettingSection: View {
+        var body: some View {
+            VStack(spacing: 42) {
+                TimeSignatureButton()
+                TimeSignatureButton()
+                TimeSignatureButton()
+            }
+            .padding(.bottom, 171)
+        }
+    }
+    
     struct TimeSignatureButton: View {
-        
         var body: some View {
             ZStack {
-                Button {} label: {
+                Button {
+                    //TODO: - Action 추가
+                } label: {
                     RoundedRectangle(cornerRadius: 8)
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
@@ -34,17 +46,6 @@ extension TimeSignatureSettingView {
                 
                 Text("4/4")
             }
-        }
-    }
-    
-    struct TimeSignatureSettingSection: View {
-        var body: some View {
-            VStack(spacing: 42) {
-                TimeSignatureButton()
-                TimeSignatureButton()
-                TimeSignatureButton()
-            }
-            .padding(.bottom, 171)
         }
     }
 }

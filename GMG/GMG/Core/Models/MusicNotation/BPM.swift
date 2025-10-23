@@ -1,8 +1,10 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-struct BPM: Equatable {
+struct BPM {
     let value: Int
 }
+
+extension BPM: Equatable {}
 
 extension BPM: CustomStringConvertible {
     var description: String {

@@ -10,6 +10,8 @@ struct TimeSignature {
     }
 }
 
+extension TimeSignature: Equatable {}
+
 extension TimeSignature {
     static var threeFour: TimeSignature = TimeSignature(
         numerator: 3,
