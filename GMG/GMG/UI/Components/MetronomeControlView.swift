@@ -18,7 +18,7 @@ struct MetronomeControlView: View {
         VStack() {
 
             // 메트로놈 표시/틱 (값만 받아서 동작)
-            Metronome(bpm: BPM(value: bpm), isPlaying: isPlaying, selectedTimeSig: selectedTimeSig)
+            Metronome(bpm: BPM(value: bpm), isPlaying: isPlaying, timeSignature: selectedTimeSig)
             
             VStack(spacing: 42) {
                 

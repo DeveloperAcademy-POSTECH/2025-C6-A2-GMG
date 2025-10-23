@@ -1,6 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-struct TimeSignature: Equatable {
+struct TimeSignature {
     let numerator: Int
     let denumerator: NoteDuration
 
@@ -9,6 +9,8 @@ struct TimeSignature: Equatable {
         self.denumerator = denumerator
     }
 }
+
+extension TimeSignature: Equatable {}
 
 extension TimeSignature {
     static var threeFour: TimeSignature = TimeSignature(
