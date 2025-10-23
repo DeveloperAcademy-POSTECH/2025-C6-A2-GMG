@@ -1,28 +1,41 @@
 import SwiftUI
 
 struct ChordProgressView: View {
+    private let transportHeight: CGFloat = 162
+    @State private var isPlaying = false
+    
     var body: some View {
-        ZStack {
-            Color.backgroundLight1.ignoresSafeArea()
+        GeometryReader { proxy in
+            let transportHeightWithoutSafeArea = transportHeight - proxy.safeAreaInsets.bottom
             
-            VStack(spacing: 0) {
-                NavigationHeader(onClickHome: {}, onClickSave: {})
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 24)
-                
-                // ToolbarView
-                ToolbarView(onClickTrash: {}, onClickUndo: {}, onClickRedo: {})
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 18)
-                
-                // TimelineView
-                TimelineView()
-                
-                // TransportView
-                TransportView()
-                
-                Spacer()
+            ZStack {
+                Color.backgroundLight1.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    NavigationHeader(onClickHome: {}, onClickSave: {})
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 24)
+
+                    ToolbarView(onClickTrash: {}, onClickUndo: {}, onClickRedo: {})
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 18)
+
+                    ZStack(alignment: .bottom) {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            TimelineView()
+                                .padding(.bottom, transportHeightWithoutSafeArea)
+                        }
+                        
+                        TransportView(
+                            transportHeight: transportHeightWithoutSafeArea,
+                            isPlaying: $isPlaying,
+                            onClickPlay: { isPlaying = true },
+                            onClickPause: { isPlaying = false },
+                            onClickStop: { isPlaying = false }
+                        )
+                    }
+                }
             }
         }
     }
@@ -66,7 +79,7 @@ extension ChordProgressView {
         var body: some View {
             HStack {
                 HStack(spacing: 20) {
-                    Text("6/8")
+                    Text("4/4")
                     
                     Text("80 BPM")
                         
@@ -107,6 +120,10 @@ extension ChordProgressView {
                 
                 MeasureView()
                 
+                MeasureView()
+                
+                MeasureView()
+
                 MeasureView()
                 
                 MeasureView()
@@ -209,8 +226,135 @@ extension ChordProgressView {
     }
     
     struct TransportView: View {
+        var transportHeight: CGFloat
+        @Binding var isPlaying: Bool
+
+        var onClickPlay: () -> Void
+        var onClickPause: () -> Void
+        var onClickStop: () -> Void
+
+        init(
+            transportHeight: CGFloat,
+            isPlaying: Binding<Bool>,
+            onClickPlay: @escaping () -> Void = {},
+            onClickPause: @escaping () -> Void = {},
+            onClickStop: @escaping () -> Void = {}
+        ) {
+            self.transportHeight = transportHeight
+            self._isPlaying = isPlaying
+            self.onClickPlay = onClickPlay
+            self.onClickPause = onClickPause
+            self.onClickStop = onClickStop
+        }
+
         var body: some View {
-            
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(.backgroundLight1)
+                    .frame(height: 30)
+                    .blur(radius: 6)
+                    .offset(y: 20)
+                
+                if !isPlaying {
+                    RecommendedChordCellView()
+                }
+
+                VStack {
+                    TransportPrimaryButton(
+                        title: isPlaying ? "일시정지" : "재생하기",
+                        action: isPlaying ? onClickPause : onClickPlay
+                    )
+                    .padding(.top, 23)
+                    .padding(.bottom, 18)
+
+                    TransportSecondaryButton(
+                        title: "중지",
+                        action: onClickStop
+                    )
+                    .opacity(isPlaying ? 1 : 0)
+                    .accessibilityHidden(!isPlaying)
+                }
+            }
+            .ignoresSafeArea(.container, edges: .bottom)
+            .frame(maxWidth: .infinity, minHeight: transportHeight, alignment: .top)
+            .padding(.top, 10)
+            .background(.backgroundLight1)
+        }
+    }
+    
+    struct TransportPrimaryButton: View {
+        var title: String
+        var action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(Typography.NeoDonggeunmoPro.R6)
+                    .foregroundStyle(.text1)
+                    .frame(width: 112, height: 52)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.green2)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                    )
+            }
+        }
+    }
+
+    struct TransportSecondaryButton: View {
+        var title: String
+        var action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(Typography.NeoDonggeunmoPro.R5)
+                    .foregroundStyle(.text1)
+            }
+        }
+    }
+    
+    struct RecommendedChordCellView: View {
+        var recommendedChords: [Chord] = [
+            .init(root: .A, quality: .eleven)
+            , .init(root: .G, quality: .sus4)
+            , .init(root: .G, quality: .maj)
+            , .init(root: .E, quality: .maj)
+            , .init(root: .F, quality: .maj)
+        ]
+        
+        var body: some View {
+            VStack(spacing: 10) {
+                HStack(spacing: 0) {
+                    Text("Recommended Chords")
+                        .font(Typography.DOSGothic.M6)
+                        .foregroundStyle(.text1)
+                    Image(systemName: "wand.and.sparkles.inverse")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                HStack(spacing: 10) {
+                    ForEach(recommendedChords.indices, id: \.self) { index in
+                        Text(recommendedChords[index].description)
+                            .font(Typography.DOSGothic.M7)
+                            .foregroundStyle(.text1)
+                            .frame(width: 64, height: 43)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.green3)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(.black.opacity(0.1), lineWidth: 1)
+                            )
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
         }
     }
 }
