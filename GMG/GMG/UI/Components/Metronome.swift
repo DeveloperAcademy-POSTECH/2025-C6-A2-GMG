@@ -151,15 +151,46 @@ extension Metronome {
         var body: some View {
             HStack(spacing: beatsPerBar == 6 ? 18 : 24) {
                 ForEach(0 ..< beatsPerBar, id: \.self) { index in
-                    Image(index == currentBeat ? "metronome_cd_fill" : "metronome_cd_empty")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: (beatsPerBar == 6 ? 33 : 44))
-                        .transition(.asymmetric(insertion: .scale.combined(with: .opacity),
-                                                removal: .opacity))
-                        .accessibilityLabel("Beat \(index + 1)" + (index == currentBeat ? " (current)" : ""))
+                    
+                    if index == currentBeat {
+                        SelectedCD(beatsPerBar: beatsPerBar)
+                    } else {
+                        glow_cd(beatsPerBar: beatsPerBar)
+                    }
+                    
+//                    Image(index == currentBeat ? "metronome_cd_fill" : "glow_cd")
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(height: (beatsPerBar == 6 ? 33 : 44))
+//                        .transition(.asymmetric(insertion: .scale.combined(with: .opacity),
+//                                                removal: .opacity))
                 }
             }
+        }
+    }
+    
+    struct SelectedCD: View {
+        var beatsPerBar: Int
+        
+        var body: some View {
+            Circle()
+                .frame(width: beatsPerBar == 6 ? 34 : 46)
+                .foregroundStyle(.green4)
+                .shadow(color: .green4, radius: 10)
+                .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
+        }
+    }
+    
+    struct glow_cd: View {
+        var beatsPerBar: Int
+        
+        var body: some View {
+            Image("glow_cd")
+                .resizable()
+                .scaledToFit()
+                .frame(width: beatsPerBar == 6 ? 34 : 46)
+                .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
+                
         }
     }
 }
