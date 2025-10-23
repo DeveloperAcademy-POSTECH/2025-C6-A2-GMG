@@ -12,8 +12,8 @@ final class BPMSettingModel: BPMSettingStateProtocol, BPMSettingActionProtocol {
     private let longPressStep: Int = 10 // 길게 눌렀을 때 올라갈 bpm 숫자
     private let shortPressStep: Int = 1 // 짧게 눌렀을 때 올라갈 bpm 숫자
     
-    private let minBPM: Int = 10 //최소 BPM
-    private let maxBPM: Int = 400 //최대 BPM
+    private let minBPM: Int = 30 //최소 BPM
+    private let maxBPM: Int = 320 //최대 BPM
     
     private(set) var bpmText: String = "100"
     private(set) var sliderValue: Double = 0.0

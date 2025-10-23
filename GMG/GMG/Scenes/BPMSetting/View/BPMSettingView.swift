@@ -3,8 +3,15 @@
 import SwiftUI
 
 struct BPMSettingView: View {
+    
     var model: BPMSettingStateProtocol
     var intent: BPMSettingIntentProtocol
+    
+    init(model: BPMSettingStateProtocol, intent: BPMSettingIntentProtocol) {
+        self.model = model
+        self.intent = intent
+    }
+    
     var bpmText: String {
         String(model.bpm.value)
     }
@@ -24,14 +31,16 @@ struct BPMSettingView: View {
                     .padding(.bottom, 116)
                 
                 BPMTapSession()
+                    .padding(.bottom, 116)
                 
                 BPMControlSession(
                     bpm: Binding(
                         get: { model.bpm.value },
                         set: { intent.setBPM($0) }
-                    )
+                    ),
+                    plus: {intent.tapPlus()},
+                    minus: { intent.tapMinus()}
                 )
-                
                 
             }
         }
@@ -82,12 +91,14 @@ extension BPMSettingView {
     
     struct BPMControlSession: View {
         @Binding var bpm: Int
+        var plus: () -> Void
+        var minus: () -> Void
         
         var body: some View {
             HStack(spacing: 0) {
-                MinusButton()
+                MinusButton(minus: minus)
                 BPMIndicator(bpm: bpm)
-                PlusButton()
+                PlusButton(plus: plus)
             }
             .frame(maxHeight: .infinity)
             .padding(.horizontal, 74)
@@ -116,8 +127,12 @@ extension BPMSettingView {
     }
     
     struct PlusButton: View {
+        var plus: () -> Void
+        
         var body: some View {
-            Button(action: {}, label: {
+            Button(action: {
+                plus()
+            }, label: {
                 Text("+")
                     .font(Typography.DOSGothic.M15)
                     .foregroundStyle(.text1)
@@ -126,6 +141,8 @@ extension BPMSettingView {
     }
     
     struct MinusButton: View {
+        var minus: () -> Void
+        
         var body: some View {
             Button(action: {}, label: {
                 Text("-")
