@@ -41,7 +41,6 @@ struct Metronome: View {
     }
     
     var body: some View {
-        //TimelineView를 사용해 beatInterval마다 뷰가 업데이트 되도록 구성함
         BeatMeasure(beatsPerMeasure: beatsPerMeasure, currentBeat: currentBeat, isPlaying: isPlaying)
             .padding()
             .onAppear {
@@ -262,46 +261,39 @@ extension Metronome {
 }
 
 #Preview {
-    struct PreviewWrapper: View {
-        @State private var bpm: Int = 100
-        @State private var isPlaying: Bool = false
-        @State private var timeSignature: TimeSignature = .fourFour
-
-        var body: some View {
-            VStack(spacing: 20) {
-                Metronome(
-                    bpm: BPM(value: bpm),
-                    isPlaying: isPlaying,
-                    timeSignature: timeSignature
-                )
-
-                Button(isPlaying ? "Stop" : "Play") {
-                    isPlaying.toggle()
-                }
-                .buttonStyle(.bordered)
-
-                Stepper("BPM: \(bpm)", value: $bpm, in: 30...320)
-                
-                HStack(spacing: 30) {
-                    Button("3/4") {
-                        timeSignature = .threeFour
-                    }
-                    .buttonStyle(.bordered)
-                    Button("4/4") {
-                        timeSignature = .fourFour
-                    }
-                    .buttonStyle(.bordered)
-                    Button("6/8") {
-                        timeSignature = .sixEight
-                    }
-                    .buttonStyle(.bordered)
-                }
+    @Previewable @State var bpm: Int = 100
+    @Previewable @State var isPlaying: Bool = false
+    @Previewable @State var timeSignature: TimeSignature = .fourFour
+    VStack(spacing: 20) {
+        Metronome(
+            bpm: BPM(value: bpm),
+            isPlaying: isPlaying,
+            timeSignature: timeSignature
+        )
+        
+        Button(isPlaying ? "Stop" : "Play") {
+            isPlaying.toggle()
+        }
+        .buttonStyle(.bordered)
+        
+        Stepper("BPM: \(bpm)", value: $bpm, in: 30...320)
+        
+        HStack(spacing: 30) {
+            Button("3/4") {
+                timeSignature = .threeFour
             }
-            .padding()
+            .buttonStyle(.bordered)
+            Button("4/4") {
+                timeSignature = .fourFour
+            }
+            .buttonStyle(.bordered)
+            Button("6/8") {
+                timeSignature = .sixEight
+            }
+            .buttonStyle(.bordered)
         }
     }
-
-    return PreviewWrapper()
+    .padding()
 }
 
 // MARK: - BPM Extension
