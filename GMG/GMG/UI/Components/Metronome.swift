@@ -71,8 +71,8 @@ struct Metronome: View {
         }
     }
 
-    // 위에서 구분한 Index에 따라 박자별 High or Low 음성 재생
-    private func playClick(for beatIndex: Int) {
+    // 박자별 High or Low 음성 재생
+    private func playBeatSound(for beatIndex: Int) {
         if shouldUseHigh(beatIndex: beatIndex) {
             guard let audioPlayer = highPlayer else {
                 print("[Metronome] highPlayer is nil")
@@ -95,20 +95,35 @@ struct Metronome: View {
         //TimelineView를 사용해 beatInterval마다 뷰가 업데이트 되도록 구성함
         TimelineView(.periodic(from: .now, by: beatInterval)) { context in
             BeatBar(beatsPerBar: beatsPerBar, currentBeat: currentBeatToShow)
-            .animation(.spring(response: 0.28, dampingFraction: 0.85, blendDuration: 0.2), value: beatsPerBar)
-            .padding()
-            .onChange(of: context.date) { _, _ in
-                guard isPlaying, let start = startDate else { return }
-                let step = Int(floor(Date().timeIntervalSince(start) / beatInterval))
-                if step != lastStepPlayed {
-                    lastStepPlayed = step
-                    playClick(for: currentBeatToShow)
+                .animation(.spring(response: 0.28, dampingFraction: 0.85, blendDuration: 0.2), value: beatsPerBar)
+                .padding()
+                .onChange(of: context.date) { _, _ in
+                    guard isPlaying, let start = startDate else { return }
+                    let step = Int(floor(Date().timeIntervalSince(start) / beatInterval))
+                    if step != lastStepPlayed {
+                        lastStepPlayed = step
+                        playBeatSound(for: currentBeatToShow)
+                    }
                 }
-            }
         }
         .onAppear {
             configureAudioSession()
             loadPlayers()
+        }
+        .onDisappear() {
+            // audio session 관련 메모리 해제 로직
+            // 1. 플레이어 중지 및 메모리에서 해제
+            highPlayer?.stop()
+            lowPlayer?.stop()
+            highPlayer = nil
+            lowPlayer = nil
+            
+            // 2. 오디오 세션 비활성화
+            do {
+                try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+            } catch {
+                print("[Metronome] AudioSession deactivation error: \(error)")
+            }
         }
         //박자가 변경될 때 자연스럽게 CD 갯수가 바뀌는 애니메이션
         .onChange(of: selectedTimeSig) { _, _ in
