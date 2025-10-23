@@ -10,9 +10,9 @@ import AVFoundation
 import Combine
 
 struct Metronome: View {
-    let bpm: BPM //bpm
-    let isPlaying: Bool //메트로놈 플레이 여부
-    let timeSignature: TimeSignature //박자
+    let bpm: BPM
+    let isPlaying: Bool
+    let timeSignature: TimeSignature
     
     @State private var currentBeat: Int = 0
     @State private var timer: Publishers.Autoconnect<Timer.TimerPublisher>
