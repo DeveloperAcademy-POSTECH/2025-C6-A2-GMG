@@ -251,9 +251,9 @@ extension ChordProgressView {
             VStack(spacing: 0) {
                 Rectangle()
                     .fill(.backgroundLight1)
-                    .frame(height: 30)
+                    .frame(height: 20)
                     .blur(radius: 6)
-                    .offset(y: 20)
+                    .offset(y: -20)
                 
                 if !isPlaying {
                     RecommendedChordCellView()
