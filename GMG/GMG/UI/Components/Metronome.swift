@@ -16,10 +16,10 @@ struct Metronome: View {
     
     @State private var currentBeat: Int = 0
     @State private var timer: Publishers.Autoconnect<Timer.TimerPublisher>
-
+    
     @State private var highPlayer: AVAudioPlayer? = nil //메트로놈 강박 Player
     @State private var lowPlayer: AVAudioPlayer? = nil //메트로놈 약박 Player
-
+    
     // 박자에서 분자 뽑아내서 표시할 메트로놈 cd의 갯수 확정하기
     private var beatsPerMeasure: Int { timeSignature.numerator }
     
@@ -39,10 +39,10 @@ struct Metronome: View {
         )
         .autoconnect()
     }
-
+    
     var body: some View {
         //TimelineView를 사용해 beatInterval마다 뷰가 업데이트 되도록 구성함
-        BeatMeasure(beatsPerMeasure: beatsPerMeasure, currentBeat: currentBeat)
+        BeatMeasure(beatsPerMeasure: beatsPerMeasure, currentBeat: currentBeat, isPlaying: isPlaying)
             .padding()
             .onAppear {
                 configureAudioSession()
@@ -71,6 +71,11 @@ struct Metronome: View {
                     in: .common
                 ).autoconnect()
             }
+            .onChange(of: isPlaying) { _, newValue in
+                if newValue == false {
+                    currentBeat = 0
+                }
+            }
     }
 }
 
@@ -80,16 +85,17 @@ extension Metronome {
     struct BeatMeasure: View {
         let beatsPerMeasure: Int
         let currentBeat: Int
+        let isPlaying: Bool
         
         private var spacing: CGFloat { beatsPerMeasure == 6 ? 18 : 24 }
         
         var body: some View {
             HStack(spacing: spacing) {
                 ForEach(0 ..< beatsPerMeasure, id: \.self) { index in
-                    if index == currentBeat {
+                    if isPlaying && index == currentBeat {
                         SelectedCD(beatsPerMeasure: beatsPerMeasure)
                     } else {
-                        glow_cd(beatsPerMeasure: beatsPerMeasure)
+                        UnselectedCD(beatsPerMeasure: beatsPerMeasure)
                     }
                 }
             }
@@ -117,7 +123,7 @@ extension Metronome {
         }
     }
     
-    struct glow_cd: View {
+    struct UnselectedCD: View {
         var beatsPerMeasure: Int
         private var width: CGFloat { beatsPerMeasure == 6 ? 34 : 46 }
         
@@ -127,7 +133,6 @@ extension Metronome {
                 .scaledToFit()
                 .frame(width: width)
                 .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
-                
         }
     }
 }
@@ -160,73 +165,73 @@ extension Metronome {
     }
     
     private func loadHighPlayer() {
-            guard highPlayer == nil else { return }
-
-            guard
-                let url = Bundle.main.url(
-                    forResource: "MetronomeHigh",
-                    withExtension: "wav"
-                )
-            else {
-                print(
-                    "[Metronome] Missing resource: Metronome_High.wav (check target membership)"
-                )
-                return
-            }
-
-            do {
-                let player = try AVAudioPlayer(contentsOf: url)
-
-                player.volume = 1.0
-                player.prepareToPlay()
-
-                self.highPlayer = player
-            } catch {
-                print("[Metronome] Failed to initialize audio player for high")
-            }
+        guard highPlayer == nil else { return }
+        
+        guard
+            let url = Bundle.main.url(
+                forResource: "MetronomeHigh",
+                withExtension: "wav"
+            )
+        else {
+            print(
+                "[Metronome] Missing resource: Metronome_High.wav (check target membership)"
+            )
+            return
         }
-
-        private func loadLowPlayer() {
-            guard lowPlayer == nil else { return }
-
-            guard
-                let url = Bundle.main.url(
-                    forResource: "MetronomeLow",
-                    withExtension: "wav"
-                )
-            else {
-                print(
-                    "[Metronome] Missing resource: Metronome_Low.wav (check target membership)"
-                )
-                return
-            }
-
-            do {
-                let player = try AVAudioPlayer(contentsOf: url)
-
-                player.volume = 1.0
-                player.prepareToPlay()
-
-                self.lowPlayer = player
-            } catch {
-                print("[Metronome] Failed to initialize audio player for low")
-            }
+        
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            
+            player.volume = 1.0
+            player.prepareToPlay()
+            
+            self.highPlayer = player
+        } catch {
+            print("[Metronome] Failed to initialize audio player for high")
         }
-
-        private func unloadHighPlayer() {
-            guard let highPlayer else { return }
-            highPlayer.stop()
-
-            self.highPlayer = nil
+    }
+    
+    private func loadLowPlayer() {
+        guard lowPlayer == nil else { return }
+        
+        guard
+            let url = Bundle.main.url(
+                forResource: "MetronomeLow",
+                withExtension: "wav"
+            )
+        else {
+            print(
+                "[Metronome] Missing resource: Metronome_Low.wav (check target membership)"
+            )
+            return
         }
-
-        private func unloadLowPlayer() {
-            guard let lowPlayer else { return }
-            lowPlayer.stop()
-
-            self.lowPlayer = nil
+        
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            
+            player.volume = 1.0
+            player.prepareToPlay()
+            
+            self.lowPlayer = player
+        } catch {
+            print("[Metronome] Failed to initialize audio player for low")
         }
-
+    }
+    
+    private func unloadHighPlayer() {
+        guard let highPlayer else { return }
+        highPlayer.stop()
+        
+        self.highPlayer = nil
+    }
+    
+    private func unloadLowPlayer() {
+        guard let lowPlayer else { return }
+        lowPlayer.stop()
+        
+        self.lowPlayer = nil
+    }
+    
     // 소리 중 강박을 구분을 위한 인텍스 설정 (3/4, 4/4 박자는 첫 번째 박만 강박이지만, 6/8 박자의 경우 1, 4번 박에 강박을 줘야 함) *강박: Metronome 재생 중 기준을 잡는 높은 음
     private func shouldUseHigh(beatIndex: Int) -> Bool {
         if timeSignature.numerator == 6 && timeSignature.denumerator == .eighth {
@@ -235,7 +240,7 @@ extension Metronome {
             return beatIndex == 0
         }
     }
-
+    
     // 박자별 High or Low 음성 재생
     private func playBeatSound(for beatIndex: Int) {
         if shouldUseHigh(beatIndex: beatIndex) {
