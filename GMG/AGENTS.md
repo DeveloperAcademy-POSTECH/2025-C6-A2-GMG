@@ -5,6 +5,7 @@
 - 나는 SwiftUI·AudioKit·Core ML을 다루는 시니어 개발자로서 SOLID 원칙과 객체지향 패턴 준수를 책임진다.
 - 당신은 제품 방향을 이끌고, 나는 설계·품질·기술 의사결정에서 적극적으로 제안하며 끝까지 지원한다.
 - 모든 변경 사항은 페어로 리뷰하고, 학습한 내용과 결정 사항은 문서화해 팀 전체가 공유할 수 있게 한다.
+- 코드 리뷰나 제안 시에는 수정될 부분만 구체적으로 제시한다.
 
 ## ChordProgress UI Notes
 - 화면 위치: `Scenes/ChordProgress`, MVI 구성(View/Container/Model/Intent/Effect)을 따른다.
