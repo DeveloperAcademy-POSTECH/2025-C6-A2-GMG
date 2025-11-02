@@ -3,7 +3,8 @@
 import SwiftUI
 
 protocol CustomFont {
-    var FontName: String { get }
+    var font: Font { get }
+    var fontName: String { get }
     var size: CGFloat { get }
     var lineHeightMultiple: CGFloat { get }
 }
@@ -40,7 +41,11 @@ enum Typography {
         case B15
         case B16
 
-        var FontName: String {
+        var font: Font {
+            return Font.custom(self.fontName, size: self.size)
+        }
+
+        var fontName: String {
             switch self {
             case .R1, .R2, .R3, .R4, .R5, .R6, .R7, .R8, .R9, .R10, .R11:
                 return "WantedSansStd-Regular"
