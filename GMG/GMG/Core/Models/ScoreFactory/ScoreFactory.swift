@@ -10,28 +10,19 @@ class ScoreFactory {
     }
 
     func createScore(
-        samples: [FeatureSample],
-        bpm: BPM,
-        timeSignature: TimeSignature
+        audioUrl: URL
     ) -> Score {
         Score(
-            bpm: BPM(value: 96),
-            timeSignature: TimeSignature.fourFour,
-            key: Key(root: .C, type: .major),
-            humFileURL: .temporaryDirectory,
-            measures: []
+            title: "",
+            key: Key(root: .C),
+            audioUrl: URL(filePath: ""),
+            totalDuration: 0.0,
+            notes: [],
+            chordCells: []
         )
     }
 
-    private func convertMeasures(
-        samples: [FeatureSample],
-        bpm: BPM,
-        timeSignature: TimeSignature
-    ) -> [Measure] {
+    private func convertAudioToNotes(audioUrl: URL) -> [Note] {
         []
-    }
-
-    private func findKey(measures: [Measure]) -> Key {
-        Key(root: .C, type: .major)
     }
 }
