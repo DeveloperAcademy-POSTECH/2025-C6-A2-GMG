@@ -3,9 +3,9 @@
 import SwiftUI
 
 extension View {
-    func font<T: CustomFont>(_ customFont: T) -> some View {
+    func font(_ customFont: CustomFont) -> some View {
         self
-            .font(.custom(T.FontName, size: customFont.size))
+            .font(.custom(customFont.FontName, size: customFont.size))
             .lineHeight(.multiple(factor: customFont.lineHeightMultiple))
     }
 }

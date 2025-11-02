@@ -3,54 +3,13 @@
 import SwiftUI
 
 protocol CustomFont {
-    static var FontName: String { get }
-
+    var FontName: String { get }
     var size: CGFloat { get }
     var lineHeightMultiple: CGFloat { get }
 }
 
 enum Typography {
-    enum DOSGothic: CustomFont {
-        case M1
-        case M2
-        case M3
-        case M4
-        case M5
-        case M6
-        case M7
-        case M8
-        case M9
-        case M10
-        case M11
-        case M12
-        case M13
-
-        static let FontName: String = "DOSGothic"
-
-        var size: CGFloat {
-            switch self {
-            case .M1: return 8
-            case .M2: return 10
-            case .M3: return 12
-            case .M4: return 14
-            case .M5: return 16
-            case .M6: return 18
-            case .M7: return 20
-            case .M8: return 22
-            case .M9: return 24
-            case .M10: return 26
-            case .M11: return 28
-            case .M12: return 30
-            case .M13: return 32
-            }
-        }
-
-        var lineHeightMultiple: CGFloat {
-            return 1.4
-        }
-    }
-
-    enum NeoDonggeunmoPro: CustomFont {
+    enum WantedSansStd: CustomFont {
         case R1
         case R2
         case R3
@@ -62,10 +21,36 @@ enum Typography {
         case R9
         case R10
         case R11
-        case R12
-        case R13
+        case M1
+        case M2
+        case B1
+        case B2
+        case B3
+        case B4
+        case B5
+        case B6
+        case B7
+        case B8
+        case B9
+        case B10
+        case B11
+        case B12
+        case B13
+        case B14
+        case B15
+        case B16
 
-        static let FontName: String = "NeoDunggeunmoPro-Regular"
+        var FontName: String {
+            switch self {
+            case .R1, .R2, .R3, .R4, .R5, .R6, .R7, .R8, .R9, .R10, .R11:
+                return "WantedSansStd-Regular"
+            case .M1, .M2:
+                return "WantedSansStd-Medium"
+            case .B1, .B2, .B3, .B4, .B5, .B6, .B7, .B8, .B9, .B10, .B11,
+                .B12, .B13, .B14, .B15, .B16:
+                return "WantedSansStd-Bold"
+            }
+        }
 
         var size: CGFloat {
             switch self {
@@ -78,15 +63,34 @@ enum Typography {
             case .R7: return 20
             case .R8: return 22
             case .R9: return 24
-            case .R10: return 26
-            case .R11: return 28
-            case .R12: return 30
-            case .R13: return 32
+            case .R10: return 34
+            case .R11: return 84
+            case .M1: return 8
+            case .M2: return 10
+            case .B1: return 8
+            case .B2: return 10
+            case .B3: return 12
+            case .B4: return 14
+            case .B5: return 16
+            case .B6: return 18
+            case .B7: return 20
+            case .B8: return 22
+            case .B9: return 24
+            case .B10: return 26
+            case .B11: return 28
+            case .B12: return 30
+            case .B13: return 32
+            case .B14: return 34
+            case .B15: return 36
+            case .B16: return 46
             }
         }
 
         var lineHeightMultiple: CGFloat {
-            return 1.4
+            switch self {
+            case .B16: return 1.1
+            default: return 1.4
+            }
         }
     }
 }
