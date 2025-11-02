@@ -3,51 +3,42 @@
 import Foundation
 
 class Score {
-    let bpm: BPM
-    let timeSignature: TimeSignature
+    let title: String
     let key: Key
-    let humFileURL: URL
-    private let measures: [Measure]
+    let audioUrl: URL
+    let totalDuration: TimeInterval
+    private let notes: [Note]
+    private let chordCells: [ChordCell]
 
     init(
-        bpm: BPM,
-        timeSignature: TimeSignature,
+        title: String,
         key: Key,
-        humFileURL: URL,
-        measures: [Measure]
+        audioUrl: URL,
+        totalDuration: TimeInterval,
+        notes: [Note],
+        chordCells: [ChordCell]
     ) {
-        self.bpm = bpm
-        self.timeSignature = timeSignature
+        self.title = title
         self.key = key
-        self.humFileURL = humFileURL
-        self.measures = measures
+        self.audioUrl = audioUrl
+        self.totalDuration = totalDuration
+        self.notes = notes
+        self.chordCells = chordCells
     }
 
-    func retrieveMeasureBy(measureIndex: Int) -> Measure {
-        Measure(notes: [], chordCells: [])
-    }
-    
-    func retrieveChordCellsBy(measureIndex: Int) -> [ChordCell] {
-        []
-    }
-    
-    func retrieveMeasureIndexBy(time: TimeInterval) -> Int {
-        0
-    }
-    
     func retrieveCellIndexBy(time: TimeInterval) -> Int {
         0
     }
-    
+
     func retrieveChordBy(time: TimeInterval) -> Chord {
         Chord(root: .C, quality: .maj)
     }
-    
-    func retrieveChordCellBy(measureIndex: Int, chordIndex: Int) -> ChordCell {
-        ChordCell(chord: nil, chordCandidates: [])
+
+    func retrieveChordCellBy(cellIndex: Int) -> ChordCell {
+        ChordCell(chord: nil, chordCandidates: [], startTime: 0.0)
     }
-    
-    func updateChordCellBy(measureIndex: Int, chordIndex: Int, chord: Chord) {
-        
+
+    func updateChordCellBy(cellIndex: Int, chord: Chord) {
+
     }
 }
