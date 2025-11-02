@@ -65,8 +65,8 @@ enum Typography {
             case .R9: return 24
             case .R10: return 34
             case .R11: return 84
-            case .M1: return 8
-            case .M2: return 10
+            case .M1: return 14
+            case .M2: return 18
             case .B1: return 8
             case .B2: return 10
             case .B3: return 12
