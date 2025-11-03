@@ -2,11 +2,10 @@
 
 struct Key {
     let root: NoteName
-    let type: KeyType
 }
 
 extension Key: CustomStringConvertible {
     var description: String {
-        "\(root)\(type)"
+        root.description
     }
 }

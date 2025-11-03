@@ -14,9 +14,7 @@ class ScorePlayer {
     init() {
         self.playhead = Playhead(
             isPlaying: false,
-            currentMeasureIndex: 0,
-            currentCellIndex: 0,
-            elapsedDuration: 0.0
+            elapsedTime: 0.0
         )
     }
 
@@ -32,7 +30,7 @@ class ScorePlayer {
 
     }
 
-    func seek(measureIndex: Int, cellIndex: Int) {
+    func seek(cellIndex: Int) {
 
     }
 
