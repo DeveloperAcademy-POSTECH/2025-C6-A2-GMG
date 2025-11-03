@@ -7,6 +7,8 @@ class Score {
     let key: Key
     let audioUrl: URL
     let totalDuration: TimeInterval
+    let createdAt: Date
+    let updatedAt: Date
     private let notes: [Note]
     private let chordCells: [ChordCell]
 
@@ -15,6 +17,8 @@ class Score {
         key: Key,
         audioUrl: URL,
         totalDuration: TimeInterval,
+        createdAt: Date,
+        updatedAt: Date,
         notes: [Note],
         chordCells: [ChordCell]
     ) {
@@ -22,6 +26,8 @@ class Score {
         self.key = key
         self.audioUrl = audioUrl
         self.totalDuration = totalDuration
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
         self.notes = notes
         self.chordCells = chordCells
     }
