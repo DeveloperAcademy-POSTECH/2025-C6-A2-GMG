@@ -17,6 +17,8 @@ class ScoreFactory {
             key: Key(root: .C),
             audioUrl: URL(filePath: ""),
             totalDuration: 0.0,
+            createdAt: Date(),
+            updatedAt: Date(),
             notes: [],
             chordCells: []
         )
