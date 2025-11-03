@@ -4,7 +4,5 @@ import Foundation
 
 struct Playhead {
     let isPlaying: Bool
-    let currentMeasureIndex: Int
-    let currentCellIndex: Int
-    let elapsedDuration: TimeInterval
+    let elapsedTime: TimeInterval
 }
