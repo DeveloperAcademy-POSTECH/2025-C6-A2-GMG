@@ -1,9 +1,4 @@
-//
-//  RecordManager.swift
-//  SwiftF0
-//
-//  Created by 정희균 on 10/28/25.
-//
+//  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import AVFAudio
 import AudioKit
@@ -23,9 +18,10 @@ final class RecordManager {
     private var fader: Fader?
 
     private(set) var isRecordingPublisher: CurrentValueSubject<Bool, Never>
-    private(set) var recordedDurationPublisher: CurrentValueSubject<TimeInterval, Never>
+    private(set) var recordedDurationPublisher:
+        CurrentValueSubject<TimeInterval, Never>
     private(set) var amplitudePublisher: CurrentValueSubject<Float, Never>
-    
+
     private var cancellables: Set<AnyCancellable>
 
     init() {
@@ -34,9 +30,10 @@ final class RecordManager {
         self.fader = nil
 
         self.isRecordingPublisher = CurrentValueSubject<Bool, Never>(false)
-        self.recordedDurationPublisher = CurrentValueSubject<TimeInterval, Never>(.zero)
+        self.recordedDurationPublisher =
+            CurrentValueSubject<TimeInterval, Never>(.zero)
         self.amplitudePublisher = CurrentValueSubject<Float, Never>(0.0)
-        
+
         self.cancellables = Set<AnyCancellable>()
     }
 
@@ -46,9 +43,10 @@ final class RecordManager {
         guard let inputNode = AudioConductor.shared.inputNode else {
             throw RecordManagerError.audioEngineInputNodeNotAvailable
         }
-        
+
         let highpassFilter = HighPassFilter(inputNode)
-        let amplitudeTap = AmplitudeTap(highpassFilter, analysisMode: .peak) { [weak self] amplitude in
+        let amplitudeTap = AmplitudeTap(highpassFilter, analysisMode: .peak) {
+            [weak self] amplitude in
             guard let self else { return }
             self.amplitudePublisher.send(amplitude)
         }
@@ -58,18 +56,20 @@ final class RecordManager {
         AudioConductor.shared.addOutput(fader)
 
         try AudioConductor.shared.start()
-        
+
         amplitudeTap.start()
         try audioRecorder.record()
-        
+
         Timer.publish(every: 1.0, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self, let recordedDuration = self.audioRecorder?.recordedDuration else { return }
+                guard let self,
+                    let recordedDuration = self.audioRecorder?.recordedDuration
+                else { return }
                 self.recordedDurationPublisher.send(recordedDuration)
             }
             .store(in: &cancellables)
-        
+
         self.audioRecorder = audioRecorder
         self.highpassFilter = highpassFilter
         self.amplitudeTap = amplitudeTap
@@ -97,12 +97,12 @@ final class RecordManager {
         )
 
         try? FileManager.default.moveItem(at: tempUrl, to: url)
-        
+
         self.audioRecorder = nil
         self.highpassFilter = nil
         self.amplitudeTap = nil
         self.fader = nil
-        
+
         return url
     }
 }
