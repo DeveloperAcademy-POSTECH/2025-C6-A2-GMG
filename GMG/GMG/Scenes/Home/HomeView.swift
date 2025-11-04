@@ -1,29 +1,52 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
-    @State private var songCount: Int = 4
-    @State private var expandedRecent: Int? = nil
+    @Environment(\.modelContext) private var context
+    @Query private var allScores: [Score]
+
     @State private var expandedAll: Int? = nil
     @State private var isLatest: Bool = true
-    
+
+    private var songCount: Int { allScores.count }
+
+    private var sortedScores: [Score] {
+        allScores.sorted {
+            if isLatest {
+                if $0.updatedAt != $1.updatedAt {
+                    return $0.updatedAt > $1.updatedAt
+                } else {
+                    return $0.createdAt > $1.createdAt
+                }
+            } else {
+                if $0.createdAt != $1.createdAt {
+                    return $0.createdAt < $1.createdAt
+                } else {
+                    return $0.updatedAt < $1.updatedAt
+                }
+            }
+        }
+    }
+
+    private var recentScores: [Score] {
+        Array(sortedScores.prefix(10))
+    }
+
     var body: some View {
         ZStack {
-            Color.Background.bg1
-                .ignoresSafeArea()
+            Color.Background.bg1.ignoresSafeArea()
 
             ScrollView {
                 LazyVStack(spacing: Spacing.xl) {
                     HStack {
                         Logo()
-
                         Spacer()
-
                         SongCount(count: songCount)
                             .padding(.top, 60)
                     }
-
+                    
                     VStack(spacing: Spacing.md) {
                         HStack {
                             Text("Recent Files")
@@ -31,25 +54,21 @@ struct HomeView: View {
                                 .foregroundStyle(Color.Text.black)
                             Spacer()
                         }
+
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: Spacing.md) {
                                 AddScoreButton {}
-                                ScoreCard(
-                                    score: sampleScore,
-                                    minWidth: 160,
-                                    minHeight: nil,
-                                    index: 1,
-                                    isMove: false,
-                                    isSelected: bindingForRecent(index: 1)
-                                )
-                                ScoreCard(
-                                    score: sampleScore,
-                                    minWidth: 160,
-                                    minHeight: nil,
-                                    index: 2,
-                                    isMove: false,
-                                    isSelected: bindingForRecent(index: 2)
-                                )
+
+                                ForEach(Array(recentScores.enumerated()), id: \.element.persistentModelID) { (idx, score) in
+                                    ScoreCard(
+                                        score: score,
+                                        minWidth: 160,
+                                        minHeight: nil,
+                                        index: idx + 1,
+                                        isMove: false,
+                                        isSelected: bindingForRecent(index: idx + 1)
+                                    )
+                                }
                             }
                         }
                         .frame(minHeight: 128)
@@ -66,54 +85,49 @@ struct HomeView: View {
                                 .font(Typography.WantedSansStd.R5)
                                 .foregroundStyle(isLatest ? Color.black5 : Color.black3)
                                 .padding(.trailing, 12)
-                                .onTapGesture {
-                                    isLatest = true
-                                }
-                            
-                            Text("Earlist")
+                                .onTapGesture { isLatest = true }
+
+                            Text("Earliest")
                                 .font(Typography.WantedSansStd.R5)
                                 .foregroundStyle(isLatest ? Color.black3 : Color.black5)
                                 .padding(.trailing, 12)
-                                .onTapGesture {
-                                    isLatest = false
-                                }
-                            
+                                .onTapGesture { isLatest = false }
+
                             Spacer()
                         }
+                        
+                        if songCount == 0 {
 
-                        VStack(spacing: -82) {
-                            ScoreCard(
-                                score: sampleScore,
-                                minWidth: nil,
-                                minHeight: 128,
-                                index: 1,
-                                isMove: true,
-                                isSelected: bindingForAll(index: 1)
-                            )
-                            ScoreCard(
-                                score: sampleScore,
-                                minWidth: nil,
-                                minHeight: 128,
-                                index: 2,
-                                isMove: true,
-                                isSelected: bindingForAll(index: 2)
-                            )
-                            ScoreCard(
-                                score: sampleScore,
-                                minWidth: nil,
-                                minHeight: 128,
-                                index: 3,
-                                isMove: true,
-                                isSelected: bindingForAll(index: 3)
-                            )
-                            ScoreCard(
-                                score: sampleScore,
-                                minWidth: nil,
-                                minHeight: 128,
-                                index: 4,
-                                isMove: true,
-                                isSelected: bindingForAll(index: 4)
-                            )
+                            VStack(alignment: .leading) {
+                                Text("An experience")
+                                    .font(Typography.WantedSansStd.Empty)
+                                    .foregroundStyle(Color.black1.opacity(0.1))
+                                Text("where humming")
+                                    .font(Typography.WantedSansStd.Empty)
+                                    .foregroundStyle(Color.black1.opacity(0.3))
+                                Text("becomes the")
+                                    .font(Typography.WantedSansStd.Empty)
+                                    .foregroundStyle(Color.black1.opacity(0.5))
+                                Text("start of a song")
+                                    .font(Typography.WantedSansStd.Empty)
+                                    .foregroundStyle(Color.black1.opacity(0.6))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 48)
+                        } else {
+                            
+                            VStack(spacing: -82) {
+                                ForEach(Array(sortedScores.enumerated()), id: \.element.persistentModelID) { (idx, score) in
+                                    ScoreCard(
+                                        score: score,
+                                        minWidth: nil,
+                                        minHeight: 128,
+                                        index: idx + 1,
+                                        isMove: true,
+                                        isSelected: bindingForAll(index: idx + 1)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -121,23 +135,9 @@ struct HomeView: View {
             .safeAreaPadding()
         }
     }
-
-    var sampleScore: Score {
-        Score(
-            title: "Sample",
-            key: Key(root: .C),
-            audioUrl: FileManager.default.temporaryDirectory,
-            totalDuration: 30,
-            createdAt: Date(),
-            updatedAt: Date(),
-            notes: [],
-            chordCells: []
-        )
-    }
 }
 
 extension HomeView {
-    
     struct ScoreCard: View {
         let score: Score
         let minWidth: CGFloat?
@@ -169,7 +169,7 @@ extension HomeView {
                 
                 VStack(alignment: .trailing, spacing: .zero) {
                     Button(action: {
-                        // TODO: Ellipsis 버튼 액션
+                        //TODO: 삭제 등 미트볼버튼 기능 추가
                     }, label: {
                         Image(systemName: "ellipsis")
                             .foregroundStyle(Color.Text.white)
@@ -185,7 +185,7 @@ extension HomeView {
                         .padding(.trailing, 1)
                     
                     Button {
-                        // TODO: 재생 버튼
+                        // TODO: 오디오 재생 기능
                     } label: {
                         Image(systemName: "play.fill")
                             .resizable()
@@ -296,14 +296,18 @@ extension HomeView {
         }
     }
     
+}
+
+// MARK: - 데이터 처리 function
+extension HomeView {
+
     static func dateConverter(_ date: Date) -> String {
-            let formatted = DateFormatter()
-            formatted.dateFormat = "yy. MM. dd"
-            return formatted.string(from: date)
+        let formatted = DateFormatter()
+        formatted.dateFormat = "yy. MM. dd"
+        return formatted.string(from: date)
     }
-    
+
     private func bindingForRecent(index i: Int) -> Binding<Bool> {
-        // 최근(가로)은 움직이지 않는 정책이라 상태를 공유하지 않도록 완전 차단
         Binding(get: { false }, set: { _ in })
     }
 
@@ -317,7 +321,6 @@ extension HomeView {
             }
         )
     }
-    
 }
 
 #Preview {

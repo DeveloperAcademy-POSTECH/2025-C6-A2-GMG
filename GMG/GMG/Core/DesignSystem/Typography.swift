@@ -39,6 +39,7 @@ enum Typography {
         case B13
         case B14
         case B15
+        case Empty
         case B16
 
         var font: Font {
@@ -52,7 +53,7 @@ enum Typography {
             case .M1, .M2:
                 return "WantedSansStd-Medium"
             case .B1, .B2, .B3, .B4, .B5, .B6, .B7, .B8, .B9, .B10, .B11,
-                .B12, .B13, .B14, .B15, .B16:
+                    .B12, .B13, .B14, .B15, .Empty, .B16:
                 return "WantedSansStd-Bold"
             }
         }
@@ -87,6 +88,7 @@ enum Typography {
             case .B13: return 32
             case .B14: return 34
             case .B15: return 36
+            case .Empty: return 42
             case .B16: return 46
             }
         }
