@@ -81,7 +81,7 @@ final class RecordingIntent: RecordingIntentProtocol {
             do {
                 try recordManager.startRecord()
             } catch {
-                print(error)
+                Logger.error(String(describing: error))
             }
         }
     }
@@ -102,7 +102,7 @@ final class RecordingIntent: RecordingIntentProtocol {
         do {
             try playbackManager.play(url)
         } catch {
-            print(error)
+            Logger.error(String(describing: error))
         }
     }
 

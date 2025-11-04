@@ -1,9 +1,4 @@
-//
-//  AudioConductor.swift
-//  SwiftF0
-//
-//  Created by 정희균 on 10/28/25.
-//
+//  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import AVFAudio
 import AudioKit
@@ -66,13 +61,13 @@ final class AudioConductor {
     func setAudioMode(_ mode: AudioMode?) throws {
         try teardown()
         try deactivateAudioSession()
-        
+
         if let mode {
             try setCategoryAudioSession(mode)
             try activateAudioSession()
             try setup()
         }
-        
+
         self.audioMode = mode
     }
 
