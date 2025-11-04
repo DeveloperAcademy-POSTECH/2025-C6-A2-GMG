@@ -1,16 +1,19 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
+import SwiftData
 
+@Model
 class Score {
-    let title: String
-    let key: Key
-    let audioUrl: URL
-    let totalDuration: TimeInterval
-    let createdAt: Date
-    let updatedAt: Date
-    private let notes: [Note]
-    private let chordCells: [ChordCell]
+    var id: UUID = UUID()
+    var title: String
+    var key: Key
+    var audioUrl: URL
+    var totalDuration: TimeInterval
+    var createdAt: Date
+    var updatedAt: Date
+    var notes: [Note]
+    var chordCells: [ChordCell]
 
     init(
         title: String,

@@ -1,6 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-struct Key {
+struct Key: Codable {
     let root: NoteName
 }
 

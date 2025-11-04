@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct ChordCell {
+struct ChordCell: Codable {
     let chord: Chord?
     let chordCandidates: [Chord]
     let startTime: TimeInterval

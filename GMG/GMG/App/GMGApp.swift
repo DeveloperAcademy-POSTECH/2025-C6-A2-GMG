@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct GMGApp: App {
@@ -13,5 +14,6 @@ struct GMGApp: App {
         WindowGroup {
             HomeView()
         }
+        .modelContainer(for: [Score.self])
     }
 }

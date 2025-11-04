@@ -1,6 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-enum NoteName {
+enum NoteName: Codable {
     case C
     case Cs
     case Db

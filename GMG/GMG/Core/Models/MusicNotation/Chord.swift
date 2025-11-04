@@ -1,6 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-struct Chord {
+struct Chord: Codable {
     let root: NoteName
     let quality: ChordQuality
 }

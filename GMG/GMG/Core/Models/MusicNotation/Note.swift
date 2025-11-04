@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct Note {
+struct Note: Codable {
     let name: NoteName
     let startTime: TimeInterval
     let duration: TimeInterval

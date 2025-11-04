@@ -1,6 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-enum ChordQuality {
+enum ChordQuality: Codable {
     case maj
     case maj7
     case maj9
