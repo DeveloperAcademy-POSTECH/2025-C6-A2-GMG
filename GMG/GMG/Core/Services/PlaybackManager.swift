@@ -1,9 +1,4 @@
-//
-//  PlaybackManager.swift
-//  SwiftF0
-//
-//  Created by 정희균 on 10/28/25.
-//
+//  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import AudioKit
 import Combine
@@ -22,7 +17,7 @@ final class PlaybackManager {
         
         self.audioPlayer.completionHandler = { [weak self] in
             guard let self else { return }
-            self.isPlayingPublisher.send(false)
+            self.stop()
         }
     }
 
