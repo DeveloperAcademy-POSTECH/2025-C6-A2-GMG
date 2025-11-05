@@ -8,6 +8,8 @@ struct NavigationBar<Leading: View, Trailing: View>: View {
     let leading: Leading
     let trailing: Trailing
 
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+
     init(
         _ title: String? = nil,
         isBackButtonHidden: Bool = false,
@@ -38,7 +40,10 @@ struct NavigationBar<Leading: View, Trailing: View>: View {
             if let title {
                 Text(title)
                     .font(Typography.WantedSansStd.R6)
-                    .foregroundStyle(Color.Text.black)
+                    .foregroundStyle(
+                        colorScheme == .light
+                            ? Color.black1 : Color.white1
+                    )
             }
         }
         .padding(Spacing.md)
