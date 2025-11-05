@@ -6,3 +6,5 @@ struct Playhead {
     let isPlaying: Bool
     let elapsedTime: TimeInterval
 }
+
+extension Playhead: Equatable {}
