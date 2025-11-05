@@ -1,11 +1,11 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct HomeView: View {
     @Environment(Router.self) private var router: Router
-    
+
     @Environment(\.modelContext) private var context
     @Query private var allScores: [Score]
 
@@ -48,7 +48,7 @@ struct HomeView: View {
                         SongCount(count: songCount)
                             .padding(.top, 60)
                     }
-                    
+
                     VStack(spacing: Spacing.md) {
                         HStack {
                             Text("Recent Files")
@@ -63,15 +63,22 @@ struct HomeView: View {
                                     router.push(.recording)
                                 }
 
-                                ForEach(Array(recentScores.enumerated()), id: \.element.persistentModelID) { (idx, score) in
+                                ForEach(
+                                    Array(recentScores.enumerated()),
+                                    id: \.element.persistentModelID
+                                ) { (idx, score) in
                                     ScoreCard(
                                         score: score,
                                         minWidth: 160,
                                         minHeight: nil,
                                         index: idx + 1,
                                         isMove: false,
-                                        isSelected: bindingForRecent(index: idx + 1)
-                                    )
+                                        isSelected: .constant(false)
+                                    ) {
+                                        router.push(
+                                            .chordProgress(score: score)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -87,21 +94,28 @@ struct HomeView: View {
 
                             Text("Latest")
                                 .font(Typography.WantedSansStd.R5)
-                                .foregroundStyle(isLatest ? Color.black5 : Color.black3)
+                                .foregroundStyle(
+                                    isLatest ? Color.black5 : Color.black3
+                                )
                                 .padding(.trailing, 12)
                                 .onTapGesture { isLatest = true }
 
                             Text("Earliest")
                                 .font(Typography.WantedSansStd.R5)
-                                .foregroundStyle(isLatest ? Color.black3 : Color.black5)
+                                .foregroundStyle(
+                                    isLatest ? Color.black3 : Color.black5
+                                )
                                 .padding(.trailing, 12)
                                 .onTapGesture { isLatest = false }
 
                             Spacer()
                         }
-                        
+
                         if songCount == 0 {
-                            let font: Font = .custom(Typography.WantedSansStd.Bold, size: 42)
+                            let font: Font = .custom(
+                                Typography.WantedSansStd.Bold,
+                                size: 42
+                            )
 
                             VStack(alignment: .leading) {
                                 Text("An experience")
@@ -120,24 +134,34 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.top, 48)
                         } else {
-                            
+
                             VStack(spacing: -82) {
-                                ForEach(Array(sortedScores.enumerated()), id: \.element.persistentModelID) { (idx, score) in
+                                ForEach(
+                                    Array(sortedScores.enumerated()),
+                                    id: \.element.persistentModelID
+                                ) { (idx, score) in
                                     ScoreCard(
                                         score: score,
                                         minWidth: nil,
                                         minHeight: 128,
                                         index: idx + 1,
                                         isMove: true,
-                                        isSelected: bindingForAll(index: idx + 1)
-                                    )
+                                        isSelected: bindingForAll(
+                                            index: idx + 1
+                                        )
+                                    ) {
+                                        router.push(
+                                            .chordProgress(score: score)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                .safeAreaPadding()
             }
-            .safeAreaPadding()
+            .scrollIndicators(.hidden)
         }
     }
 }
@@ -150,7 +174,8 @@ extension HomeView {
         let index: Int
         let isMove: Bool
         @Binding var isSelected: Bool
-        
+        let action: () -> Void
+
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
@@ -158,37 +183,40 @@ extension HomeView {
                         .font(Typography.WantedSansStd.R4)
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 4)
-                    
+
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
-                    
+
                     Spacer()
-                    
+
                     Text(HomeView.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.black6)
                 }
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .trailing, spacing: .zero) {
-                    Button(action: {
-                        //TODO: 미트볼버튼 기능 추가
-                    }, label: {
-                        Image(systemName: "ellipsis")
-                            .foregroundStyle(Color.white1)
-                    })
+                    Button(
+                        action: {
+                            //TODO: 미트볼버튼 기능 추가
+                        },
+                        label: {
+                            Image(systemName: "ellipsis")
+                                .foregroundStyle(Color.white1)
+                        }
+                    )
                     .buttonStyle(.plain)
-                    
+
                     Spacer()
-                    
+
                     Text(score.totalDuration.description)
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 9.5)
                         .padding(.trailing, 1)
-                    
+
                     Button {
                         // TODO: 오디오 재생 기능
                     } label: {
@@ -217,24 +245,28 @@ extension HomeView {
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
             .onTapGesture {
-                isSelected.toggle()
+                if isSelected {
+                    action()
+                } else {
+                    isSelected.toggle()
+                }
             }
             .padding(.bottom, isSelected && isMove ? 60 : 0)
         }
-        
+
         private func colorForIndex(_ i: Int) -> Color {
             let palette: [Color] = [
                 Color.blue3,
                 Color.blue4,
                 Color.blue5,
                 Color.blue1,
-                Color.blue2
+                Color.blue2,
             ]
             let safe = max(i, 1)
             return palette[(safe - 1) % palette.count]
         }
     }
-    
+
     struct AddScoreButton: View {
         let action: () -> Void
 
@@ -253,7 +285,7 @@ extension HomeView {
             .frame(width: 80)
         }
     }
-    
+
     struct Logo: View {
         private var reString: AttributedString {
             var string: AttributedString = AttributedString("Re:")
@@ -268,17 +300,11 @@ extension HomeView {
         }
 
         var body: some View {
-            ViewThatFits {
-                Text("\(reString)\n\(chordString)")
-                    .font(Typography.WantedSansStd.B16)
-                    .transition(.blurReplace)
-                Text("\(reString)\(chordString)")
-                    .font(Typography.WantedSansStd.B16)
-                    .transition(.blurReplace)
-            }
+            Text("\(reString)\n\(chordString)")
+                .font(Typography.WantedSansStd.B16)
         }
     }
-    
+
     struct SongCount: View {
         let count: Int
 
@@ -299,7 +325,7 @@ extension HomeView {
                 .foregroundStyle(Color.black1)
         }
     }
-    
+
 }
 
 // MARK: - 데이터 처리 function
@@ -311,15 +337,13 @@ extension HomeView {
         return formatted.string(from: date)
     }
 
-    private func bindingForRecent(index i: Int) -> Binding<Bool> {
-        Binding(get: { false }, set: { _ in })
-    }
-
     private func bindingForAll(index i: Int) -> Binding<Bool> {
         Binding(
             get: { expandedAll == i },
             set: { newValue in
-                withAnimation(.interactiveSpring(response: 0.35, dampingFraction: 0.85)) {
+                withAnimation(
+                    .interactiveSpring(response: 0.35, dampingFraction: 0.85)
+                ) {
                     expandedAll = newValue ? i : nil
                 }
             }
