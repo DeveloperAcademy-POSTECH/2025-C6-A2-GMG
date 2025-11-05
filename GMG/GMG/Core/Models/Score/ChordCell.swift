@@ -7,3 +7,5 @@ struct ChordCell {
     let chordCandidates: [Chord]
     let startTime: TimeInterval
 }
+
+extension ChordCell: Codable {}

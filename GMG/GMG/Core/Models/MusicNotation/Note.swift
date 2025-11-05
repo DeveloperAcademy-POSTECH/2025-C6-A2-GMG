@@ -4,6 +4,9 @@ import Foundation
 
 struct Note {
     let name: NoteName
+    let octave: Int
     let startTime: TimeInterval
     let duration: TimeInterval
 }
+
+extension Note: Codable {}

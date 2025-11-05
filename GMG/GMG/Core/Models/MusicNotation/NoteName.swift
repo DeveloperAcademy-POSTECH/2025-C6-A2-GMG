@@ -6,6 +6,7 @@ enum NoteName {
     case Db
     case D
     case Ds
+    case Eb
     case E
     case Fb
     case F
@@ -24,22 +25,25 @@ extension NoteName: CustomStringConvertible {
     var description: String {
         switch self {
         case .C: return "C"
-        case .Cs: return "C♯"
-        case .Db: return "D♭"
+        case .Cs: return "C#"
+        case .Db: return "Db"
         case .D: return "D"
-        case .Ds: return "D♯"
+        case .Ds: return "D#"
+        case .Eb: return "Eb"
         case .E: return "E"
-        case .Fb: return "F♭"
+        case .Fb: return "Fb"
         case .F: return "F"
-        case .Fs: return "F♯"
-        case .Gb: return "G♭"
+        case .Fs: return "F#"
+        case .Gb: return "Gb"
         case .G: return "G"
-        case .Gs: return "G♯"
-        case .Ab: return "A♭"
+        case .Gs: return "G#"
+        case .Ab: return "Ab"
         case .A: return "A"
-        case .As: return "A♯"
-        case .Bb: return "B♭"
+        case .As: return "A#"
+        case .Bb: return "Bb"
         case .B: return "B"
         }
     }
 }
+
+extension NoteName: Codable {}
