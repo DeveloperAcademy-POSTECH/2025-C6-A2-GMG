@@ -60,7 +60,7 @@ final class RecordManager {
         amplitudeTap.start()
         try audioRecorder.record()
 
-        Timer.publish(every: 1.0, on: .main, in: .common)
+        Timer.publish(every: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self,
@@ -81,6 +81,10 @@ final class RecordManager {
     func stopRecord() -> URL? {
         audioRecorder?.stop()
         amplitudeTap?.stop()
+        
+        if let fader {
+            AudioConductor.shared.removeOutput(fader)
+        }
 
         try? AudioConductor.shared.setAudioMode(nil)
 
