@@ -4,7 +4,7 @@ import SwiftUI
 
 struct ChordProgressView: View {
     @Environment(Router.self) private var router: Router
-    
+
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
 
@@ -13,17 +13,6 @@ struct ChordProgressView: View {
 
         self.model = model
         self.intent = ChordProgressIntent(model: model)
-    }
-
-    private var minuteString: String {
-        String(format: "%02d", Int(model.score.totalDuration / 60))
-    }
-
-    private var secondString: String {
-        String(
-            format: "%02d",
-            Int(model.score.totalDuration.truncatingRemainder(dividingBy: 60))
-        )
     }
 
     var body: some View {
@@ -52,59 +41,29 @@ struct ChordProgressView: View {
                 }
                 .padding(Spacing.md)
 
-                ScrollView {
-                    let segmentDuration: TimeInterval = 5.0
-                    let totalDuration: TimeInterval = model.score.totalDuration
-                    let chordCells: [ChordCell] = model.score
-                        .retrieveAllChordCells()
-                    let currentChordCell: ChordCell? = model.currentChordCell
-
-                    LazyVStack(spacing: Spacing.md) {
-                        ForEach(
-                            0..<Int(ceil(totalDuration / segmentDuration)),
-                            id: \.self
-                        ) { index in
-                            Segment(
-                                index: index,
-                                totalDuration: totalDuration,
-                                chordCells: chordCells,
-                                segmentDuration: segmentDuration,
-                                currentChordCell: currentChordCell,
-                                chordCellAction: intent.onTapChordCell
-                            )
-                        }
-                    }
-                    .safeAreaPadding(Spacing.md)
-                    .safeAreaPadding(.bottom, 128)
-                }
-                .mask {
-                    VStack(spacing: .zero) {
-                        LinearGradient(
-                            stops: [
-                                Gradient.Stop(color: .clear, location: 0.0),
-                                Gradient.Stop(color: .white, location: 1.0),
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .frame(height: Spacing.md)
-                        Color.white
-                    }
-                    .ignoresSafeArea()
-                }
+                SegmentsScrollView(
+                    segmentDuration: 5.0,
+                    totalDuration: model.score.totalDuration,
+                    chordCells: model.score.retrieveAllChordCells(),
+                    currentChordCell: model.currentChordCell,
+                    chordCellAction: intent.onTapChordCell
+                )
             }
             .preferredColorScheme(model.isEditMode ? .dark : .light)
-            .navigationBar(model.score.title, leading: {}, trailing: {
-                Button {
-                    router.push(.export)
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
+            .navigationBar(
+                model.score.title,
+                leading: {},
+                trailing: {
+                    Button {
+                        router.push(.export)
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
                 }
-            })
+            )
 
             VStack {
                 Spacer()
-                Text(String(format: "%.2f", model.playhead.elapsedTime))
 
                 Controller(
                     isPlaying: model.playhead.isPlaying,
@@ -115,7 +74,6 @@ struct ChordProgressView: View {
             }
             .padding()
         }
-        .animation(.default, value: model.isEditMode)
         .onAppear {
             intent.onAppear(model.score)
         }
@@ -123,7 +81,9 @@ struct ChordProgressView: View {
             intent.onDisappear()
         }
     }
+}
 
+extension ChordProgressView {
     struct Background: View {
         @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
@@ -238,77 +198,95 @@ struct ChordProgressView: View {
         var body: some View {
             Grid {
                 GridRow {
-                    Button {
+                    ControllerButton {
                         stopAction()
                     } label: {
-                        Image(systemName: "stop.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(Color.black1)
-                            .frame(width: 16, height: 16)
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity
-                            )
-                            .background(
-                                .white,
-                                in: RoundedRectangle(cornerRadius: 18)
-                            )
+                        Image(.stop)
+                            .renderingMode(.template)
                     }
-                    .buttonStyle(.bouncy)
                     .transition(
-                        .scale(scale: 0.0, anchor: .leading).combined(
-                            with: .opacity
-                        )
+                        .scale(scale: 0.0, anchor: .leading)
+                            .combined(with: .opacity)
                     )
                     .gridCellColumns(1)
 
-                    Button {
+                    Group {
                         if isPlaying {
-                            pauseAction()
+                            ControllerButton(isDark: true) {
+                                pauseAction()
+                            } label: {
+                                Image(.pause)
+                                    .renderingMode(.template)
+                            }
+
                         } else {
-                            playAction()
+                            ControllerButton(isDark: true) {
+                                playAction()
+                            } label: {
+                                Image(.play)
+                                    .renderingMode(.template)
+                            }
                         }
-                    } label: {
-                        Image(
-                            systemName: isPlaying ? "pause.fill" : "play.fill"
-                        )
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(Color.white1)
-                        .frame(width: 16, height: 16)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(
-                            .black,
-                            in: RoundedRectangle(cornerRadius: 18)
-                        )
                     }
-                    .buttonStyle(.bouncy)
                     .gridCellColumns(3)
 
-                    Button {
+                    ControllerButton {
 
                     } label: {
                         Image(.guitar)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity
-                            )
-                            .background(
-                                .white,
-                                in: RoundedRectangle(cornerRadius: 18)
-                            )
+                            .renderingMode(.template)
                     }
-                    .buttonStyle(.bouncy)
                     .gridCellColumns(1)
                 }
             }
             .padding()
             .frame(maxHeight: 96)
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18))
+        }
+    }
+
+    struct SegmentsScrollView: View {
+        let segmentDuration: TimeInterval
+        let totalDuration: TimeInterval
+        let chordCells: [ChordCell]
+        let currentChordCell: ChordCell?
+        let chordCellAction: (ChordCell) -> Void
+
+        var body: some View {
+            ScrollView {
+                LazyVStack(spacing: Spacing.md) {
+                    ForEach(
+                        0..<Int(ceil(totalDuration / segmentDuration)),
+                        id: \.self
+                    ) { index in
+                        Segment(
+                            index: index,
+                            totalDuration: totalDuration,
+                            chordCells: chordCells,
+                            segmentDuration: segmentDuration,
+                            currentChordCell: currentChordCell,
+                            chordCellAction: chordCellAction
+                        )
+                    }
+                }
+                .safeAreaPadding(Spacing.md)
+                .safeAreaPadding(.bottom, 128)
+            }
+            .mask {
+                VStack(spacing: .zero) {
+                    LinearGradient(
+                        stops: [
+                            Gradient.Stop(color: .clear, location: 0.0),
+                            Gradient.Stop(color: .white, location: 1.0),
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: Spacing.md)
+                    Color.white
+                }
+                .ignoresSafeArea()
+            }
         }
     }
 
@@ -320,15 +298,15 @@ struct ChordProgressView: View {
         let currentChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
 
-        var segmentStartTime: TimeInterval {
+        private var segmentStartTime: TimeInterval {
             TimeInterval(index) * segmentDuration
         }
 
-        var segmentEndTime: TimeInterval {
+        private var segmentEndTime: TimeInterval {
             segmentStartTime + segmentDuration
         }
 
-        var filteredChordCells: [ChordCell] {
+        private var filteredChordCells: [ChordCell] {
             var filteredChordCells: [ChordCell] = chordCells.filter {
                 chordCell in
                 segmentStartTime <= chordCell.startTime
@@ -383,7 +361,9 @@ struct ChordProgressView: View {
             return filteredChordCells
         }
 
-        var chordCellsWithDuration: [(chordCell: ChordCell, duration: Int)] {
+        private var chordCellsWithDuration:
+            [(chordCell: ChordCell, duration: Int)]
+        {
             guard !filteredChordCells.isEmpty else { return [] }
 
             var result: [(chordCell: ChordCell, duration: Int)] = []
@@ -437,32 +417,13 @@ struct ChordProgressView: View {
 
                             ZStack {
                                 if let chord = chordCell.chord {
-                                    Button {
+                                    ChordCellButton(
+                                        chord: chord,
+                                        isSelected: currentChordCell?.startTime
+                                            == chordCell.startTime
+                                    ) {
                                         chordCellAction(chordCell)
-                                    } label: {
-                                        Text(chord.description)
-                                            .font(Typography.WantedSansStd.R7)
-                                            .foregroundStyle(
-                                                currentChordCell?.startTime
-                                                    == chordCell.startTime
-                                                    ? Color.white1
-                                                    : Color.black1
-                                            )
-                                            .frame(
-                                                maxWidth: .infinity,
-                                                maxHeight: .infinity
-                                            )
-                                            .background(
-                                                currentChordCell?.startTime
-                                                    == chordCell.startTime
-                                                    ? Color.blue4
-                                                    : Color.white,
-                                                in: RoundedRectangle(
-                                                    cornerRadius: 12
-                                                )
-                                            )
                                     }
-                                    .buttonStyle(.bouncy)
                                 } else {
                                     Color.clear
                                 }
@@ -473,28 +434,75 @@ struct ChordProgressView: View {
                 }
                 .frame(height: 64)
 
-                // TODO: Waveform 구현
+                Waveform()
+
+                TimeRuler(
+                    startTime: segmentStartTime,
+                    endTime: segmentEndTime,
+                    dotCount: Int(segmentDuration * 2) - 1
+                )
+            }
+        }
+
+        struct ChordCellButton: View {
+            let chord: Chord
+            let isSelected: Bool
+            let action: () -> Void
+
+            var body: some View {
+                Button {
+                    action()
+                } label: {
+                    Text(chord.description)
+                        .font(Typography.WantedSansStd.R7)
+                        .foregroundStyle(
+                            isSelected ? Color.white1 : Color.black1
+                        )
+                        .frame(
+                            maxWidth: .infinity,
+                            maxHeight: .infinity
+                        )
+                        .background(
+                            isSelected ? Color.blue4 : Color.white,
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
+                }
+                .buttonStyle(.bouncy)
+            }
+        }
+
+        // TODO: Waveform 구현
+        struct Waveform: View {
+            var body: some View {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(
-                        Color(red: 245 / 255, green: 245 / 255, blue: 245 / 255)
+                        Color.white2
                     )
                     .frame(height: 36)
+            }
+        }
 
+        struct TimeRuler: View {
+            let startTime: TimeInterval
+            let endTime: TimeInterval
+            let dotCount: Int
+
+            var body: some View {
                 HStack {
-                    Text("\(segmentStartTime, specifier: "%.0f")s")
+                    Text("\(startTime, specifier: "%.0f")s")
                         .font(Typography.WantedSansStd.R2)
                         .fixedSize()
-                    ForEach(0..<Int(segmentDuration * 2) - 1, id: \.self) { _ in
+                    ForEach(0..<dotCount, id: \.self) { _ in
                         Circle()
                             .frame(width: 2, height: 2)
                             .frame(maxWidth: .infinity)
                     }
-                    Text("\(segmentEndTime, specifier: "%.0f")s")
+                    Text("\(endTime, specifier: "%.0f")s")
                         .font(Typography.WantedSansStd.R2)
                         .fixedSize()
                 }
                 .foregroundStyle(
-                    Color(red: 95 / 255, green: 93 / 255, blue: 94 / 255)
+                    Color.black5
                 )
                 .padding(.horizontal, Spacing.xs)
             }

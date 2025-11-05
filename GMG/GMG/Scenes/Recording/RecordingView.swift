@@ -93,7 +93,7 @@ struct RecordingView: View {
                     Text(countdown.formatted())
                         .font(
                             .custom(
-                                Typography.WantedSansStd.M1.fontName,
+                                Typography.WantedSansStd.Medium,
                                 size: 128
                             )
                         )
@@ -213,33 +213,53 @@ struct RecordingView: View {
         let stopPlayAction: () -> Void
         let nextAction: () -> Void
 
-        var body: some View {
-            var primaryButtonTitle: String = "Record"
-            var primaryButtonIconName: String = "circle.fill"
-            var primaryButtonAction: () -> Void = recordAction
+        private var primaryButtonTitle: String {
             if isRecording {
-                primaryButtonTitle = "Stop"
-                primaryButtonIconName = "stop.fill"
-                primaryButtonAction = stopRecordAction
+                return "Stop"
             } else if isPlaying {
-                primaryButtonTitle = "Stop"
-                primaryButtonIconName = "stop.fill"
-                primaryButtonAction = stopPlayAction
+                return "Stop"
             } else if recordingUrl != nil {
-                primaryButtonTitle = "Replay"
-                primaryButtonIconName = "play.fill"
-                primaryButtonAction = playAction
+                return "Play"
             }
+            return "Record"
+        }
 
-            return Grid {
+        private var primaryButtonImage: ImageResource {
+            if isRecording {
+                return .stop
+            } else if isPlaying {
+                return .stop
+            } else if recordingUrl != nil {
+                return .play
+            }
+            return .record
+        }
+
+        private var primaryButtonAction: () -> Void {
+            if isRecording {
+                return stopRecordAction
+            } else if isPlaying {
+                return stopPlayAction
+            } else if recordingUrl != nil {
+                return playAction
+            }
+            return recordAction
+        }
+
+        var body: some View {
+            Grid {
                 GridRow {
                     if recordingUrl != nil {
-                        ControllerButton(
-                            title: "Reset",
-                            iconName: "arrow.clockwise",
-                            action: resetAction,
-                            isDark: false
-                        )
+                        ControllerButton {
+                            resetAction()
+                        } label: {
+                            VStack(spacing: Spacing.xs) {
+                                Image(.reset)
+                                    .renderingMode(.template)
+                                Text("Reset")
+                                    .font(Typography.WantedSansStd.M2)
+                            }
+                        }
                         .transition(
                             .scale(scale: 0.0, anchor: .leading)
                                 .combined(with: .opacity)
@@ -247,21 +267,29 @@ struct RecordingView: View {
                         .gridCellColumns(1)
                     }
 
-                    ControllerButton(
-                        title: primaryButtonTitle,
-                        iconName: primaryButtonIconName,
-                        action: primaryButtonAction,
-                        isDark: true
-                    )
+                    ControllerButton(isDark: true) {
+                        primaryButtonAction()
+                    } label: {
+                        VStack(spacing: Spacing.xs) {
+                            Image(primaryButtonImage)
+                                .renderingMode(.template)
+                            Text(primaryButtonTitle)
+                                .font(Typography.WantedSansStd.M2)
+                        }
+                    }
                     .gridCellColumns(2)
 
                     if recordingUrl != nil {
-                        ControllerButton(
-                            title: "Next",
-                            iconName: "chevron.forward",
-                            action: nextAction,
-                            isDark: false
-                        )
+                        ControllerButton {
+                            nextAction()
+                        } label: {
+                            VStack(spacing: Spacing.xs) {
+                                Image(.next)
+                                    .renderingMode(.template)
+                                Text("Next")
+                                    .font(Typography.WantedSansStd.M2)
+                            }
+                        }
                         .transition(
                             .scale(scale: 0.0, anchor: .trailing)
                                 .combined(with: .opacity)
@@ -274,35 +302,6 @@ struct RecordingView: View {
             .frame(maxWidth: .infinity, maxHeight: 140)
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18))
             .animation(.default, value: recordingUrl)
-        }
-
-        struct ControllerButton: View {
-            let title: String
-            let iconName: String
-            let action: () -> Void
-            let isDark: Bool
-
-            var body: some View {
-                Button {
-                    action()
-                } label: {
-                    VStack(spacing: Spacing.xs) {
-                        Image(systemName: iconName)
-                            .frame(minWidth: 20)
-                        Text(title)
-                            .font(Typography.WantedSansStd.M2)
-                    }
-                    .foregroundStyle(
-                        isDark ? Color.white1 : Color.black1
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(
-                        isDark ? Color.black : Color.white,
-                        in: RoundedRectangle(cornerRadius: 18)
-                    )
-                }
-                .buttonStyle(.bouncy)
-            }
         }
     }
 }
