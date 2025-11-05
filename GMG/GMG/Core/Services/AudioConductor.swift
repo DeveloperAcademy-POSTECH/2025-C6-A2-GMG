@@ -53,9 +53,11 @@ final class AudioConductor {
     private func teardown() throws {
         self.mixer?.stop()
         self.engine?.stop()
+        
+        self.engine?.output = nil
 
-        self.engine = nil
         self.mixer = nil
+        self.engine = nil
     }
 
     func setAudioMode(_ mode: AudioMode?) throws {
