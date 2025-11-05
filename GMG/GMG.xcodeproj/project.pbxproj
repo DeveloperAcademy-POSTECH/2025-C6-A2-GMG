@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */ = {isa = PBXBuildFile; productRef = E32372042EB8D8A4004C5BC9 /* SwiftF0 */; };
+		E331F8DF2EB9F44400752589 /* Tonic in Frameworks */ = {isa = PBXBuildFile; productRef = E331F8DE2EB9F44400752589 /* Tonic */; };
 		E3C8F6182EB79C2F00BA3AAB /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E331F8DF2EB9F44400752589 /* Tonic in Frameworks */,
+				E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */,
 				E3C8F6182EB79C2F00BA3AAB /* AudioKitEX in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,6 +115,8 @@
 			name = GMG;
 			packageProductDependencies = (
 				E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */,
+				E32372042EB8D8A4004C5BC9 /* SwiftF0 */,
+				E331F8DE2EB9F44400752589 /* Tonic */,
 			);
 			productName = GMG;
 			productReference = 32C5AB512EA213420007BEFD /* GMG.app */;
@@ -169,6 +175,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */,
+				E32372032EB8D8A4004C5BC9 /* XCRemoteSwiftPackageReference "SwiftF0" */,
+				E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 32C5AB522EA213420007BEFD /* Products */;
@@ -530,6 +538,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E32372032EB8D8A4004C5BC9 /* XCRemoteSwiftPackageReference "SwiftF0" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Segyun/SwiftF0";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/Tonic.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 		E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/AudioKit/AudioKitEX";
@@ -541,6 +565,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E32372042EB8D8A4004C5BC9 /* SwiftF0 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E32372032EB8D8A4004C5BC9 /* XCRemoteSwiftPackageReference "SwiftF0" */;
+			productName = SwiftF0;
+		};
+		E331F8DE2EB9F44400752589 /* Tonic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */;
+			productName = Tonic;
+		};
 		E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */;
