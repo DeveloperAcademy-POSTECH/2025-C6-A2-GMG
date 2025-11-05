@@ -16,16 +16,18 @@ enum ChordQuality {
 extension ChordQuality: CustomStringConvertible {
     var description: String {
         switch self {
-        case .maj: return "maj"
-        case .maj7: return "maj7"
-        case .maj9: return "maj9"
-        case .min: return "min"
-        case .min7: return "min7"
+        case .maj: return "M"
+        case .maj7: return "M7"
+        case .maj9: return "M9"
+        case .min: return "m"
+        case .min7: return "m7"
         case .dom7: return "7"
         case .dom9: return "9"
         case .dim: return "dim"
         case .dim7: return "dim7"
-        case .halfDim7: return "hdim7"
+        case .halfDim7: return "m7b5"
         }
     }
 }
+
+extension ChordQuality: Codable {}
