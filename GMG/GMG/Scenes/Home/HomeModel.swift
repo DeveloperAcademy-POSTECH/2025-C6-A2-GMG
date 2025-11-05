@@ -2,6 +2,14 @@
 
 import Foundation
 
+protocol HomeModelStateProtocol {
+    
+}
+
+protocol HomeModelActionProtocol {
+    
+}
+
 @Observable
 class HomeMode: HomeModelStateProtocol, HomeModelActionProtocol {
     private(set) var songCount: Int
@@ -11,6 +19,6 @@ class HomeMode: HomeModelStateProtocol, HomeModelActionProtocol {
     }
     
     func updateSongCount(_ songCount: Int) {
-        self.songCount = songCount
+        self.songCount
     }
 }

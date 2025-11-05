@@ -169,7 +169,7 @@ extension HomeView {
                 
                 VStack(alignment: .trailing, spacing: .zero) {
                     Button(action: {
-                        //TODO: 삭제 등 미트볼버튼 기능 추가
+                        //TODO: 미트볼버튼 기능 추가
                     }, label: {
                         Image(systemName: "ellipsis")
                             .foregroundStyle(Color.Text.white)
@@ -225,7 +225,6 @@ extension HomeView {
                 Color.blue1,
                 Color.blue2
             ]
-            // 1 미만이 들어와도 안전하게 처리
             let safe = max(i, 1)
             return palette[(safe - 1) % palette.count]
         }

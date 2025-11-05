@@ -12,7 +12,7 @@ import SwiftData
 struct GMGApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            ExportView()
         }
         .modelContainer(for: [Score.self])
     }
