@@ -9,6 +9,8 @@ protocol RecordingModelStateProtocol {
     var isPlaying: Bool { get }
     var amplitudes: [Float] { get }
     var countdown: Int { get }
+    var scoreFactoryState: ScoreFactoryState? { get }
+    var score: Score? { get }
 }
 
 protocol RecordingModelActionProtocol: AnyObject {
@@ -21,6 +23,8 @@ protocol RecordingModelActionProtocol: AnyObject {
     func updateRecordingTime(_ recordingTime: TimeInterval)
     func appendAmplitdue(_ amplitude: Float)
     func updateCountdown(_ countdown: Int)
+    func updateScoreFactoryState(_ scoreFactoryState: ScoreFactoryState?)
+    func finishScoreCreation(_ score: Score)
 }
 
 @Observable
@@ -34,6 +38,8 @@ final class RecordingModel:
     private(set) var isPlaying: Bool
     private(set) var amplitudes: [Float]
     private(set) var countdown: Int
+    private(set) var scoreFactoryState: ScoreFactoryState?
+    private(set) var score: Score?
 
     init() {
         self.isRecording = false
@@ -42,6 +48,8 @@ final class RecordingModel:
         self.isPlaying = false
         self.amplitudes = []
         self.countdown = .zero
+        self.scoreFactoryState = nil
+        self.score = nil
     }
 
     func startRecording() {
@@ -77,8 +85,16 @@ final class RecordingModel:
     func appendAmplitdue(_ amplitude: Float) {
         self.amplitudes.append(amplitude)
     }
-    
+
     func updateCountdown(_ countdown: Int) {
         self.countdown = countdown
+    }
+
+    func updateScoreFactoryState(_ scoreFactoryState: ScoreFactoryState?) {
+        self.scoreFactoryState = scoreFactoryState
+    }
+    
+    func finishScoreCreation(_ score: Score) {
+        self.score = score
     }
 }
