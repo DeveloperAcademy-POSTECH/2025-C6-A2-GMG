@@ -41,6 +41,14 @@ enum Typography {
         case B15
         case B16
 
+        static let Regular: String = "WantedSansStd-Regular"
+        static let Medium: String = "WantedSansStd-Medium"
+        static let SemiBold: String = "WantedSansStd-SemiBold"
+        static let Bold: String = "WantedSansStd-Bold"
+        static let ExtraBold: String = "WantedSansStd-ExtraBold"
+        static let Black: String = "WantedSansStd-Black"
+        static let ExtraBlack: String = "WantedSansStd-ExtraBlack"
+
         var font: Font {
             return Font.custom(self.fontName, size: self.size)
         }
@@ -48,12 +56,12 @@ enum Typography {
         var fontName: String {
             switch self {
             case .R1, .R2, .R3, .R4, .R5, .R6, .R7, .R8, .R9, .R10, .R11:
-                return "WantedSansStd-Regular"
+                return Self.Regular
             case .M1, .M2:
-                return "WantedSansStd-Medium"
+                return Self.Medium
             case .B1, .B2, .B3, .B4, .B5, .B6, .B7, .B8, .B9, .B10, .B11,
                 .B12, .B13, .B14, .B15, .B16:
-                return "WantedSansStd-Bold"
+                return Self.Bold
             }
         }
 
