@@ -10,3 +10,7 @@ extension Chord: CustomStringConvertible {
         "\(root)\(quality)"
     }
 }
+
+extension Chord: Equatable {}
+
+extension Chord: Codable {}

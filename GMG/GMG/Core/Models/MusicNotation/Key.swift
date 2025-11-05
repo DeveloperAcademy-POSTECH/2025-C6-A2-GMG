@@ -9,3 +9,5 @@ extension Key: CustomStringConvertible {
         root.description
     }
 }
+
+extension Key: Codable {}
