@@ -9,21 +9,32 @@ protocol RecordingIntentProtocol {
     func onTapResetButton()
     func onTapPlayButton(_ url: URL)
     func onTapStopPlayButton()
+    func onTapNextButton(_ url: URL, completion: @escaping () -> Void)
 }
 
 final class RecordingIntent: RecordingIntentProtocol {
     private weak var model: RecordingModelActionProtocol?
+
     private let recordManager: RecordManager
     private let playbackManager: PlaybackManager
 
+    private let scoreFactory: ScoreFactory
+
     private var cancellables: Set<AnyCancellable>
+
+    private var scoreCreationTask: Task<Void, Never>?
 
     init(model: RecordingModelActionProtocol) {
         self.model = model
+
         self.recordManager = RecordManager()
         self.playbackManager = PlaybackManager()
 
+        self.scoreFactory = ScoreFactory()
+
         self.cancellables = Set<AnyCancellable>()
+
+        self.scoreCreationTask = nil
 
         setupPublishers()
     }
@@ -60,6 +71,12 @@ final class RecordingIntent: RecordingIntentProtocol {
                 }
             }
             .store(in: &cancellables)
+
+        scoreFactory.scoreFactoryStatePublisher
+            .sink { [weak self] scoreFactoryState in
+                self?.model?.updateScoreFactoryState(scoreFactoryState)
+            }
+            .store(in: &self.cancellables)
     }
 
     func onTapRecordButton() {
@@ -108,5 +125,36 @@ final class RecordingIntent: RecordingIntentProtocol {
 
     func onTapStopPlayButton() {
         playbackManager.stop()
+    }
+
+    func onTapNextButton(_ url: URL, completion: @escaping () -> Void) {
+        scoreCreationTask?.cancel()
+
+        scoreCreationTask = Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                // TODO: Swift Concurrency 방법 찾아보기!
+                // DispatchQueue.global()을 사용하지 않으면 MainThread에서 실행되어 로딩 화면이 안나옴
+                let score: Score = try await withCheckedThrowingContinuation {
+                    continuation in
+                    DispatchQueue.global().async {
+                        do {
+                            let score: Score = try self.scoreFactory
+                                .createScore(audioUrl: url)
+                            continuation.resume(returning: score)
+                        } catch {
+                            continuation.resume(throwing: error)
+                        }
+                    }
+                }
+
+                self.model?.updateScoreFactoryState(nil)
+                self.model?.finishScoreCreation(score)
+                completion()
+            } catch {
+                Logger.error(String(describing: error))
+            }
+        }
     }
 }

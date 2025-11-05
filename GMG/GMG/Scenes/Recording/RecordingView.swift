@@ -1,8 +1,12 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import SwiftData
 import SwiftUI
 
 struct RecordingView: View {
+    @Environment(\.modelContext) private var context
+    @Environment(Router.self) private var router: Router
+
     @State private var model: RecordingModelStateProtocol
     @State private var intent: RecordingIntentProtocol
 
@@ -15,7 +19,7 @@ struct RecordingView: View {
 
     var body: some View {
         ZStack {
-            Color.Background.light
+            Color.bg1
                 .ignoresSafeArea()
 
             VStack {
@@ -42,18 +46,38 @@ struct RecordingView: View {
                     stopRecordAction: intent.onTapStopRecordButton,
                     resetAction: intent.onTapResetButton,
                     playAction: {
-                        if let url = model.recordingURL {
-                            intent.onTapPlayButton(url)
+                        guard let url = model.recordingURL else { return }
+
+                        intent.onTapPlayButton(url)
+                    },
+                    stopPlayAction: intent.onTapStopPlayButton,
+                    nextAction: {
+                        guard let url = model.recordingURL else { return }
+
+                        intent.onTapNextButton(url) {
+                            guard let score = model.score else { return }
+
+                            context.insert(score)
+
+                            router.popToRoot()
+
+                            router.push(.chordProgress(score: score))
                         }
                     },
-                    stopPlayAction: intent.onTapStopPlayButton
                 )
             }
             .padding()
 
             Countdown(countdown: model.countdown)
         }
-
+        .overlay {
+            ZStack {
+                if let scoreFactoryState = model.scoreFactoryState {
+                    LoadingView(scoreFactoryState: scoreFactoryState)
+                }
+            }
+            .animation(.default, value: model.scoreFactoryState)
+        }
     }
 
     struct Countdown: View {
@@ -73,7 +97,7 @@ struct RecordingView: View {
                                 size: 128
                             )
                         )
-                        .foregroundStyle(Color.Text.white)
+                        .foregroundStyle(Color.white1)
                         .contentTransition(.numericText())
                 }
             }
@@ -94,8 +118,8 @@ struct RecordingView: View {
                                 recordingTime.truncatingRemainder(dividingBy: 2)
                             )
                                 == 1)
-                            ? Color.RecordingIndicator.active
-                            : Color.RecordingIndicator.inactive
+                            ? Color.red1
+                            : Color.black3
                     )
                     .frame(width: 14, height: 14)
                     .offset(y: -20)
@@ -117,31 +141,31 @@ struct RecordingView: View {
                 String(format: "%02d:%02d", minute, second)
             )
 
-            attributedString.foregroundColor = Color.Text.gray
+            attributedString.foregroundColor = Color.black3
 
             if minute >= 10 {
-                attributedString.foregroundColor = Color.Text.black
+                attributedString.foregroundColor = Color.black1
             } else if minute > 0 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 1
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.Text.black
+                attributedString[range].foregroundColor = Color.black1
             } else if second >= 10 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 3
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.Text.black
+                attributedString[range].foregroundColor = Color.black1
             } else if second > 0 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 4
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.Text.black
+                attributedString[range].foregroundColor = Color.black1
             }
 
             return attributedString
@@ -150,7 +174,7 @@ struct RecordingView: View {
 
     struct WaveForm: View {
         let amplitudes: [Float]
-        
+
         private var paddedAmplitudes: [Float] {
             Array(
                 repeating: .zero,
@@ -165,7 +189,6 @@ struct RecordingView: View {
                     id: \.0
                 ) { _, amplitude in
                     let height: CGFloat = clampHeight(CGFloat(amplitude) * 5000)
-                    
 
                     Capsule()
                         .foregroundStyle(Color.gray)
@@ -173,7 +196,7 @@ struct RecordingView: View {
                 }
             }
         }
-        
+
         private func clampHeight(_ height: CGFloat) -> CGFloat {
             return min(90, max(10, height))
         }
@@ -188,6 +211,7 @@ struct RecordingView: View {
         let resetAction: () -> Void
         let playAction: () -> Void
         let stopPlayAction: () -> Void
+        let nextAction: () -> Void
 
         var body: some View {
             var primaryButtonTitle: String = "Record"
@@ -235,7 +259,7 @@ struct RecordingView: View {
                         ControllerButton(
                             title: "Next",
                             iconName: "chevron.forward",
-                            action: {},
+                            action: nextAction,
                             isDark: false
                         )
                         .transition(
@@ -269,7 +293,7 @@ struct RecordingView: View {
                             .font(Typography.WantedSansStd.M2)
                     }
                     .foregroundStyle(
-                        isDark ? Color.Text.white : Color.Text.black
+                        isDark ? Color.white1 : Color.black1
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(
@@ -283,6 +307,6 @@ struct RecordingView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .routerModifier) {
     RecordingView()
 }
