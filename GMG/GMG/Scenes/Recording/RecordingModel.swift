@@ -21,7 +21,7 @@ protocol RecordingModelActionProtocol: AnyObject {
     func stopPlaying()
     func reset()
     func updateRecordingTime(_ recordingTime: TimeInterval)
-    func appendAmplitdue(_ amplitude: Float)
+    func appendAmplitude(_ amplitude: Float)
     func updateCountdown(_ countdown: Int)
     func updateScoreFactoryState(_ scoreFactoryState: ScoreFactoryState?)
     func finishScoreCreation(_ score: Score)
@@ -82,7 +82,7 @@ final class RecordingModel:
         self.recordingTime = recordingTime
     }
 
-    func appendAmplitdue(_ amplitude: Float) {
+    func appendAmplitude(_ amplitude: Float) {
         self.amplitudes.append(amplitude)
     }
 
