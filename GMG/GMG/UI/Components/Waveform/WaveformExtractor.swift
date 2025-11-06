@@ -52,43 +52,49 @@ struct WaveformExtractor {
         // 현재 bin에 들어갈 샘플을 누적하다가 samplePerBin 개가 쌓이면 emitBin()으로 해당 bin의 대표값(RMS 또는 피크)을 확정하고 초기화
         func emitBin() {
             guard sampleCountInBin > 0 else { return }
-            let v: Float = (mode == .rms)
+            let binValue: Float = (mode == .rms)
                 ? sqrt(sumOfSquaredSamples / Float(sampleCountInBin))
                 : peakAmplitudeInBin
-            binAmplitudes.append(v)
+            binAmplitudes.append(binValue)
             sampleCountInBin = 0; sumOfSquaredSamples = 0; peakAmplitudeInBin = 0
         }
         
         while reader.status == .reading {
-            guard let sbuf = output.copyNextSampleBuffer() else { break }
-            guard let block = CMSampleBufferGetDataBuffer(sbuf) else {
-                CMSampleBufferInvalidate(sbuf)
+            guard let sampleBuffer = output.copyNextSampleBuffer() else { break }
+            guard let dataBuffer = CMSampleBufferGetDataBuffer(sampleBuffer) else {
+                CMSampleBufferInvalidate(sampleBuffer)
                 continue
             }
             
-            var length = 0
-            var p: UnsafeMutablePointer<Int8>?
-            CMBlockBufferGetDataPointer(block, atOffset: 0, lengthAtOffsetOut: nil, totalLengthOut: &length, dataPointerOut: &p)
+            var byteLength = 0
+            var pointer: UnsafeMutablePointer<Int8>?
+            CMBlockBufferGetDataPointer(
+                dataBuffer, atOffset: 0,
+                lengthAtOffsetOut: nil,
+                totalLengthOut: &byteLength,
+                dataPointerOut: &pointer
+            )
             
-            if let p {
-                let count = length / MemoryLayout<Float>.size
-                p.withMemoryRebound(to: Float.self, capacity: count) { fptr in
-                    var i = 0
-                    while i < count {
-                        let s = fptr[i]
-                        let a = abs(s)
-                        peakAmplitudeInBin = max(peakAmplitudeInBin, a)
-                        sumOfSquaredSamples += s * s
+            if let pointer {
+                let sampleCount = byteLength / MemoryLayout<Float>.size
+                pointer.withMemoryRebound(to: Float.self, capacity: sampleCount) { floatPointer in
+                    var index = 0
+                    while index < sampleCount {
+                        let sample = floatPointer[index]
+                        let amplitude = abs(sample)
+                        
+                        peakAmplitudeInBin = max(peakAmplitudeInBin, amplitude)
+                        sumOfSquaredSamples += sample * sample
                         sampleCountInBin += 1
                         
                         if sampleCountInBin >= samplePerBin {
                             emitBin()
                         }
-                        i += 1
+                        index += 1
                     }
                 }
             }
-            CMSampleBufferInvalidate(sbuf)
+            CMSampleBufferInvalidate(sampleBuffer)
         }
         if sampleCountInBin > 0 { emitBin() }
         
