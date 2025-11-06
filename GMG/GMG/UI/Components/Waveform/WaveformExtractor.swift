@@ -22,17 +22,16 @@ struct WaveformExtractor {
             throw WaveformError.noAudioTrack
         }
         
-        let outputSettings: [String: Any] = [
+        let reader = try AVAssetReader(asset: asset)
+        let output = AVAssetReaderTrackOutput(track: track, outputSettings: [
             AVFormatIDKey: kAudioFormatLinearPCM,
             AVLinearPCMIsFloatKey: true,
             AVLinearPCMIsBigEndianKey: false,
             AVLinearPCMBitDepthKey: 32,
             AVNumberOfChannelsKey: 1,
             AVSampleRateKey: targetSampleRate
-        ]
+        ])
         
-        let reader = try AVAssetReader(asset: asset)
-        let output = AVAssetReaderTrackOutput(track: track, outputSettings: outputSettings)
         output.alwaysCopiesSampleData = false
         reader.add(output)
         
