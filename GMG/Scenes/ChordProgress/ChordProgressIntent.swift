@@ -74,8 +74,6 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onTapChordCell(_ chordCell: ChordCell) {
         self.scorePlayer?.seek(chordCell: chordCell)
-
-//        guard let chord: Chord = chordCell.chord else { return }
-//        scorePlayer?.play(chord: chord)
+        self.model?.selectChordCell(chordCell)
     }
 }
