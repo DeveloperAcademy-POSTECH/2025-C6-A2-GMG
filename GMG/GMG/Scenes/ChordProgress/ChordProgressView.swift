@@ -346,7 +346,7 @@ extension ChordProgressView {
             }
 
             /// 마지막 세그먼트에서 오디오 길이보다 작을 경우
-            if index == Int(floor(totalDuration / 5))
+            if index == Int(floor(totalDuration / segmentDuration))
                 && totalDuration < segmentEndTime
             {
                 filteredChordCells.append(
