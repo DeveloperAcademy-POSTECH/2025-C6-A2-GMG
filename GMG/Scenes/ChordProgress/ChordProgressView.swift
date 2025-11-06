@@ -46,13 +46,15 @@ struct ChordProgressView: View {
                     totalDuration: model.score.totalDuration,
                     chordCells: model.score.retrieveAllChordCells(),
                     currentChordCell: model.currentChordCell,
+                    selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell
                 )
             }
-            .preferredColorScheme(model.isEditMode ? .dark : .light)
             .navigationBar(
                 model.score.title,
-                leading: {},
+                leading: {
+
+                },
                 trailing: {
                     Button {
                         router.push(.export)
@@ -61,6 +63,7 @@ struct ChordProgressView: View {
                     }
                 }
             )
+            .environment(\.colorScheme, model.isEditMode ? .dark : .light)
 
             VStack {
                 Spacer()
@@ -74,6 +77,10 @@ struct ChordProgressView: View {
             }
             .padding()
         }
+        .environment(
+            \.editMode,
+            .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
+        )
         .onAppear {
             intent.onAppear(model.score)
         }
@@ -85,17 +92,19 @@ struct ChordProgressView: View {
 
 extension ChordProgressView {
     struct Background: View {
-        @Environment(\.colorScheme) private var colorScheme: ColorScheme
+        @Environment(\.editMode) private var editMode
+
+        private var backgroundColor: Color {
+            if editMode?.wrappedValue.isEditing == true {
+                Color.bg2
+            } else {
+                Color.bg1
+            }
+        }
 
         var body: some View {
-            Group {
-                if colorScheme == .light {
-                    Color.bg1
-                } else {
-                    Color.bg2
-                }
-            }
-            .ignoresSafeArea()
+            backgroundColor
+                .ignoresSafeArea()
         }
     }
 
@@ -103,7 +112,7 @@ extension ChordProgressView {
         let key: Key
         let totalDuration: TimeInterval
 
-        @Environment(\.colorScheme) private var colorScheme: ColorScheme
+        @Environment(\.editMode) private var editMode
 
         private var minuteString: String {
             String(
@@ -127,7 +136,8 @@ extension ChordProgressView {
                     .font(Typography.WantedSansStd.R4)
             }
             .foregroundStyle(
-                colorScheme == .light ? Color.black1 : Color.white1
+                editMode?.wrappedValue.isEditing == true
+                    ? Color.white1 : Color.black1
             )
         }
     }
@@ -195,6 +205,22 @@ extension ChordProgressView {
         let pauseAction: () -> Void
         let stopAction: () -> Void
 
+        private var primaryButtonImage: ImageResource {
+            if isPlaying {
+                return .pause
+            } else {
+                return .play
+            }
+        }
+
+        private var primaryButtonAction: () -> Void {
+            if isPlaying {
+                return pauseAction
+            } else {
+                return playAction
+            }
+        }
+
         var body: some View {
             Grid {
                 GridRow {
@@ -204,29 +230,13 @@ extension ChordProgressView {
                         Image(.stop)
                             .renderingMode(.template)
                     }
-                    .transition(
-                        .scale(scale: 0.0, anchor: .leading)
-                            .combined(with: .opacity)
-                    )
                     .gridCellColumns(1)
 
-                    Group {
-                        if isPlaying {
-                            ControllerButton(isDark: true) {
-                                pauseAction()
-                            } label: {
-                                Image(.pause)
-                                    .renderingMode(.template)
-                            }
-
-                        } else {
-                            ControllerButton(isDark: true) {
-                                playAction()
-                            } label: {
-                                Image(.play)
-                                    .renderingMode(.template)
-                            }
-                        }
+                    ControllerButton(isDark: true) {
+                        primaryButtonAction()
+                    } label: {
+                        Image(primaryButtonImage)
+                            .renderingMode(.template)
                     }
                     .gridCellColumns(3)
 
@@ -241,7 +251,7 @@ extension ChordProgressView {
             }
             .padding()
             .frame(maxHeight: 96)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18))
+            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 18))
         }
     }
 
@@ -250,6 +260,7 @@ extension ChordProgressView {
         let totalDuration: TimeInterval
         let chordCells: [ChordCell]
         let currentChordCell: ChordCell?
+        let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
 
         var body: some View {
@@ -265,6 +276,7 @@ extension ChordProgressView {
                             chordCells: chordCells,
                             segmentDuration: segmentDuration,
                             currentChordCell: currentChordCell,
+                            selectedChordCell: selectedChordCell,
                             chordCellAction: chordCellAction
                         )
                     }
@@ -296,7 +308,10 @@ extension ChordProgressView {
         let chordCells: [ChordCell]
         let segmentDuration: TimeInterval
         let currentChordCell: ChordCell?
+        let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
+
+        @Environment(\.editMode) private var editMode
 
         private var segmentStartTime: TimeInterval {
             TimeInterval(index) * segmentDuration
@@ -419,7 +434,10 @@ extension ChordProgressView {
                                 if let chord = chordCell.chord {
                                     ChordCellButton(
                                         chord: chord,
-                                        isSelected: currentChordCell?.startTime
+                                        isCurrentChord: currentChordCell?
+                                            .startTime
+                                            == chordCell.startTime,
+                                        isSelected: selectedChordCell?.startTime
                                             == chordCell.startTime
                                     ) {
                                         chordCellAction(chordCell)
@@ -434,6 +452,20 @@ extension ChordProgressView {
                 }
                 .frame(height: 64)
 
+                let showCandidates: Bool =
+                    editMode?.wrappedValue.isEditing == true
+                    && filteredChordCells.contains(where: {
+                        $0.startTime == selectedChordCell?.startTime
+                    })
+                    && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
+
+                ChordCellCandidates(
+                    chordCandidates: selectedChordCell?.chordCandidates ?? []
+                )
+                .frame(height: showCandidates ? 62 : 0)
+                .scaleEffect(y: showCandidates ? 1.0 : 0.0)
+                .opacity(showCandidates ? 1.0 : 0.0)
+
                 Waveform()
 
                 TimeRuler(
@@ -442,12 +474,83 @@ extension ChordProgressView {
                     dotCount: Int(segmentDuration * 2) - 1
                 )
             }
+            .animation(.default, value: editMode?.wrappedValue)
+            .animation(.default, value: selectedChordCell?.startTime)
+        }
+
+        struct ChordCellCandidates: View {
+            let chordCandidates: [Chord]
+
+            var body: some View {
+                ZStack {
+                    Color.black2
+
+                    ScrollView(.horizontal) {
+                        HStack {
+                            ForEach(
+                                Array(chordCandidates).enumerated(),
+                                id: \.0
+                            ) { index, chord in
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 8)
+                                    Text(chord.description)
+                                        .font(Typography.WantedSansStd.R5)
+                                }
+                                .frame(minWidth: 60)
+                            }
+                        }
+                        .padding(Spacing.sm)
+                    }
+                    .contentMargins(.horizontal, Spacing.md)
+                }
+                .frame(minHeight: 62)
+                .padding(.horizontal, -Spacing.md)
+            }
         }
 
         struct ChordCellButton: View {
             let chord: Chord
+            let isCurrentChord: Bool
             let isSelected: Bool
             let action: () -> Void
+
+            @Environment(\.editMode) private var editMode
+
+            private var foregroundColor: Color {
+                if editMode?.wrappedValue.isEditing == true {
+                    if isSelected {
+                        return Color.white1
+                    } else if isCurrentChord {
+                        return Color.black1
+                    } else {
+                        return Color.white1
+                    }
+                } else {
+                    if isCurrentChord {
+                        return Color.white1
+                    } else {
+                        return Color.black1
+                    }
+                }
+            }
+
+            private var backgroundColor: Color {
+                if editMode?.wrappedValue.isEditing == true {
+                    if isSelected {
+                        return Color.blue6
+                    } else if isCurrentChord {
+                        return Color.white1
+                    } else {
+                        return Color.black2
+                    }
+                } else {
+                    if isCurrentChord {
+                        return Color.blue4
+                    } else {
+                        return Color.white1
+                    }
+                }
+            }
 
             var body: some View {
                 Button {
@@ -456,14 +559,14 @@ extension ChordProgressView {
                     Text(chord.description)
                         .font(Typography.WantedSansStd.R7)
                         .foregroundStyle(
-                            isSelected ? Color.white1 : Color.black1
+                            foregroundColor
                         )
                         .frame(
                             maxWidth: .infinity,
                             maxHeight: .infinity
                         )
                         .background(
-                            isSelected ? Color.blue4 : Color.white,
+                            backgroundColor,
                             in: RoundedRectangle(cornerRadius: 12)
                         )
                 }
@@ -473,10 +576,13 @@ extension ChordProgressView {
 
         // TODO: Waveform 구현
         struct Waveform: View {
+            @Environment(\.editMode) private var editMode
+
             var body: some View {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(
-                        Color.white2
+                        editMode?.wrappedValue.isEditing == true
+                            ? Color.black2 : Color.white2
                     )
                     .frame(height: 36)
             }
@@ -486,6 +592,8 @@ extension ChordProgressView {
             let startTime: TimeInterval
             let endTime: TimeInterval
             let dotCount: Int
+
+            @Environment(\.editMode) private var editMode
 
             var body: some View {
                 HStack {
@@ -502,7 +610,8 @@ extension ChordProgressView {
                         .fixedSize()
                 }
                 .foregroundStyle(
-                    Color.black5
+                    editMode?.wrappedValue.isEditing == true
+                        ? Color.black5 : Color.black8
                 )
                 .padding(.horizontal, Spacing.xs)
             }
@@ -511,5 +620,7 @@ extension ChordProgressView {
 }
 
 #Preview(traits: .routerModifier) {
-    ChordProgressView(score: .mock)
+    NavigationStack {
+        ChordProgressView(score: .mock)
+    }
 }
