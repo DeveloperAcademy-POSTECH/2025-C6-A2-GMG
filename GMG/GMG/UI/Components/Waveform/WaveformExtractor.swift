@@ -12,62 +12,6 @@ enum DownsampleMode { case rms, peak }
 
 struct WaveformExtractor {
     
-    //MARK: 디코딩 파이프가 정상 작동하는 지 샘플 개수 세어서 확인하는 함수 -> 동작에는 크게 필요없지만 debug용으로 작동하는 함수
-    static func debugCountSamples(from url: URL, targetSampleRate: Double = 44_100) async throws -> Int {
-        let asset = AVURLAsset(url: url)
-        
-        let audioTracks = try await asset.loadTracks(withMediaType: .audio)
-        guard let track = audioTracks.first else {
-            throw WaveformError.noAudioTrack
-        }
-        
-        let outputSettings: [String: Any] = [
-            AVFormatIDKey: kAudioFormatLinearPCM,
-            AVLinearPCMIsFloatKey: true,
-            AVLinearPCMIsBigEndianKey: false,
-            AVLinearPCMBitDepthKey: 32,
-            AVNumberOfChannelsKey: 1,
-            AVSampleRateKey: targetSampleRate
-        ]
-        
-        let reader = try AVAssetReader(asset: asset)
-        let output = AVAssetReaderTrackOutput(track: track, outputSettings: outputSettings)
-        output.alwaysCopiesSampleData = false
-        reader.add(output)
-        
-        guard reader.startReading() else {
-            throw WaveformError.readerFailed(reader.error?.localizedDescription ?? "Unknown Error")
-        }
-        
-        var totalFloatSamples = 0
-        
-        while reader.status == .reading {
-            guard let sbuf = output.copyNextSampleBuffer() else {
-                break
-            }
-            guard let blockBuffer = CMSampleBufferGetDataBuffer(sbuf) else {
-                continue
-            }
-            
-            var length = 0
-            var dataPointer: UnsafeMutablePointer<Int8>?
-            CMBlockBufferGetDataPointer(blockBuffer, atOffset: 0, lengthAtOffsetOut: nil, totalLengthOut: &length, dataPointerOut: &dataPointer)
-            
-            if let _ = dataPointer {
-                let count = length / MemoryLayout<Float>.size
-                
-                totalFloatSamples += count
-            }
-            CMSampleBufferInvalidate(sbuf)
-        }
-        
-        if reader.status == .failed {
-            throw WaveformError.readerFailed(reader.error?.localizedDescription ?? "reader Failed")
-        }
-        
-        return totalFloatSamples
-    }
-    
     //MARK: 진폭 배열 추출 함수 (녹음본 다운샘플링)
     static func extractAmplitudes(from url: URL, bins: Int, mode: DownsampleMode = .rms, targetSampleRate: Double = 44_100) async throws -> [Float] {
         let asset = AVURLAsset(url: url)
