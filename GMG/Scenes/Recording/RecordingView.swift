@@ -300,7 +300,7 @@ struct RecordingView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: 140)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18))
+            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 18))
             .animation(.default, value: recordingUrl)
         }
     }
