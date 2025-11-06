@@ -44,19 +44,19 @@ struct WaveformExtractor {
         let totalSamplesEstimate = max(1, Int(durationSec * targetSampleRate))
         let samplePerBin = max(1, totalSamplesEstimate / max(1, bins))
         
-        var result = [Float](); result.reserveCapacity(bins)
-        var accCount = 0
-        var accEnergy: Float = 0
-        var accPeak: Float = 0
+        var binAmplitudes = [Float](); binAmplitudes.reserveCapacity(bins)
+        var sampleCountInBin = 0 //현재 Bin에 몇 개의 샘플이 쌓였는지
+        var sumOfSquaredSamples: Float = 0 //RMS 계산을 위한 샘플^2 누적값
+        var peakAmplitudeInBin: Float = 0 //현재 bin에서 가장 큰 진폭 (피크값)
         
-        // 현재 bin에 들어갈 샘플을 누적하다가 samplePerBin 개가 쌓이면 commitBin()으로 해당 bin의 대표값(RMS 또는 피크)을 확정하고 초기화
-        func commitBin() {
-            guard accCount > 0 else { return }
+        // 현재 bin에 들어갈 샘플을 누적하다가 samplePerBin 개가 쌓이면 emitBin()으로 해당 bin의 대표값(RMS 또는 피크)을 확정하고 초기화
+        func emitBin() {
+            guard sampleCountInBin > 0 else { return }
             let v: Float = (mode == .rms)
-                ? sqrt(accEnergy / Float(accCount))
-                : accPeak
-            result.append(v)
-            accCount = 0; accEnergy = 0; accPeak = 0
+                ? sqrt(sumOfSquaredSamples / Float(sampleCountInBin))
+                : peakAmplitudeInBin
+            binAmplitudes.append(v)
+            sampleCountInBin = 0; sumOfSquaredSamples = 0; peakAmplitudeInBin = 0
         }
         
         while reader.status == .reading {
@@ -77,12 +77,12 @@ struct WaveformExtractor {
                     while i < count {
                         let s = fptr[i]
                         let a = abs(s)
-                        accPeak = max(accPeak, a)
-                        accEnergy += s * s
-                        accCount += 1
+                        peakAmplitudeInBin = max(peakAmplitudeInBin, a)
+                        sumOfSquaredSamples += s * s
+                        sampleCountInBin += 1
                         
-                        if accCount >= samplePerBin {
-                            commitBin()
+                        if sampleCountInBin >= samplePerBin {
+                            emitBin()
                         }
                         i += 1
                     }
@@ -90,17 +90,17 @@ struct WaveformExtractor {
             }
             CMSampleBufferInvalidate(sbuf)
         }
-        if accCount > 0 { commitBin() }
+        if sampleCountInBin > 0 { emitBin() }
         
-        if result.count < bins { result.append(contentsOf: Array(repeating: 0, count: bins - result.count)) }
-        if result.count > bins { result.removeLast(result.count - bins) }
+        if binAmplitudes.count < bins { binAmplitudes.append(contentsOf: Array(repeating: 0, count: bins - binAmplitudes.count)) }
+        if binAmplitudes.count > bins { binAmplitudes.removeLast(binAmplitudes.count - bins) }
         
         if reader.status == .failed {
             throw WaveformError.readerFailed(reader.error?.localizedDescription ?? "Unknown error")
         }
         
-        let maxV = max(result.max() ?? 0, 1e-6)
-        let normalized = result.map { min(1, max(0, $0 / maxV)) }
+        let maxV = max(binAmplitudes.max() ?? 0, 1e-6)
+        let normalized = binAmplitudes.map { min(1, max(0, $0 / maxV)) }
         
         return normalized
     }
