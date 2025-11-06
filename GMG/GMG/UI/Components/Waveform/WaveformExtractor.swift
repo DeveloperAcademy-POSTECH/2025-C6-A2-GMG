@@ -44,13 +44,13 @@ struct WaveformExtractor {
         let totalSamplesEstimate = max(1, Int(durationSec * targetSampleRate))
         let samplePerBin = max(1, totalSamplesEstimate / max(1, bins))
         
-        // bin 단위로 accCount/accEnergy, accPeak를 모았다가 꽉 차면
         var result = [Float](); result.reserveCapacity(bins)
         var accCount = 0
         var accEnergy: Float = 0
         var accPeak: Float = 0
         
-        func flushBin() {
+        // 현재 bin에 들어갈 샘플을 누적하다가 samplePerBin 개가 쌓이면 commitBin()으로 해당 bin의 대표값(RMS 또는 피크)을 확정하고 초기화
+        func commitBin() {
             guard accCount > 0 else { return }
             let v: Float = (mode == .rms)
                 ? sqrt(accEnergy / Float(accCount))
@@ -82,7 +82,7 @@ struct WaveformExtractor {
                         accCount += 1
                         
                         if accCount >= samplePerBin {
-                            flushBin()
+                            commitBin()
                         }
                         i += 1
                     }
@@ -90,7 +90,7 @@ struct WaveformExtractor {
             }
             CMSampleBufferInvalidate(sbuf)
         }
-        if accCount > 0 { flushBin() }
+        if accCount > 0 { commitBin() }
         
         if result.count < bins { result.append(contentsOf: Array(repeating: 0, count: bins - result.count)) }
         if result.count > bins { result.removeLast(result.count - bins) }
