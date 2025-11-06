@@ -28,8 +28,6 @@ final class ScoreFactory {
     func createScore(
         audioUrl: URL
     ) throws -> Score {
-        Logger.debug("Main Thread: \(Thread.isMainThread)")
-
         scoreFactoryStatePublisher.send(.hummingAnalysis)
 
         let notes: [Note] = try self.convertAudioToNotes(audioUrl: audioUrl)
