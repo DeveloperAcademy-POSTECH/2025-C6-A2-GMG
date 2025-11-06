@@ -99,8 +99,8 @@ struct WaveformExtractor {
             throw WaveformError.readerFailed(reader.error?.localizedDescription ?? "Unknown error")
         }
         
-        let maxV = max(binAmplitudes.max() ?? 0, 1e-6)
-        let waveform = binAmplitudes.map { min(1, max(0, $0 / maxV)) }
+        let PeakForNormalization = max(binAmplitudes.max() ?? 0, 1e-6) //1e-6은 최솟값으로, 완전 무음이어서 mx가 0일때 0으로 나누면 크래시가 나기 때문에 최솟값을 보장하기 위해 사용 (엡실론)
+        let waveform = binAmplitudes.map { min(1, max(0, $0 / PeakForNormalization)) }
         
         return waveform
     }
