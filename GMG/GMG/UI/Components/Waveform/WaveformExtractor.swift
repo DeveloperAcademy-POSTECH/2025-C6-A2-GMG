@@ -100,8 +100,8 @@ struct WaveformExtractor {
         }
         
         let maxV = max(binAmplitudes.max() ?? 0, 1e-6)
-        let normalized = binAmplitudes.map { min(1, max(0, $0 / maxV)) }
+        let waveform = binAmplitudes.map { min(1, max(0, $0 / maxV)) }
         
-        return normalized
+        return waveform
     }
 }
