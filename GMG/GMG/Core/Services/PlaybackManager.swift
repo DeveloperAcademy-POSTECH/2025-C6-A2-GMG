@@ -45,11 +45,16 @@ final class PlaybackManager {
             }
         }
 
-        try self.audioPlayer.load(url: url)
-        self.audioPlayer.play()
-        self.audioPlayer.isLooping = false
-
-        self.isPlayingPublisher.send(true)
+        do {
+            try self.audioPlayer.load(url: url)
+            self.audioPlayer.play()
+            self.audioPlayer.isLooping = false
+            
+            self.isPlayingPublisher.send(true)
+        } catch {
+            stop()
+            throw error
+        }
     }
 
     func stop() {
