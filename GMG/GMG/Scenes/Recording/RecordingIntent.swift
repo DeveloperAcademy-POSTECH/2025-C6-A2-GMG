@@ -58,7 +58,7 @@ final class RecordingIntent: RecordingIntentProtocol {
 
         recordManager.amplitudePublisher
             .sink { [weak self] amplitude in
-                self?.model?.appendAmplitdue(amplitude)
+                self?.model?.appendAmplitude(amplitude)
             }
             .store(in: &cancellables)
 
