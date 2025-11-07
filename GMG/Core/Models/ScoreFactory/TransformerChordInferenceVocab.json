@@ -1151,14 +1151,14 @@
     "Root_A#",
     "Root_B",
     "Type_maj",
-    "Type_7",
-    "Type_9",
-    "Type_M9",
+    "Type_dom7",
+    "Type_dom9",
+    "Type_maj9",
     "Type_dim",
-    "Type_m",
-    "Type_m7",
+    "Type_min",
+    "Type_min7",
     "Type_maj7",
-    "Type_o7",
-    "Type_ø7"
+    "Type_dim7",
+    "Type_hdim7"
   ]
 }

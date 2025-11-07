@@ -7,433 +7,446 @@ struct ChordInferencerResult {
     let chordCells: [ChordCell]
 }
 
+enum ChordInferencerError: Error {
+    case notFoundVocab
+    case invalidModelOutput
+}
+
 final class ChordInferencer {
     private let model: TransformerChordInference
     private let vocab: Vocab
 
-    private var maxSrcLen: Int = 512
-    private var maxTgtLen: Int = 256
+    private var maxMelodyLength: Int = 656
+    private var maxChordLength: Int = 171
 
-    private let padIndex: Int = 0
-    private let sosIndex: Int = 1
-    private let eosIndex: Int = 2
-    private let unkIndex: Int = 3
+    private let padId: Int = 0
+    private let sosId: Int = 1
+    private let eosId: Int = 2
+    private let unkId: Int = 3
 
     init() throws {
         self.model = try TransformerChordInference()
 
-        if let melodyDesc = model.model.modelDescription
+        if let melodyDescription: MLMultiArrayConstraint = model.model
+            .modelDescription
             .inputDescriptionsByName["melody_tokens"]?.multiArrayConstraint,
-            let chordDesc = model.model.modelDescription
-                .inputDescriptionsByName["chord_input"]?.multiArrayConstraint
+            melodyDescription.shape.count == 2
         {
-
-            if melodyDesc.shape.count == 2,
-                let len = melodyDesc.shape[1].intValue as Int?
-            {
-                self.maxSrcLen = max(1, len)
-            }
-            if chordDesc.shape.count == 2,
-                let len = chordDesc.shape[1].intValue as Int?
-            {
-                self.maxTgtLen = max(2, len)
-            }
+            let length: Int = melodyDescription.shape[1].intValue
+            self.maxMelodyLength = max(1, length)
         }
 
-        let vocabUrl = Bundle.main.url(
-            forResource: "TransformerChordInferenceVocab",
-            withExtension: "json"
-        )!
+        if let chordDescription: MLMultiArrayConstraint = model.model
+            .modelDescription
+            .inputDescriptionsByName["chord_input"]?.multiArrayConstraint,
+            chordDescription.shape.count == 2
+        {
+            let length: Int = chordDescription.shape[1].intValue
+            self.maxChordLength = max(2, length)
+        }
+
+        guard
+            let vocabUrl =
+                Bundle.main.url(
+                    forResource: "TransformerChordInferenceVocab",
+                    withExtension: "json"
+                )
+        else { throw ChordInferencerError.notFoundVocab }
+
         let vocabData = try Data(contentsOf: vocabUrl)
+
         self.vocab = try JSONDecoder().decode(Vocab.self, from: vocabData)
     }
 
     func inference(notes: [Note]) throws -> ChordInferencerResult {
-        let tokenStrings: [String] = tokenizeNotes(notes)
-        let outputTokens: [String] = try inference(tokenStrings: tokenStrings)
-
-        var keyRoot: NoteName = .C
-
-        if let keyToken: String = outputTokens.first {
-            let keyString: String = keyToken.replacingOccurrences(
-                of: "Key_",
-                with: ""
-            )
-
-            switch keyString {
-            case "C": keyRoot = .C
-            case "C#": keyRoot = .Cs
-            case "D": keyRoot = .D
-            case "D#": keyRoot = .Ds
-            case "E": keyRoot = .E
-            case "F": keyRoot = .F
-            case "F#": keyRoot = .Fs
-            case "G": keyRoot = .G
-            case "G#": keyRoot = .Gs
-            case "A": keyRoot = .A
-            case "A#": keyRoot = .As
-            case "B": keyRoot = .B
-            default: break
+        // TODO: - note를 입력 최대 시간에 따라 잘라서 처리하기
+        let tokens: [String] =
+            notes
+            .map { note in
+                return note.tokens
             }
+            .flatMap { tokens in
+                return tokens
+            }
+
+        let outputTokens: [[InferenceResult]] =
+            try inference(tokens: tokens)
+
+        var key: Key = Key(root: .C)
+        if let keyTokenId: Int = outputTokens.first?.first?.id,
+            let keyToken: String = vocab.chordToken(id: keyTokenId),
+            let root: NoteName = NoteName(token: keyToken)
+        {
+            key = Key(root: root)
         }
 
-        let key: Key = Key(root: keyRoot)
+        let chordCells: [ChordCell] =
+            convertToChordCells(outputTokens)
 
-        let chordCells: [ChordCell] = convertToChordCells(outputTokens)
-        let result: ChordInferencerResult = ChordInferencerResult(
-            key: key,
-            chordCells: chordCells
-        )
+        let result: ChordInferencerResult =
+            ChordInferencerResult(
+                key: key,
+                chordCells: chordCells
+            )
 
         return result
     }
+}
 
-    // 노트 -> 토큰 문자열 변환 (클램프 + 접두사 수정)
-    private func tokenizeNotes(_ notes: [Note]) -> [String] {
-        var tokenStrings: [String] = []
-        for note in notes {
-            let posIdx = max(
-                0,
-                min(511, Int((note.startTime * 10.0).rounded()))
-            )  // 0..511
-            let pitchIdx = note.name.chormaIndex  // 0..11
-            let durIdx = max(1, min(81, Int((note.duration * 10.0).rounded())))  // 1..81
+extension ChordInferencer {
+    private func inference(tokens: [String]) throws -> [[InferenceResult]] {
+        var tokenIds: [Int] = []
 
-            let positionToken = "Position_\(posIdx)"
-            let pitchToken = "Pitch_\(pitchIdx)"
-            let durationToken = "Duration_\(durIdx)"
-
-            tokenStrings.append(positionToken)
-            tokenStrings.append(pitchToken)
-            tokenStrings.append(durationToken)
-        }
-        return tokenStrings
-    }
-
-    func inference(tokenStrings: [String]) throws -> [String] {
-        // melody 입력 길이
-        let srcLen = maxSrcLen
-        var tokens: [Int32] = Array(repeating: Int32(padIndex), count: srcLen)
-
-        // BOS
-        var write = 0
-        tokens[write] = Int32(sosIndex)
-        write += 1
-
-        for tokenString in tokenStrings {
-            if write >= srcLen - 1 { break }
-            let idx = vocab.melody.firstIndex(of: tokenString) ?? unkIndex
-            tokens[write] = Int32(idx)
-            write += 1
-        }
-        // EOS
-        tokens[min(write, srcLen - 1)] = Int32(eosIndex)
-
-        // 멜로디 입력 배열 생성
-        let melodyArray = MLShapedArray<Int32>(
-            scalars: tokens,
-            shape: [1, srcLen]
-        )
-        let melodyTokens = MLMultiArray(melodyArray)
-
-        // 디코딩
-        let chordIndices = try generateOutputSequence(
-            melodyTokens: melodyTokens,
-            topK: 5,
-            temperature: 1.0
-        )
-
-        // 토큰 문자열 매핑 (BOS 제외)
-        return chordIndices.dropFirst().map { index in
-            if index >= 0 && index < vocab.chord.count {
-                return vocab.chord[index]
-            }
-            return "<unk>"
-        }
-    }
-
-    func convertToChordCells(_ tokens: [String]) -> [ChordCell] {
-        var result: [ChordCell] = []
-
-        var position: TimeInterval?
-        var root: String?
-        var type: String?
-        for token in tokens {
-            if token.hasPrefix("Position_") {
-                if let prevPosition = position, let prevRoot = root,
-                    let prevType = type
-                {
-                    let prevChord = convertToChord(
-                        root: prevRoot,
-                        type: prevType
-                    )
-
-                    result.append(
-                        ChordCell(
-                            chord: prevChord,
-                            chordCandidates: [prevChord],
-                            startTime: prevPosition
-                        )
-                    )
-
-                    position = nil
-                    root = nil
-                    type = nil
+        tokenIds.reserveCapacity(maxMelodyLength)
+        tokenIds.append(sosId)
+        tokenIds.append(
+            contentsOf:
+                tokens
+                .prefix(maxMelodyLength - 2)
+                .map { token in
+                    return vocab.melodyId(token: token) ?? unkId
                 }
-                position =
-                    (TimeInterval(
-                        token.replacingOccurrences(of: "Position_", with: "")
-                    ) ?? 0.0) * 0.1
-                if position == 0.0 {
-                    position = nil
-                }
-            } else if token.hasPrefix("Root_") {
-                root = token.replacingOccurrences(of: "Root_", with: "")
-            } else if token.hasPrefix("Type_") {
-                type = token.replacingOccurrences(of: "Type_", with: "")
-            }
-        }
+        )
+        tokenIds.append(eosId)
 
-        if let prevPosition = position, let prevRoot = root, let prevType = type
-        {
-            let prevChord = convertToChord(root: prevRoot, type: prevType)
-
-            result.append(
-                ChordCell(
-                    chord: prevChord,
-                    chordCandidates: [prevChord],
-                    startTime: prevPosition
+        if tokenIds.count < maxMelodyLength {
+            tokenIds.append(
+                contentsOf: Array(
+                    repeating: padId,
+                    count: maxMelodyLength - tokenIds.count
                 )
             )
-
-            position = nil
-            root = nil
-            type = nil
         }
 
-        return result
-    }
+        let melodyArray: MLShapedArray<Int32> = MLShapedArray<Int32>(
+            scalars: tokenIds.map(Int32.init),
+            shape: [1, maxMelodyLength]
+        )
 
-    private func convertToChord(root: String, type: String) -> Chord {
-        var noteName: NoteName = .C
-        switch root {
-        case "C":
-            noteName = .C
-        case "C#":
-            noteName = .Cs
-        case "D":
-            noteName = .D
-        case "D#":
-            noteName = .Ds
-        case "E":
-            noteName = .E
-        case "F":
-            noteName = .F
-        case "F#":
-            noteName = .Fs
-        case "G":
-            noteName = .G
-        case "G#":
-            noteName = .Gs
-        case "A":
-            noteName = .A
-        case "A#":
-            noteName = .As
-        case "B":
-            noteName = .B
-        default:
-            break
-        }
+        let melodyTokens = MLMultiArray(melodyArray)
 
-        var chordQuality: ChordQuality = .maj
-        switch type {
-        case "maj":
-            chordQuality = .maj
-        case "maj7":
-            chordQuality = .maj7
-        case "M9":
-            chordQuality = .maj9
-        case "m":
-            chordQuality = .min
-        case "m7":
-            chordQuality = .min7
-        case "7":
-            chordQuality = .dom7
-        case "9":
-            chordQuality = .dom9
-        case "dim":
-            chordQuality = .dim
-        case "o7":
-            chordQuality = .dim7
-        case "ø7":
-            chordQuality = .halfDim7
-        default:
-            break
-        }
+        let chordInferenceResults = try generateOutputSequence(
+            melodyTokens: melodyTokens,
+            topK: 5,
+            temperature: 0.9
+        )
 
-        return Chord(root: noteName, quality: chordQuality)
+        return chordInferenceResults
     }
 
     private func generateOutputSequence(
         melodyTokens: MLMultiArray,
         topK: Int? = 5,
         temperature: Float = 0.9
-    ) throws -> [Int] {
-        var chordIndices: [Int] = [sosIndex]
+    ) throws -> [[InferenceResult]] {
+        var results: [[InferenceResult]] = []
 
-        // 모델 기대 타깃 길이로 배열 준비
-        let tgtLen = maxTgtLen
-        let chordInput = try MLMultiArray(
-            shape: [1, tgtLen] as [NSNumber],
-            dataType: .int32
+        var chordArray: MLShapedArray<Int32> = MLShapedArray(
+            repeating: Int32(padId),
+            shape: [1, maxChordLength]
         )
+        chordArray[scalarAt: [0, 0]] = Int32(sosId)
 
-        for _ in 0..<tgtLen {
-            // 입력 채우기
-            for i in 0..<tgtLen {
-                let val = (i < chordIndices.count) ? chordIndices[i] : padIndex
-                chordInput[[0, i] as [NSNumber]] = NSNumber(value: val)
-            }
+        for index in 1..<maxChordLength {
+            let chordInput: MLMultiArray = MLMultiArray(chordArray)
 
-            let input = TransformerChordInferenceInput(
-                melody_tokens: melodyTokens,
-                chord_input: chordInput
+            let input: TransformerChordInferenceInput =
+                TransformerChordInferenceInput(
+                    melody_tokens: melodyTokens,
+                    chord_input: chordInput
+                )
+            let output: TransformerChordInferenceOutput = try model.prediction(
+                input: input
             )
-            let output = try model.prediction(input: input)
-            let logits = output.chord_output
 
-            // step 위치의 다음 토큰 로짓 사용
-            let pos = chordIndices.count - 1
-            let nextToken = try sampleNextToken(
+            let logits: MLShapedArray<Float> = output.chord_outputShapedArray
+
+            let position: Int = results.count
+
+            let candidates: [InferenceResult] = try topKTokens(
                 from: logits,
-                at: pos,
+                at: position,
                 temperature: temperature,
-                topK: topK
+                k: 5
             )
 
-            if nextToken == eosIndex { break }
+            if candidates.first?.id ?? eosId == eosId { break }
 
-            chordIndices.append(nextToken)
+            results.append(candidates)
 
-            if chordIndices.count >= tgtLen { break }
+            chordArray[scalarAt: [0, index]] = Int32(
+                results.last?.first?.id ?? unkId
+            )
         }
 
-        return chordIndices
+        return results
     }
 
-    // logits: [1, T, V] 또는 [1, V, T] 자동 감지 + top-k 지원
-    private func sampleNextToken(
-        from logits: MLMultiArray,
+    private func topKTokens(
+        from logits: MLShapedArray<Float>,
         at position: Int,
         temperature: Float,
-        topK: Int?
-    ) throws -> Int {
-        let vocabSize = vocab.chord.count
-        let shape = logits.shape.map { $0.intValue }  // e.g., [1, 256, 354] or [1, 354, 256]
-        guard shape.count == 3 else { throw NSError(domain: "shape", code: -1) }
+        k: Int
+    ) throws -> [InferenceResult] {
+        let vocabSize: Int = vocab.chord.count
 
-        let isTV = (shape[2] == vocabSize)  // [1, T, V]
-        let isVT = (shape[1] == vocabSize)  // [1, V, T]
-        guard isTV || isVT else {
-            throw NSError(domain: "vocab-mismatch", code: -2)
+        let positionLogits: [Float] = logits[0, position].map { slice in
+            return (slice.scalar ?? .zero) / max(1e-6, temperature)
         }
 
-        var positionLogits = [Float](repeating: 0, count: vocabSize)
-        if isTV {
-            guard position < shape[1] else {
-                throw NSError(domain: "pos", code: -3)
-            }
-            for i in 0..<vocabSize {
-                positionLogits[i] =
-                    logits[[0, position, i] as [NSNumber]].floatValue
-                    / max(1e-6, temperature)
-            }
-        } else {
-            // [1, V, T]
-            guard position < shape[2] else {
-                throw NSError(domain: "pos", code: -4)
-            }
-            for i in 0..<vocabSize {
-                positionLogits[i] =
-                    logits[[0, i, position] as [NSNumber]].floatValue
-                    / max(1e-6, temperature)
-            }
+        let maxLogit: Float = positionLogits.max() ?? .zero
+        let expVals: [Float] = positionLogits.map { logit in
+            return exp(logit - maxLogit)
         }
+        let sumExp: Float = expVals.reduce(.zero, +)
 
-        // top-k 필터링: 상위 k 외는 -inf로 마스킹
-        if let k = topK, k > 0, k < vocabSize {
-            let sorted = positionLogits.enumerated().sorted {
-                $0.element > $1.element
-            }
-            var mask = [Bool](repeating: false, count: vocabSize)
-            for (j, pair) in sorted.enumerated() where j < k {
-                mask[pair.offset] = true
-            }
-            for i in 0..<vocabSize where !mask[i] {
-                positionLogits[i] = -Float.infinity
-            }
-        }
-
-        // softmax
-        let maxLogit = positionLogits.max() ?? 0
-        var expVals = [Float](repeating: 0, count: vocabSize)
-        var sumExp: Float = 0
-        for i in 0..<vocabSize {
-            let v = exp(positionLogits[i] - maxLogit)
-            expVals[i] = v
-            sumExp += v
-        }
-        if sumExp <= 0 {
-            // 분포가 무의미하면 greedy로 폴백
-            var bestIdx = 0
-            var bestVal = -Float.infinity
-            for i in 0..<vocabSize {
-                let v = positionLogits[i]
-                if v > bestVal {
-                    bestVal = v
-                    bestIdx = i
+        guard sumExp > 0 else {
+            let pairs = positionLogits.enumerated()
+                .map {
+                    InferenceResult(id: $0.offset, probability: $0.element)
                 }
-            }
-            return bestIdx
+                .sorted { $0.probability > $1.probability }
+
+            return Array(pairs.prefix(min(k, vocabSize)))
         }
 
-        // top-k 샘플링: 확률 분포에서 샘플
-        if let k = topK, k > 0 {
-            var probs = [Float](repeating: 0, count: vocabSize)
-            for i in 0..<vocabSize { probs[i] = expVals[i] / sumExp }
-
-            let u = Float.random(in: 0..<1)
-            var cum: Float = 0
-            for i in 0..<vocabSize {
-                cum += probs[i]
-                if u <= cum { return i }
-            }
-            // 누적오차 방지용 폴백
-            return probs.indices.max(by: { probs[$0] < probs[$1] }) ?? unkIndex
-        } else {
-            // greedy
-            var bestIdx = 0
-            var bestVal = -Float.infinity
-            for i in 0..<vocabSize {
-                let v = positionLogits[i]
-                if v > bestVal {
-                    bestVal = v
-                    bestIdx = i
-                }
-            }
-            return bestIdx
+        let probs: [Float] = expVals.map { value in
+            return value / sumExp
         }
+
+        let ranked = probs.enumerated()
+            .map { InferenceResult(id: $0.offset, probability: $0.element) }
+            .sorted { $0.probability > $1.probability }
+
+        return Array(ranked.prefix(min(k, vocabSize)))
     }
 
+    private func convertToChordCells(
+        _ inferenceResults: [[InferenceResult]],
+        threshold: Float = 0.7
+    ) -> [ChordCell] {
+        func convertToChordCell(
+            position: TimeInterval,
+            root: [InferenceResult],
+            type: [InferenceResult]
+        ) -> ChordCell {
+            let candidates:
+                [(
+                    rootId: Int, typeId: Int,
+                    probability: Float
+                )] = root.flatMap { rootResult in
+                    return type.map { typeResult in
+                        return (
+                            rootId: rootResult.id, typeId: typeResult.id,
+                            probability: rootResult.probability
+                                * typeResult.probability
+                        )
+                    }
+                }
+
+            let chordCandidates: [Chord] = Array(
+                candidates.compactMap {
+                    (rootId: Int, typeId: Int, probability: Float) in
+                    guard
+                        let rootToken = vocab.chordToken(
+                            id: rootId
+                        ),
+                        let chordRoot = NoteName(token: rootToken)
+                    else {
+                        return nil
+                    }
+
+                    guard
+                        let typeToken = vocab.chordToken(
+                            id: typeId
+                        ),
+                        let chordQuality = ChordQuality(
+                            token: typeToken
+                        )
+                    else { return nil }
+
+                    let chord: Chord = Chord(
+                        root: chordRoot,
+                        quality: chordQuality
+                    )
+
+                    return chord
+                }.prefix(5)
+            )
+
+            let chordCell: ChordCell = ChordCell(
+                chord: chordCandidates.first,
+                chordCandidates: chordCandidates,
+                startTime: position
+            )
+
+            return chordCell
+        }
+
+        var chordCells: [ChordCell] = []
+
+        var position: TimeInterval?
+        var root: [InferenceResult]?
+        var type: [InferenceResult]?
+
+        for result in inferenceResults {
+            guard let firstResult: InferenceResult = result.first,
+                let firstResultToken: String = vocab.chordToken(
+                    id: firstResult.id
+                )
+            else {
+                continue
+            }
+
+            if firstResultToken.hasPrefix("Position_") {
+                if let prevPosition = position,
+                    let prevRoot = root,
+                    let prevType = type,
+                    let probability = prevRoot.first?.probability
+                {
+                    if probability >= threshold {
+                        let chordCell: ChordCell = convertToChordCell(
+                            position: prevPosition,
+                            root: prevRoot,
+                            type: prevType
+                        )
+
+                        chordCells.append(
+                            chordCell
+                        )
+                    }
+
+                    position = nil
+                    root = nil
+                    type = nil
+                }
+
+                if let positionRawValue: TimeInterval = TimeInterval(
+                    firstResultToken.replacingOccurrences(
+                        of: "Position_",
+                        with: ""
+                    )
+                ) {
+                    position = positionRawValue * 0.1
+                }
+            } else if firstResultToken.hasPrefix("Root_") {
+                root = result
+            } else if firstResultToken.hasPrefix("Type_") {
+                type = result
+            }
+        }
+
+        if let prevPosition = position,
+            let prevRoot = root,
+            let prevType = type,
+            let probability = prevRoot.first?.probability
+        {
+            if probability >= threshold {
+                let chordCell: ChordCell = convertToChordCell(
+                    position: prevPosition,
+                    root: prevRoot,
+                    type: prevType
+                )
+
+                chordCells.append(
+                    chordCell
+                )
+            }
+
+            position = nil
+            root = nil
+            type = nil
+        }
+
+        return chordCells
+    }
 }
 
-private struct Vocab: Codable {
+private struct Vocab {
     let melody: [String]
     let chord: [String]
 
+    func melodyId(token: String) -> Int? {
+        melody.firstIndex(of: token)
+    }
+
+    func chordId(token: String) -> Int? {
+        chord.firstIndex(of: token)
+    }
+
+    func melodyToken(id: Int) -> String? {
+        guard melody.indices.contains(id) else { return nil }
+        return melody[id]
+    }
+
+    func chordToken(id: Int) -> String? {
+        guard chord.indices.contains(id) else { return nil }
+        return chord[id]
+    }
+}
+
+extension Vocab: Codable {
     enum CodingKeys: String, CodingKey {
         case melody = "melody_tokens"
         case chord = "chord_tokens"
+    }
+}
+
+private struct InferenceResult {
+    let id: Int
+    let probability: Float
+}
+
+extension NoteName {
+    fileprivate init?(token: String) {
+        var noteNameString: String? = nil
+
+        if token.hasPrefix("Root_") {
+            noteNameString = token.replacingOccurrences(of: "Root_", with: "")
+        }
+        if token.hasPrefix("Key_") {
+            noteNameString = token.replacingOccurrences(of: "Key_", with: "")
+        }
+
+        guard let noteNameString else { return nil }
+
+        switch noteNameString {
+        case "C": self = .C
+        case "C#": self = .Cs
+        case "D": self = .D
+        case "D#": self = .Ds
+        case "E": self = .E
+        case "F": self = .F
+        case "F#": self = .Fs
+        case "G": self = .G
+        case "G#": self = .Gs
+        case "A": self = .A
+        case "A#": self = .As
+        case "B": self = .B
+        default: return nil
+        }
+    }
+}
+
+extension ChordQuality {
+    fileprivate init?(token: String) {
+        guard token.hasPrefix("Type_") else { return nil }
+
+        let qualityString = token.replacingOccurrences(of: "Type_", with: "")
+
+        switch qualityString {
+        case "maj": self = .maj
+        case "maj7": self = .maj7
+        case "maj9": self = .maj9
+        case "min": self = .min
+        case "min7": self = .min7
+        case "dom7": self = .dom7
+        case "dom9": self = .dom9
+        case "dim": self = .dim
+        case "dim7": self = .dim7
+        case "hdim7": self = .halfDim7
+        default: return nil
+        }
     }
 }
 
@@ -459,5 +472,31 @@ extension NoteName {
         case .Bb: return 10
         case .B: return 11
         }
+    }
+}
+
+extension Note {
+    fileprivate var tokens: [String] {
+        var tokens: [String] = []
+
+        let position = max(
+            0,
+            min(511, Int((self.startTime * 10.0).rounded()))
+        )  // 0..511
+        let chromaIndex = self.name.chormaIndex  // 0..11
+        let duration = max(
+            1,
+            min(81, Int((self.duration * 10.0).rounded()))
+        )  // 1..81
+
+        let positionToken = "Position_\(position)"
+        let pitchToken = "Pitch_\(chromaIndex)"
+        let durationToken = "Duration_\(duration)"
+
+        tokens.append(positionToken)
+        tokens.append(pitchToken)
+        tokens.append(durationToken)
+
+        return tokens
     }
 }
