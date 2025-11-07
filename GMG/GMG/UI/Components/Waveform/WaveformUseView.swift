@@ -73,19 +73,11 @@ extension WaveformUseView {
         let progress: Double
 
         var body: some View {
-            ZStack {
-                Image("WaveformBackground")
-                    .resizable()
-                    .scaledToFit()
-                    .background(Color.white)
-                    .clipShape(RoundedCornerRectangle(radius: 20, corners: [.bottomLeft, .bottomRight]))
-
                 WaveformView(
                     amplitudes: amps,
                     highlight: amps.isEmpty ? nil : highlightRange(progress: progress, totalBins: amps.count, windowBins: 1),
                     progress: progress
                 )
-            }
         }
 
         private func highlightRange(progress: Double, totalBins: Int, windowBins: Int) -> Range<Int> {
