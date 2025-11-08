@@ -73,7 +73,8 @@ struct HomeView: View {
                                 ) { (idx, score) in
                                     ScoreCard(
                                         score: score,
-                                        minWidth: 160,
+                                        minWidth: 156,
+                                        maxWidth: 156,
                                         minHeight: nil,
                                         index: idx + 1,
                                         isMove: false,
@@ -147,6 +148,7 @@ struct HomeView: View {
                                     ScoreCard(
                                         score: score,
                                         minWidth: nil,
+                                        maxWidth: nil,
                                         minHeight: 128,
                                         index: idx + 1,
                                         isMove: true,
@@ -174,31 +176,55 @@ extension HomeView {
     struct ScoreCard: View {
         @Environment(\.modelContext) private var modelContext
         @Environment(Router.self) private var router: Router
+        
         @State private var showActions = false
-        @State private var isRenaming = false
-        @State private var editableTitle = ""
-        @FocusState private var titleFocused: Bool
+        @State private var isEditable: Bool = false
+        @FocusState private var isTitleFocused: Bool
+        
+        // ✅ 로컬 편집 버퍼
+        @State private var tempTitle: String = ""
         
         let score: Score
         let minWidth: CGFloat?
+        let maxWidth: CGFloat?
         let minHeight: CGFloat?
         let index: Int
         let isMove: Bool
         @Binding var isSelected: Bool
         let action: () -> Void
-
+        
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
-                    Text(score.title)
-                        .font(Typography.WantedSansStd.R4)
-                        .foregroundStyle(Color.white1)
-                        .padding(.bottom, 4)
-
+                    
+                    // ✅ 제목 영역
+                    if isEditable {
+                        TextField("", text: $tempTitle)
+                            .font(Typography.WantedSansStd.R4)
+                            .foregroundStyle(Color.white1)
+                            .focused($isTitleFocused)
+                            .onAppear {
+                                // 편집 시작 시 현재 저장된 타이틀을 버퍼로 복사
+                                tempTitle = score.title
+                                DispatchQueue.main.async {
+                                    isTitleFocused = true
+                                }
+                            }
+                            .onSubmit { endRename(commit: true) }   // 엔터로 커밋
+                            .submitLabel(.done)
+                            .padding(.bottom, 4)
+                    } else {
+                        Text(score.title) // ✅ 항상 저장된 값 표시
+                            .font(Typography.WantedSansStd.R4)
+                            .foregroundStyle(Color.white1)
+                            .padding(.bottom, 4)
+                            .lineLimit(1)
+                    }
+                    
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
-
+                    
                     Spacer()
                     
                     Text(HomeView.dateConverter(score.createdAt))
@@ -208,11 +234,13 @@ extension HomeView {
                 
                 Spacer()
                 
+                // 우측 액션들
                 VStack(alignment: .trailing, spacing: .zero) {
                     
                     Menu {
+                        // ✅ Rename: 편집 시작 + 포커스
                         Button {
-                            // TODO: Rename
+                            startRename()
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: "pencil")
@@ -222,11 +250,9 @@ extension HomeView {
                                     .foregroundStyle(Color.black1)
                             }
                         }
-
+                        
                         Button {
-                            router.push(
-                                .export
-                            )
+                            router.push(.export)
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: "square.and.arrow.up")
@@ -236,7 +262,7 @@ extension HomeView {
                                     .foregroundStyle(Color.black1)
                             }
                         }
-
+                        
                         Button {
                             modelContext.delete(score)
                         } label: {
@@ -253,15 +279,15 @@ extension HomeView {
                             .foregroundStyle(Color.white1)
                     }
                     .menuIndicator(.hidden)
-
+                    
                     Spacer()
-
+                    
                     Text(score.totalDuration.description)
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 9.5)
                         .padding(.trailing, 1)
-
+                    
                     Button {
                         // TODO: 오디오 재생 기능
                     } label: {
@@ -280,7 +306,7 @@ extension HomeView {
             .padding(Spacing.lg)
             .frame(
                 minWidth: minWidth,
-                maxWidth: .infinity,
+                maxWidth: maxWidth,
                 minHeight: minHeight,
                 maxHeight: .infinity
             )
@@ -290,32 +316,55 @@ extension HomeView {
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
             .onTapGesture {
-                if isSelected {
-                    action()
+                if isEditable {
+                    endRename(commit: true) // ✅ 바깥 탭으로 커밋 & 종료
                 } else {
-                    isSelected.toggle()
+                    if isSelected {
+                        action()
+                    } else {
+                        isSelected.toggle()
+                    }
                 }
             }
             .padding(.bottom, isSelected && isMove ? 60 : 0)
         }
-
+        
+        // MARK: - Rename Helpers
+        private func startRename() {
+            tempTitle = score.title
+            isEditable = true
+            DispatchQueue.main.async {
+                isTitleFocused = true
+            }
+        }
+        
+        private func endRename(commit: Bool) {
+            if commit {
+                let new = tempTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+                // 빈 문자열로 저장되는 것 방지 + 변경 시에만 저장
+                if !new.isEmpty, new != score.title {
+                    score.title = new
+                    // SwiftData는 자동 저장되지만, 즉시 반영 원하면 강제 저장 가능
+                    try? modelContext.save()
+                }
+            }
+            isTitleFocused = false
+            isEditable = false
+        }
+        
         private func colorForIndex(_ i: Int) -> Color {
             let palette: [Color] = [
-                Color.blue3,
-                Color.blue4,
-                Color.blue5,
-                Color.blue1,
-                Color.blue2,
+                Color.blue3, Color.blue4, Color.blue5, Color.blue1, Color.blue2,
             ]
             let safe = max(i, 1)
             return palette[(safe - 1) % palette.count]
         }
     }
-
+    
     struct AddScoreButton: View {
         let action: () -> Void
         let songCount: Int
-
+        
         var body: some View {
             Button {
                 action()
