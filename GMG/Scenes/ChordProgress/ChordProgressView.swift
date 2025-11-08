@@ -321,50 +321,44 @@ extension ChordProgressView {
             segmentStartTime + segmentDuration
         }
 
-        private var filteredChordCells: [ChordCell] {
-            var filteredChordCells: [ChordCell] = chordCells.filter {
-                chordCell in
-                segmentStartTime <= chordCell.startTime
-                    && chordCell.startTime < segmentEndTime
-            }
-
-            /// 현재 세그먼트에 코드가 없을 경우 추가
-            if filteredChordCells.isEmpty,
-                let previousChordCell: ChordCell = chordCells.filter({
+        private var targetChordCells: [ChordCell] {
+            var targetChordCells: [ChordCell] = chordCells.filter {
                     chordCell in
-                    chordCell.startTime <= segmentStartTime
-                }).last
-            {
-                filteredChordCells = [previousChordCell]
-            }
-
-            /// 현재 세그먼트에 이전 코드 셀이 남아 있는 경우 추가
-            if let firstStartTime = filteredChordCells.first?.startTime,
-                firstStartTime - segmentStartTime > 0
-            {
-                if let previousChordCell: ChordCell = chordCells.filter({
-                    chordCell in
-                    chordCell.startTime <= segmentStartTime
-                }).last {
-                    filteredChordCells =
-                        [previousChordCell] + filteredChordCells
-                } else {
-                    filteredChordCells =
-                        [
-                            ChordCell(
-                                chord: nil,
-                                chordCandidates: [],
-                                startTime: segmentStartTime
-                            )
-                        ] + filteredChordCells
+                    segmentStartTime <= chordCell.startTime
+                        && chordCell.startTime < segmentEndTime
                 }
+            
+            let previousChordCell: ChordCell = {
+                guard let previous = chordCells.filter({ c in c.startTime <= segmentStartTime }).last
+                else {
+                    return ChordCell(
+                        chord: nil
+                        , chordCandidates: []
+                        , startTime: segmentStartTime
+                    )
+                }
+                
+                return previous
+            }()
+            
+            /// 세그먼트에 코드가 없는 경우, 전 세그먼트의 마지막 코드를 사용
+            if targetChordCells.isEmpty {
+                targetChordCells = [previousChordCell]
+            }
+            
+            /// 코드가 존재하고, 첫 코드가 segmentStartTime보다 늦게 시작하는 경우,
+            ///  전 세그먼트의 마지막 코드를 사용
+            if let firstStartTime = targetChordCells.first?.startTime
+                , firstStartTime > segmentStartTime
+            {
+                targetChordCells.insert(previousChordCell, at: 0)
             }
 
-            /// 마지막 세그먼트에서 오디오 길이보다 작을 경우
+            /// 오디오 파일의 끝 처리
             if index == Int(floor(totalDuration / segmentDuration))
                 && totalDuration < segmentEndTime
             {
-                filteredChordCells.append(
+                targetChordCells.append(
                     ChordCell(
                         chord: nil,
                         chordCandidates: [],
@@ -373,19 +367,19 @@ extension ChordProgressView {
                 )
             }
 
-            return filteredChordCells
+            return targetChordCells
         }
 
         private var chordCellsWithDuration:
             [(chordCell: ChordCell, duration: Int)]
         {
-            guard !filteredChordCells.isEmpty else { return [] }
+            guard !targetChordCells.isEmpty else { return [] }
 
             var result: [(chordCell: ChordCell, duration: Int)] = []
 
-            for index in 0..<filteredChordCells.endIndex - 1 {
-                let currentChordCell: ChordCell = filteredChordCells[index]
-                let nextChordCell: ChordCell = filteredChordCells[index + 1]
+            for index in 0..<targetChordCells.endIndex - 1 {
+                let currentChordCell: ChordCell = targetChordCells[index]
+                let nextChordCell: ChordCell = targetChordCells[index + 1]
 
                 let duration: Int = Int(
                     ((nextChordCell.startTime - segmentStartTime)
@@ -402,7 +396,7 @@ extension ChordProgressView {
                 )
             }
 
-            if let lastChordCell = filteredChordCells.last {
+            if let lastChordCell = targetChordCells.last {
                 let duration: Int = Int(
                     segmentDuration
                         - (lastChordCell.startTime - segmentStartTime).rounded()
@@ -454,7 +448,7 @@ extension ChordProgressView {
 
                 let showCandidates: Bool =
                     editMode?.wrappedValue.isEditing == true
-                    && filteredChordCells.contains(where: {
+                    && targetChordCells.contains(where: {
                         $0.startTime == selectedChordCell?.startTime
                     })
                     && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
