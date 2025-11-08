@@ -38,7 +38,17 @@ final class ScoreFactory {
             throw ScoreFactoryError.documentDirectoryNotFound
         }
 
-        let workingURL: URL = documentDirectory.appendingPathComponent(
+        let workingFolder: URL = documentDirectory.appendingPathComponent(
+            "Scores",
+            conformingTo: .folder
+        )
+
+        try FileManager.default.createDirectory(
+            at: workingFolder,
+            withIntermediateDirectories: false
+        )
+
+        let workingURL: URL = workingFolder.appendingPathComponent(
             audioUrl.lastPathComponent,
             conformingTo: .audio
         )
