@@ -7,7 +7,7 @@ protocol RecordingModelStateProtocol {
     var recordingTime: TimeInterval { get }
     var recordingURL: URL? { get }
     var isPlaying: Bool { get }
-    var amplitudes: [Float] { get }
+    var audioLevels: [Float] { get }
     var countdown: Int { get }
     var scoreFactoryState: ScoreFactoryState? { get }
     var score: Score? { get }
@@ -21,7 +21,8 @@ protocol RecordingModelActionProtocol: AnyObject {
     func stopPlaying()
     func reset()
     func updateRecordingTime(_ recordingTime: TimeInterval)
-    func appendAmplitude(_ amplitude: Float)
+    func appendAudioLevel(_ audioLevel: Float)
+    func resetAudioLevels()
     func updateCountdown(_ countdown: Int)
     func updateScoreFactoryState(_ scoreFactoryState: ScoreFactoryState?)
     func finishScoreCreation(_ score: Score)
@@ -36,7 +37,7 @@ final class RecordingModel:
     private(set) var recordingTime: TimeInterval
     private(set) var recordingURL: URL?
     private(set) var isPlaying: Bool
-    private(set) var amplitudes: [Float]
+    private(set) var audioLevels: [Float]
     private(set) var countdown: Int
     private(set) var scoreFactoryState: ScoreFactoryState?
     private(set) var score: Score?
@@ -46,7 +47,7 @@ final class RecordingModel:
         self.recordingTime = .zero
         self.recordingURL = nil
         self.isPlaying = false
-        self.amplitudes = []
+        self.audioLevels = []
         self.countdown = .zero
         self.scoreFactoryState = nil
         self.score = nil
@@ -75,17 +76,21 @@ final class RecordingModel:
     func reset() {
         self.recordingTime = .zero
         self.recordingURL = nil
-        self.amplitudes = []
+        resetAudioLevels()
     }
 
     func updateRecordingTime(_ recordingTime: TimeInterval) {
         self.recordingTime = recordingTime
     }
 
-    func appendAmplitude(_ amplitude: Float) {
-        self.amplitudes.append(amplitude)
+    func appendAudioLevel(_ audioLevel: Float) {
+        self.audioLevels.append(audioLevel)
     }
 
+    func resetAudioLevels() {
+        self.audioLevels = []
+    }
+    
     func updateCountdown(_ countdown: Int) {
         self.countdown = countdown
     }
