@@ -1,56 +1,57 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-import AudioKit
+import AVFAudio
 import Combine
 import Foundation
 
-@Observable
-final class PlaybackManager {
-    private var audioPlayer: AudioPlayer
+final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
+    private var audioPlayer: AVAudioPlayer?
 
-    private(set) var isPlayingPublisher: CurrentValueSubject<Bool, Never>
+    let isPlayingPublisher: CurrentValueSubject<Bool, Never>
+    let playedDurationPublisher: CurrentValueSubject<TimeInterval, Never>
+    let audioLevelPublisher: CurrentValueSubject<Float, Never>
 
-    private var isPlayingPublisherTimer: AnyCancellable?
+    private var cancellables: Set<AnyCancellable>
 
-    init() {
-        self.audioPlayer = AudioPlayer()
+    override init() {
+        self.audioPlayer = nil
 
         self.isPlayingPublisher = CurrentValueSubject<Bool, Never>(false)
+        self.playedDurationPublisher = CurrentValueSubject<TimeInterval, Never>(
+            .zero
+        )
+        self.audioLevelPublisher = CurrentValueSubject<Float, Never>(.zero)
 
-        self.isPlayingPublisherTimer = nil
+        self.cancellables = Set<AnyCancellable>()
     }
 
     func play(_ url: URL) throws {
         try AudioConductor.shared.setAudioMode(.playback)
-        AudioConductor.shared.addOutput(audioPlayer)
-        try AudioConductor.shared.start()
-
-        self.isPlayingPublisherTimer = Timer.publish(
-            every: 0.1,
-            on: RunLoop.main,
-            in: RunLoop.Mode.default
-        )
-        .autoconnect()
-        .sink { [weak self] _ in
-            guard let self else { return }
-
-            let isPlaying: Bool = self.audioPlayer.isPlaying
-
-            self.isPlayingPublisher.send(isPlaying)
-
-            if self.audioPlayer.currentTime == self.audioPlayer.duration {
-                Task {
-                    self.stop()
-                }
-            }
-        }
 
         do {
-            try self.audioPlayer.load(url: url)
-            self.audioPlayer.play()
-            self.audioPlayer.isLooping = false
-            
-            self.isPlayingPublisher.send(true)
+            let audioPlayer: AVAudioPlayer = try AVAudioPlayer(contentsOf: url)
+
+            audioPlayer.delegate = self
+            audioPlayer.isMeteringEnabled = true
+            audioPlayer.play()
+
+            Timer.publish(
+                every: 0.1,
+                on: RunLoop.main,
+                in: RunLoop.Mode.common
+            )
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self else { return }
+
+                self.updateMeter()
+                self.updatePlayedDuration()
+            }
+            .store(in: &cancellables)
+
+            self.audioPlayer = audioPlayer
+
+            self.isPlayingPublisher.send(audioPlayer.isPlaying)
         } catch {
             stop()
             throw error
@@ -58,15 +59,49 @@ final class PlaybackManager {
     }
 
     func stop() {
-        self.audioPlayer.stop()
-
-        self.isPlayingPublisherTimer?.cancel()
-        self.isPlayingPublisherTimer = nil
-
-        AudioConductor.shared.removeOutput(audioPlayer)
-        AudioConductor.shared.stop()
         try? AudioConductor.shared.setAudioMode(nil)
 
-        self.isPlayingPublisher.send(false)
+        guard let audioPlayer else { return }
+
+        audioPlayer.stop()
+
+        self.audioPlayer = nil
+        self.cancellables.removeAll()
+
+        self.isPlayingPublisher.send(audioPlayer.isPlaying)
+        self.playedDurationPublisher.send(audioPlayer.duration)
+    }
+
+    private func updateMeter() {
+        guard let audioPlayer else { return }
+
+        audioPlayer.updateMeters()
+
+        let averagePower: Float = audioPlayer.averagePower(forChannel: 0)
+        let normalizedLevel: Float = normalizeLevel(averagePower)
+
+        self.audioLevelPublisher.send(normalizedLevel)
+    }
+
+    private func updatePlayedDuration() {
+        guard let audioPlayer else { return }
+
+        let playedDuration: TimeInterval = audioPlayer.currentTime
+
+        self.playedDurationPublisher.send(playedDuration)
+    }
+
+    private func normalizeLevel(_ dB: Float, minDb: Float = -30) -> Float {
+        let clamped: Float = min(0, max(minDb, dB))
+        return (clamped - minDb) / (-minDb)
+    }
+
+    // MARK: - AVAudioPlayerDelgate Implement
+
+    func audioPlayerDidFinishPlaying(
+        _ player: AVAudioPlayer,
+        successfully flag: Bool
+    ) {
+        stop()
     }
 }
