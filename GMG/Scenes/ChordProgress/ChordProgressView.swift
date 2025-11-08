@@ -27,17 +27,27 @@ struct ChordProgressView: View {
                     )
 
                     Spacer()
-
-                    EditModeToggle(
-                        isEditMode: Binding<Bool>(
-                            get: {
-                                model.isEditMode
-                            },
-                            set: {
-                                intent.onTapEditModeToggle($0)
-                            }
+                    
+                    HStack(spacing: 20){
+                        EditController(
+                            canUndo: model.canUndo
+                            , canRedo: model.canRedo
+                            , onTapUndo: intent.onTapUndoButton
+                            , onTapRedo: intent.onTapRedoButton
                         )
-                    )
+                        .opacity(model.isEditMode ? 1.0 : 0.0)
+                        
+                        EditModeToggle(
+                            isEditMode: Binding<Bool>(
+                                get: {
+                                    model.isEditMode
+                                },
+                                set: {
+                                    intent.onTapEditModeToggle($0)
+                                }
+                            )
+                        )
+                    }
                 }
                 .padding(Spacing.md)
 
@@ -143,6 +153,29 @@ extension ChordProgressView {
         }
     }
 
+    struct EditController: View {
+        let canUndo: Bool
+        let canRedo: Bool
+        let onTapUndo: () -> Void
+        let onTapRedo: () -> Void
+        
+        var body: some View {
+            HStack(spacing: 24) {
+                Button {
+                    onTapUndo()
+                } label: {
+                    Image(canUndo ? "Undo" : "Undo-unactive")
+                }
+                
+                Button {
+                    onTapRedo()
+                } label: {
+                    Image(canRedo ? "Redo" : "Redo-unactive")
+                }
+            }
+        }
+    }
+    
     struct EditModeToggle: View {
         @Binding var isEditMode: Bool
         @Namespace var namespace

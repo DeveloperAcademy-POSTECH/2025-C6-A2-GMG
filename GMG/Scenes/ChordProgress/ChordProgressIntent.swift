@@ -12,6 +12,8 @@ protocol ChordProgressIntentProtocol {
     func onTapStopButton()
     func onTapChordCell(_ chordCell: ChordCell)
     func onTapCandidateChordCell(at candidateIndex: Int, for chordCell: ChordCell)
+    func onTapUndoButton()
+    func onTapRedoButton()
 }
 
 final class ChordProgressIntent: ChordProgressIntentProtocol {
@@ -93,5 +95,13 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         }
 
         model.replaceChord(with: selectedCandidate, for: chordCell)
+    }
+    
+    func onTapUndoButton() {
+        self.model?.undoLastChange()
+    }
+    
+    func onTapRedoButton() {
+        self.model?.redoLastChange()
     }
 }
