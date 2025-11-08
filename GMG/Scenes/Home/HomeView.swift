@@ -122,7 +122,7 @@ struct HomeView: View {
                                 size: 42
                             )
 
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .leading, spacing: 8) {
                                 Text("An experience")
                                     .font(font)
                                     .foregroundStyle(Color.white3.opacity(0.6))
