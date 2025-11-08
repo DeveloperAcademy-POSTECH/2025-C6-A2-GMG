@@ -172,7 +172,12 @@ struct HomeView: View {
 
 extension HomeView {
     struct ScoreCard: View {
+        @Environment(\.modelContext) private var modelContext
+        @Environment(Router.self) private var router: Router
         @State private var showActions = false
+        @State private var isRenaming = false
+        @State private var editableTitle = ""
+        @FocusState private var titleFocused: Bool
         
         let score: Score
         let minWidth: CGFloat?
@@ -219,7 +224,9 @@ extension HomeView {
                         }
 
                         Button {
-                            // TODO: Export
+                            router.push(
+                                .export
+                            )
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: "square.and.arrow.up")
@@ -231,7 +238,7 @@ extension HomeView {
                         }
 
                         Button {
-                            // TODO: Delete
+                            modelContext.delete(score)
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: "trash")
