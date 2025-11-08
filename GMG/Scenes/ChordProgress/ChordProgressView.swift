@@ -408,15 +408,15 @@ extension ChordProgressView {
 
         var body: some View {
             VStack(spacing: Spacing.xs) {
-                Grid(horizontalSpacing: Spacing.xs) {
-                    GridRow {
-                        ForEach(
-                            Array(chordCellsWithDuration.enumerated()),
-                            id: \.0
-                        ) { index, chordCellWithDuration in
-                            let chordCell = chordCellWithDuration.chordCell
-                            let duration = chordCellWithDuration.duration
-
+                GeometryReader { proxy in
+                    let totalSpacing = Spacing.xs * CGFloat(chordCellsWithDuration.count - 1)
+                    let availableWidth = proxy.size.width - totalSpacing
+                    
+                    HStack(spacing: Spacing.xs) {
+                        ForEach(chordCellsWithDuration, id: \.0) { (chordCell, duration) in
+                            let widthRatio = duration / max(1, segmentDuration)
+                            let cellWidth = max(1, availableWidth * widthRatio)
+                            
                             ZStack {
                                 if let chord = chordCell.chord {
                                     ChordCellButton(
@@ -433,11 +433,11 @@ extension ChordProgressView {
                                     Color.clear
                                 }
                             }
-                            .gridCellColumns(Int(duration))
+                            .frame(width: cellWidth, height: 64)
                         }
                     }
                 }
-                .frame(height: 64)
+                .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
 
                 let showCandidates: Bool =
                     editMode?.wrappedValue.isEditing == true
