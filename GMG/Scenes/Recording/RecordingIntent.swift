@@ -72,11 +72,23 @@ final class RecordingIntent: RecordingIntentProtocol {
             }
             .store(in: &cancellables)
 
+        playbackManager.playedDurationPublisher
+            .sink { [weak self] playedDuration in
+                self?.model?.updateRecordingTime(playedDuration)
+            }
+            .store(in: &cancellables)
+
+        playbackManager.audioLevelPublisher
+            .sink { [weak self] audioLevel in
+                self?.model?.appendAudioLevel(audioLevel)
+            }
+            .store(in: &cancellables)
+
         scoreFactory.scoreFactoryStatePublisher
             .sink { [weak self] scoreFactoryState in
                 self?.model?.updateScoreFactoryState(scoreFactoryState)
             }
-            .store(in: &self.cancellables)
+            .store(in: &cancellables)
     }
 
     func onTapRecordButton() {
@@ -96,7 +108,7 @@ final class RecordingIntent: RecordingIntentProtocol {
             model?.updateCountdown(0)
 
             do {
-                try recordManager.startRecord()
+                try recordManager.record()
             } catch {
                 Logger.error(String(describing: error))
             }
@@ -104,7 +116,7 @@ final class RecordingIntent: RecordingIntentProtocol {
     }
 
     func onTapStopRecordButton() {
-        let url: URL? = recordManager.stopRecord()
+        let url: URL? = recordManager.stop()
 
         model?.updateRecordingURL(url)
     }
