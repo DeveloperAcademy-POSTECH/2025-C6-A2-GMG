@@ -370,46 +370,37 @@ extension ChordProgressView {
             return targetChordCells
         }
 
-        private var chordCellsWithDuration:
-            [(chordCell: ChordCell, duration: Int)]
-        {
+        private var chordCellsWithDuration: [(chordCell: ChordCell, duration: Int)] {
             guard !targetChordCells.isEmpty else { return [] }
 
             var result: [(chordCell: ChordCell, duration: Int)] = []
-
+            
             for index in 0..<targetChordCells.endIndex - 1 {
                 let currentChordCell: ChordCell = targetChordCells[index]
                 let nextChordCell: ChordCell = targetChordCells[index + 1]
 
-                let duration: Int = Int(
-                    ((nextChordCell.startTime - segmentStartTime)
-                        - (max(segmentStartTime, currentChordCell.startTime)
-                            - segmentStartTime))
-                        .rounded()
-                )
-
-                result.append(
-                    (
-                        chordCell: currentChordCell,
-                        duration: min(Int(segmentDuration), max(1, duration))
-                    )
-                )
+                let clampedCurStartTime: Double = max(currentChordCell.startTime, segmentStartTime)
+                let clampedNextStartTime: Double = min(nextChordCell.startTime, segmentEndTime)
+                
+                let curDuration = Int(clampedNextStartTime - clampedCurStartTime)
+ 
+                result.append((
+                    chordCell: currentChordCell,
+                    duration: min(Int(segmentDuration), max(1, curDuration))
+                ))
             }
 
-            if let lastChordCell = targetChordCells.last {
-                let duration: Int = Int(
-                    segmentDuration
-                        - (lastChordCell.startTime - segmentStartTime).rounded()
-                )
-
-                result.append(
-                    (
-                        chordCell: lastChordCell,
-                        duration: min(Int(segmentDuration), max(1, duration))
-                    )
-                )
+            guard let lastChordCell = targetChordCells.last else {
+                return result
             }
-
+            
+            let clampedStartTime: Double = max(lastChordCell.startTime, segmentStartTime)
+        
+            result.append((
+                chordCell: lastChordCell,
+                duration: max(1, Int(segmentEndTime - clampedStartTime))
+            ))
+            
             return result
         }
 
