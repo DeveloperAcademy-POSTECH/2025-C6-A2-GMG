@@ -322,12 +322,9 @@ extension ChordInferencer {
                 }
 
                 if let positionRawValue: TimeInterval = TimeInterval(
-                    firstResultToken.replacingOccurrences(
-                        of: "Position_",
-                        with: ""
-                    )
+                    token: firstResultToken
                 ) {
-                    position = positionRawValue * 0.1
+                    position = positionRawValue
                 }
             } else if firstResultToken.hasPrefix("Root_") {
                 root = result
@@ -447,6 +444,20 @@ extension ChordQuality {
         case "hdim7": self = .halfDim7
         default: return nil
         }
+    }
+}
+
+extension TimeInterval {
+    fileprivate init?(token: String) {
+        guard token.hasPrefix("Position_") else { return nil }
+
+        guard
+            let position = TimeInterval(
+                token.replacingOccurrences(of: "Position_", with: "")
+            )
+        else { return nil }
+
+        self = position * 0.1
     }
 }
 
