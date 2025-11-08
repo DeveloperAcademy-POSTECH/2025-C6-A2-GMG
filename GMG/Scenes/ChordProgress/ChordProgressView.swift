@@ -448,6 +448,7 @@ extension ChordProgressView {
 
                 ChordCellCandidates(
                     chordCandidates: selectedChordCell?.chordCandidates ?? []
+                    , selectedChord: selectedChordCell?.chord?.description ?? ""
                 )
                 .frame(height: showCandidates ? 62 : 0)
                 .scaleEffect(y: showCandidates ? 1.0 : 0.0)
@@ -467,28 +468,39 @@ extension ChordProgressView {
 
         struct ChordCellCandidates: View {
             let chordCandidates: [Chord]
+            let selectedChord: String
 
             var body: some View {
                 ZStack {
                     Color.black2
 
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(
-                                Array(chordCandidates).enumerated(),
-                                id: \.0
-                            ) { index, chord in
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 8)
+                    HStack {
+                        Spacer()
+                        
+                        ForEach(chordCandidates, id: \.self) { chord in
+                            Button {
+                                
+                            } label: {
+                                VStack {
                                     Text(chord.description)
                                         .font(Typography.WantedSansStd.R5)
+                                        .foregroundStyle(.white1)
                                 }
-                                .frame(minWidth: 60)
+                                .frame(minWidth: 60, minHeight: 40)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(
+                                            chord.description == selectedChord
+                                                ? .blue6
+                                                : .blue3
+                                        )
+                                }
                             }
                         }
-                        .padding(Spacing.sm)
+                        
+                        Spacer()
                     }
-                    .contentMargins(.horizontal, Spacing.md)
+                    .frame(maxWidth: .infinity)
                 }
                 .frame(minHeight: 62)
                 .padding(.horizontal, -Spacing.md)
