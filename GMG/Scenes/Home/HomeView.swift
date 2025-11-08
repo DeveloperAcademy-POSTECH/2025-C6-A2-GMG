@@ -282,8 +282,7 @@ extension HomeView {
                     
                     Spacer()
                     
-                    Text(score.totalDuration.description)
-                        .font(Typography.WantedSansStd.R2)
+                    Text(HomeView.formatDuration(score.totalDuration))                        .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 9.5)
                         .padding(.trailing, 1)
@@ -431,7 +430,14 @@ extension HomeView {
         formatted.dateFormat = "yy. MM. dd"
         return formatted.string(from: date)
     }
-
+    
+    static func formatDuration(_ seconds: Double) -> String {
+        let totalSeconds = Int(seconds.rounded())  // 반올림해서 Int로 변환
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
     private func bindingForAll(index i: Int) -> Binding<Bool> {
         Binding(
             get: { expandedAll == i },
