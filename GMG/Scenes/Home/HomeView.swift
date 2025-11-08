@@ -11,6 +11,7 @@ struct HomeView: View {
 
     @State private var expandedAll: Int? = nil
     @State private var isLatest: Bool = true
+    @State private var showActions = false
 
     private var songCount: Int { allScores.count }
 
@@ -123,16 +124,16 @@ struct HomeView: View {
                             VStack(alignment: .leading) {
                                 Text("An experience")
                                     .font(font)
-                                    .foregroundStyle(Color.black1.opacity(0.1))
+                                    .foregroundStyle(Color.white3.opacity(0.6))
                                 Text("where humming")
                                     .font(font)
-                                    .foregroundStyle(Color.black1.opacity(0.3))
+                                    .foregroundStyle(Color.black8.opacity(0.4))
                                 Text("becomes the")
                                     .font(font)
-                                    .foregroundStyle(Color.black1.opacity(0.5))
+                                    .foregroundStyle(Color.black4.opacity(0.4))
                                 Text("start of a song")
                                     .font(font)
-                                    .foregroundStyle(Color.black1.opacity(0.6))
+                                    .foregroundStyle(Color.black4.opacity(0.55))
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.top, 48)
@@ -171,6 +172,8 @@ struct HomeView: View {
 
 extension HomeView {
     struct ScoreCard: View {
+        @State private var showActions = false
+        
         let score: Score
         let minWidth: CGFloat?
         let minHeight: CGFloat?
@@ -192,25 +195,57 @@ extension HomeView {
                         .foregroundStyle(Color.white1)
 
                     Spacer()
-
+                    
                     Text(HomeView.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.black6)
                 }
-
+                
                 Spacer()
-
+                
                 VStack(alignment: .trailing, spacing: .zero) {
-                    Button(
-                        action: {
-                            //TODO: 미트볼버튼 기능 추가
-                        },
-                        label: {
-                            Image(systemName: "ellipsis")
-                                .foregroundStyle(Color.white1)
+                    
+                    Menu {
+                        Button {
+                            // TODO: Rename
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: "pencil")
+                                    .foregroundStyle(Color.black1)
+                                Text("Rename")
+                                    .font(Typography.WantedSansStd.R3)
+                                    .foregroundStyle(Color.black1)
+                            }
                         }
-                    )
-                    .buttonStyle(.plain)
+
+                        Button {
+                            // TODO: Export
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .foregroundStyle(Color.black1)
+                                Text("Export")
+                                    .font(Typography.WantedSansStd.R3)
+                                    .foregroundStyle(Color.black1)
+                            }
+                        }
+
+                        Button {
+                            // TODO: Delete
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(Color.blue2)
+                                Text("Delete")
+                                    .font(Typography.WantedSansStd.R3)
+                                    .foregroundStyle(Color.blue2)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundStyle(Color.white1)
+                    }
+                    .menuIndicator(.hidden)
 
                     Spacer()
 
@@ -286,7 +321,7 @@ extension HomeView {
                         in: RoundedRectangle(cornerRadius: 18)
                     )
             }
-            .frame(width: songCount==0 ? 80 : 128)
+            .frame(width: songCount == 0 ? 156 : 77)
         }
     }
 
@@ -355,6 +390,6 @@ extension HomeView {
     }
 }
 
-#Preview(traits: .routerModifier) {
-    HomeView()
-}
+//#Preview(traits: .routerModifier) {
+//    HomeView()
+//}
