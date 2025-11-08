@@ -305,10 +305,10 @@ extension ChordProgressView {
     struct Segment: View {
         let index: Int
         let totalDuration: TimeInterval
-        let chordCells: [ChordCell]
+        let chordCells: [ChordCell] // 전체 악보의 코드 셀 리스트
         let segmentDuration: TimeInterval
-        let currentChordCell: ChordCell?
-        let selectedChordCell: ChordCell?
+        let currentChordCell: ChordCell? // 재생 중인 코드 셀
+        let selectedChordCell: ChordCell? // 편집 모드에서 선택된 코드 셀
         let chordCellAction: (ChordCell) -> Void
 
         @Environment(\.editMode) private var editMode
