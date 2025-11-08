@@ -1,112 +1,112 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import AVFAudio
-import AudioKit
-import AudioKitEX
 import Combine
 import Foundation
 internal import UniformTypeIdentifiers
 
-enum RecordManagerError: Error {
-    case audioEngineInputNodeNotAvailable
-}
-
 final class RecordManager {
-    private var audioRecorder: NodeRecorder?
-    private var highpassFilter: HighPassFilter?
-    private var amplitudeTap: AmplitudeTap?
-    private var fader: Fader?
+    private var audioRecorder: AVAudioRecorder?
 
-    private(set) var isRecordingPublisher: CurrentValueSubject<Bool, Never>
-    private(set) var recordedDurationPublisher:
-        CurrentValueSubject<TimeInterval, Never>
-    private(set) var amplitudePublisher: CurrentValueSubject<Float, Never>
+    let isRecordingPublisher: CurrentValueSubject<Bool, Never>
+    let recordedDurationPublisher: CurrentValueSubject<TimeInterval, Never>
+    let audioLevelPublisher: CurrentValueSubject<Float, Never>
 
     private var cancellables: Set<AnyCancellable>
 
     init() {
         self.audioRecorder = nil
-        self.amplitudeTap = nil
-        self.fader = nil
 
         self.isRecordingPublisher = CurrentValueSubject<Bool, Never>(false)
         self.recordedDurationPublisher =
             CurrentValueSubject<TimeInterval, Never>(.zero)
-        self.amplitudePublisher = CurrentValueSubject<Float, Never>(0.0)
+        self.audioLevelPublisher = CurrentValueSubject<Float, Never>(.zero)
 
         self.cancellables = Set<AnyCancellable>()
     }
 
-    func startRecord() throws {
+    func record() throws {
         try AudioConductor.shared.setAudioMode(.record)
 
-        guard let inputNode = AudioConductor.shared.inputNode else {
-            throw RecordManagerError.audioEngineInputNodeNotAvailable
-        }
+        do {
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent(
+                    "recording-\(Date().ISO8601Format()).m4a",
+                    conformingTo: .audio
+                )
+            let settings: [String: Any] = [
+                AVFormatIDKey: kAudioFormatMPEG4AAC,
+                AVSampleRateKey: 48_000,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+            ]
 
-        let highpassFilter = HighPassFilter(inputNode)
-        let amplitudeTap = AmplitudeTap(highpassFilter, analysisMode: .peak) {
-            [weak self] amplitude in
-            guard let self else { return }
-            self.amplitudePublisher.send(amplitude)
-        }
-        let fader = Fader(highpassFilter)
-        let audioRecorder = try NodeRecorder(node: inputNode)
+            let audioRecorder: AVAudioRecorder = try AVAudioRecorder(
+                url: url,
+                settings: settings
+            )
 
-        AudioConductor.shared.addOutput(fader)
+            audioRecorder.isMeteringEnabled = true
+            audioRecorder.record()
 
-        try AudioConductor.shared.start()
-
-        amplitudeTap.start()
-        try audioRecorder.record()
-
-        Timer.publish(every: 0.1, on: .main, in: .common)
+            Timer.publish(
+                every: 0.1,
+                on: RunLoop.main,
+                in: RunLoop.Mode.common
+            )
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self,
-                    let recordedDuration = self.audioRecorder?.recordedDuration
-                else { return }
-                self.recordedDurationPublisher.send(recordedDuration)
+                guard let self else { return }
+
+                self.updateMeter()
+                self.updateRecordedDuration()
             }
             .store(in: &cancellables)
 
-        self.audioRecorder = audioRecorder
-        self.highpassFilter = highpassFilter
-        self.amplitudeTap = amplitudeTap
-        self.fader = fader
+            self.audioRecorder = audioRecorder
 
-        self.isRecordingPublisher.send(true)
+            self.isRecordingPublisher.send(audioRecorder.isRecording)
+        } catch {
+            _ = stop()
+            throw error
+        }
     }
 
-    func stopRecord() -> URL? {
-        audioRecorder?.stop()
-        amplitudeTap?.stop()
-        
-        if let fader {
-            AudioConductor.shared.removeOutput(fader)
-        }
-
+    func stop() -> URL? {
         try? AudioConductor.shared.setAudioMode(nil)
 
-        self.isRecordingPublisher.send(false)
-        self.cancellables.removeAll()
+        guard let audioRecorder else { return nil }
 
-        guard let tempUrl = audioRecorder?.audioFile?.url else {
-            return nil
-        }
-
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "recording-\(Date().ISO8601Format()).caf",
-            conformingTo: .audio
-        )
-
-        try? FileManager.default.moveItem(at: tempUrl, to: url)
+        audioRecorder.stop()
 
         self.audioRecorder = nil
-        self.highpassFilter = nil
-        self.amplitudeTap = nil
-        self.fader = nil
+        self.cancellables.removeAll()
 
-        return url
+        self.isRecordingPublisher.send(audioRecorder.isRecording)
+
+        return audioRecorder.url
+    }
+
+    private func updateRecordedDuration() {
+        guard let audioRecorder else { return }
+
+        let recordedDuration: TimeInterval = audioRecorder.currentTime
+
+        self.recordedDurationPublisher.send(recordedDuration)
+    }
+
+    private func updateMeter() {
+        guard let audioRecorder else { return }
+
+        audioRecorder.updateMeters()
+
+        let averagePower: Float = audioRecorder.averagePower(forChannel: 0)
+        let normalizedLevel: Float = normalizeLevel(averagePower)
+
+        self.audioLevelPublisher.send(normalizedLevel)
+    }
+
+    private func normalizeLevel(_ dB: Float, minDb: Float = -30) -> Float {
+        let clamped: Float = min(0, max(minDb, dB))
+        return (clamped - minDb) / (-minDb)
     }
 }
