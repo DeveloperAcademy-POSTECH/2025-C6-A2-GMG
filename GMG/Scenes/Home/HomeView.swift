@@ -181,7 +181,7 @@ extension HomeView {
         @State private var isEditable: Bool = false
         @FocusState private var isTitleFocused: Bool
         
-        // ✅ 로컬 편집 버퍼
+        // 로컬 편집 버퍼
         @State private var tempTitle: String = ""
         
         let score: Score
@@ -196,25 +196,22 @@ extension HomeView {
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
-                    
-                    // ✅ 제목 영역
                     if isEditable {
                         TextField("", text: $tempTitle)
                             .font(Typography.WantedSansStd.R4)
                             .foregroundStyle(Color.white1)
                             .focused($isTitleFocused)
                             .onAppear {
-                                // 편집 시작 시 현재 저장된 타이틀을 버퍼로 복사
                                 tempTitle = score.title
                                 DispatchQueue.main.async {
                                     isTitleFocused = true
                                 }
                             }
-                            .onSubmit { endRename(commit: true) }   // 엔터로 커밋
+                            .onSubmit { endRename(commit: true) }
                             .submitLabel(.done)
                             .padding(.bottom, 4)
                     } else {
-                        Text(score.title) // ✅ 항상 저장된 값 표시
+                        Text(score.title)
                             .font(Typography.WantedSansStd.R4)
                             .foregroundStyle(Color.white1)
                             .padding(.bottom, 4)
@@ -234,11 +231,9 @@ extension HomeView {
                 
                 Spacer()
                 
-                // 우측 액션들
                 VStack(alignment: .trailing, spacing: .zero) {
                     
                     Menu {
-                        // ✅ Rename: 편집 시작 + 포커스
                         Button {
                             startRename()
                         } label: {
@@ -316,7 +311,7 @@ extension HomeView {
             .contentShape(RoundedRectangle(cornerRadius: 32))
             .onTapGesture {
                 if isEditable {
-                    endRename(commit: true) // ✅ 바깥 탭으로 커밋 & 종료
+                    endRename(commit: true)
                 } else {
                     if isSelected {
                         action()
@@ -343,7 +338,6 @@ extension HomeView {
                 // 빈 문자열로 저장되는 것 방지 + 변경 시에만 저장
                 if !new.isEmpty, new != score.title {
                     score.title = new
-                    // SwiftData는 자동 저장되지만, 즉시 반영 원하면 강제 저장 가능
                     try? modelContext.save()
                 }
             }
@@ -432,7 +426,7 @@ extension HomeView {
     }
     
     static func formatDuration(_ seconds: Double) -> String {
-        let totalSeconds = Int(seconds.rounded())  // 반올림해서 Int로 변환
+        let totalSeconds = Int(seconds.rounded())
         let minutes = totalSeconds / 60
         let seconds = totalSeconds % 60
         return String(format: "%02d:%02d", minutes, seconds)
@@ -452,6 +446,6 @@ extension HomeView {
     }
 }
 
-//#Preview(traits: .routerModifier) {
-//    HomeView()
-//}
+#Preview(traits: .routerModifier) {
+    HomeView()
+}
