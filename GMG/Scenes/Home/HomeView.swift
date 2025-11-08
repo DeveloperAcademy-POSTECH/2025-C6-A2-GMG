@@ -67,7 +67,7 @@ struct HomeView: View {
                                 )
                                 
                                 ForEach(
-                                    Array(recentScores.enumerated()),
+                                    Array(recentScores.prefix(3).enumerated()),
                                     id: \.element.persistentModelID
                                 ) { (idx, score) in
                                     ScoreCard(
