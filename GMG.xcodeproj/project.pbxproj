@@ -28,7 +28,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E3BD259E2EA4E13900FB6CFD /* Exceptions for "GMG" folder in "GMG" target */ = {
+		32071CE72EBF162F00F03308 /* Exceptions for "GMG" folder in "GMG" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -41,7 +41,7 @@
 		32C5AB532EA213420007BEFD /* GMG */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E3BD259E2EA4E13900FB6CFD /* Exceptions for "GMG" folder in "GMG" target */,
+				32071CE72EBF162F00F03308 /* Exceptions for "GMG" folder in "GMG" target */,
 			);
 			path = GMG;
 			sourceTree = "<group>";

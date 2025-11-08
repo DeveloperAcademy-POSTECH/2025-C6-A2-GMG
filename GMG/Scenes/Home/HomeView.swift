@@ -56,13 +56,16 @@ struct HomeView: View {
                                 .foregroundStyle(Color.black1)
                             Spacer()
                         }
-
+                        
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: Spacing.md) {
-                                AddScoreButton {
-                                    router.push(.recording)
-                                }
-
+                                AddScoreButton (
+                                    action: {
+                                        router.push(.recording)
+                                    },
+                                    songCount: songCount
+                                )
+                                
                                 ForEach(
                                     Array(recentScores.enumerated()),
                                     id: \.element.persistentModelID
@@ -269,6 +272,7 @@ extension HomeView {
 
     struct AddScoreButton: View {
         let action: () -> Void
+        let songCount: Int
 
         var body: some View {
             Button {
@@ -282,7 +286,7 @@ extension HomeView {
                         in: RoundedRectangle(cornerRadius: 18)
                     )
             }
-            .frame(width: 80)
+            .frame(width: songCount==0 ? 80 : 128)
         }
     }
 
