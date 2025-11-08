@@ -47,7 +47,8 @@ struct ChordProgressView: View {
                     chordCells: model.score.retrieveAllChordCells(),
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
-                    chordCellAction: intent.onTapChordCell
+                    chordCellAction: intent.onTapChordCell,
+                    chordCandidateAction: intent.onTapCandidateChordCell
                 )
             }
             .navigationBar(
@@ -262,6 +263,7 @@ extension ChordProgressView {
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
+        let chordCandidateAction: (Int, ChordCell) -> Void
 
         var body: some View {
             ScrollView {
@@ -277,7 +279,8 @@ extension ChordProgressView {
                             segmentDuration: segmentDuration,
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,
-                            chordCellAction: chordCellAction
+                            chordCellAction: chordCellAction,
+                            chordCandidateAction: chordCandidateAction
                         )
                     }
                 }
@@ -310,7 +313,8 @@ extension ChordProgressView {
         let currentChordCell: ChordCell? // 재생 중인 코드 셀
         let selectedChordCell: ChordCell? // 편집 모드에서 선택된 코드 셀
         let chordCellAction: (ChordCell) -> Void
-
+        let chordCandidateAction: (Int, ChordCell) -> Void
+ 
         @Environment(\.editMode) private var editMode
 
         private var segmentStartTime: TimeInterval {
@@ -447,8 +451,8 @@ extension ChordProgressView {
                     && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
 
                 ChordCellCandidates(
-                    chordCandidates: selectedChordCell?.chordCandidates ?? []
-                    , selectedChord: selectedChordCell?.chord?.description ?? ""
+                    chordCell: selectedChordCell ?? ChordCell.empty,
+                    onTapAction: chordCandidateAction
                 )
                 .frame(height: showCandidates ? 62 : 0)
                 .scaleEffect(y: showCandidates ? 1.0 : 0.0)
@@ -467,8 +471,8 @@ extension ChordProgressView {
         }
 
         struct ChordCellCandidates: View {
-            let chordCandidates: [Chord]
-            let selectedChord: String
+            let chordCell: ChordCell
+            let onTapAction: (Int, ChordCell) -> Void
 
             var body: some View {
                 ZStack {
@@ -477,9 +481,10 @@ extension ChordProgressView {
                     HStack {
                         Spacer()
                         
-                        ForEach(chordCandidates, id: \.self) { chord in
+                        ForEach(chordCell.chordCandidates.indices, id: \.self) { index in
+                            let chord = chordCell.chordCandidates[index]
                             Button {
-                                
+                                onTapAction(index, chordCell)
                             } label: {
                                 VStack {
                                     Text(chord.description)
@@ -490,7 +495,7 @@ extension ChordProgressView {
                                 .background {
                                     RoundedRectangle(cornerRadius: 8)
                                         .fill(
-                                            chord.description == selectedChord
+                                            chord.description == chordCell.chord?.description
                                                 ? .blue6
                                                 : .blue3
                                         )

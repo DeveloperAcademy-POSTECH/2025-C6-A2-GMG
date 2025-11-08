@@ -68,7 +68,7 @@ class Score {
         return chordCells[cellIndex]
     }
 
-    func updateChordCellBy(cellIndex: Int, chord: Chord) {
+    func updateChordCellBy(cellIndex: Int, chord: Chord?) {
         guard chordCells.indices.contains(cellIndex) else { return }
 
         let chordCell: ChordCell = chordCells[cellIndex]
