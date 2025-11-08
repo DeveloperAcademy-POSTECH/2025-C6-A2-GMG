@@ -100,22 +100,22 @@ extension Score {
                 ),
                 ChordCell(
                     chord: Chord(root: .D, quality: .min),
-                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [Chord(root: .D, quality: .min), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 2.5
                 ),
                 ChordCell(
                     chord: Chord(root: .E, quality: .dim),
-                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [Chord(root: .E, quality: .dim), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 5.0
                 ),
                 ChordCell(
                     chord: Chord(root: .F, quality: .maj9),
-                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
-                    startTime: 10.0
+                    chordCandidates: [Chord(root: .F, quality: .maj9), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    startTime: 11.3
                 ),
                 ChordCell(
-                    chord: Chord(root: .Bb, quality: .halfDim7),
-                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chord: Chord(root: .Bb, quality: .maj),
+                    chordCandidates: [Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 13.0
                 ),
             ]
