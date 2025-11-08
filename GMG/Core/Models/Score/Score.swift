@@ -95,27 +95,27 @@ extension Score {
             chordCells: [
                 ChordCell(
                     chord: Chord(root: .C, quality: .maj),
-                    chordCandidates: [],
+                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 0.0
                 ),
                 ChordCell(
                     chord: Chord(root: .D, quality: .min),
-                    chordCandidates: [],
+                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 2.5
                 ),
                 ChordCell(
                     chord: Chord(root: .E, quality: .dim),
-                    chordCandidates: [],
+                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 5.0
                 ),
                 ChordCell(
                     chord: Chord(root: .F, quality: .maj9),
-                    chordCandidates: [],
+                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 10.0
                 ),
                 ChordCell(
                     chord: Chord(root: .Bb, quality: .halfDim7),
-                    chordCandidates: [],
+                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
                     startTime: 13.0
                 ),
             ]
