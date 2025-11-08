@@ -25,6 +25,8 @@
 /* Begin PBXFileReference section */
 		32C5AB512EA213420007BEFD /* GMG.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GMG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		32F1740B2EA3BC3700851F42 /* GMGTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GMGTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7C5C2F92EBDB378009E8CB8 /* GMG.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = GMG.xcodeproj; sourceTree = "<group>"; };
+		E7EC9E4F2EBD9808004568D8 /* GMG.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = GMG.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -91,6 +93,16 @@
 				32C5AB512EA213420007BEFD /* GMG.app */,
 				32F1740B2EA3BC3700851F42 /* GMGTests.xctest */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E7C5C2FB2EBDB378009E8CB8 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E7EC9E512EBD9808004568D8 /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -181,6 +193,16 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 32C5AB522EA213420007BEFD /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = E7C5C2FB2EBDB378009E8CB8 /* Products */;
+					ProjectRef = E7C5C2F92EBDB378009E8CB8 /* GMG.xcodeproj */;
+				},
+				{
+					ProductGroup = E7EC9E512EBD9808004568D8 /* Products */;
+					ProjectRef = E7EC9E4F2EBD9808004568D8 /* GMG.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				32C5AB502EA213420007BEFD /* GMG */,
