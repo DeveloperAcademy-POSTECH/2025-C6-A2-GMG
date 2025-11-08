@@ -6,6 +6,7 @@ import Foundation
 import SwiftF0
 
 enum ScoreFactoryError: Error {
+    case documentDirectoryNotFound
     case pitchDetectModelNotFound
     case failedToChordInference
 }
@@ -28,9 +29,25 @@ final class ScoreFactory {
     func createScore(
         audioUrl: URL
     ) throws -> Score {
+        guard
+            let documentDirectory: URL = FileManager.default.urls(
+                for: .documentDirectory,
+                in: .userDomainMask
+            ).first
+        else {
+            throw ScoreFactoryError.documentDirectoryNotFound
+        }
+
+        let workingURL: URL = documentDirectory.appendingPathComponent(
+            audioUrl.lastPathComponent,
+            conformingTo: .audio
+        )
+
+        try FileManager.default.copyItem(at: audioUrl, to: workingURL)
+
         scoreFactoryStatePublisher.send(.hummingAnalysis)
 
-        let notes: [Note] = try self.convertAudioToNotes(audioUrl: audioUrl)
+        let notes: [Note] = try self.convertAudioToNotes(audioUrl: workingURL)
 
         scoreFactoryStatePublisher.send(.chordGeneration)
 
@@ -45,7 +62,7 @@ final class ScoreFactory {
 
         let mergedChordCells: [ChordCell] = mergeChordCells(chordCells)
 
-        let file: AVAudioFile = try AVAudioFile(forReading: audioUrl)
+        let file: AVAudioFile = try AVAudioFile(forReading: workingURL)
         let totalDuration: TimeInterval =
             TimeInterval(file.length) / file.fileFormat.sampleRate
 
@@ -69,7 +86,7 @@ final class ScoreFactory {
         return Score(
             title: "Untitled",
             key: key,
-            audioUrl: audioUrl,
+            audioUrl: workingURL,
             totalDuration: totalDuration,
             createdAt: Date(),
             updatedAt: Date(),
