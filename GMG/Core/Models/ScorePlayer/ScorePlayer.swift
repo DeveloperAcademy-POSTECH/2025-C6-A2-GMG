@@ -45,10 +45,11 @@ final class ScorePlayer {
 
         // 코드 재생 준비
         try midiSampler.loadSoundFont("8MBGMSFX", preset: 0, bank: 0)
-        
+        midiSampler.volume = 0.8
+
         let chordCells: [ChordCell] = score.retrieveAllChordCells()
         let audioDuration: TimeInterval = score.totalDuration
-        
+
         sequencer.tempo = 60
 
         let track: SequencerTrack = sequencer.addTrack(for: midiSampler)
@@ -108,11 +109,13 @@ final class ScorePlayer {
         .autoconnect()
         .sink { [weak self] _ in
             guard let self else { return }
-            
-            if self.playheadPublisher.value.elapsedTime >= self.score.totalDuration {
+
+            if self.playheadPublisher.value.elapsedTime
+                >= self.score.totalDuration
+            {
                 self.stop()
             }
-            
+
             self.playheadPublisher.send(
                 Playhead(
                     isPlaying: self.audioPlayer.isPlaying,
@@ -151,9 +154,9 @@ final class ScorePlayer {
 
     func seek(chordCell: ChordCell) {
         let isPlaying: Bool = audioPlayer.isPlaying
-        
+
         stop()
-        
+
         self.audioPlayer.seek(time: chordCell.startTime + 0.04)
         self.sequencer.seek(to: audioPlayer.currentTime)
 
@@ -161,7 +164,7 @@ final class ScorePlayer {
             play()
         } else {
             pause()
-            
+
             guard let chord: Chord = chordCell.chord else { return }
             play(chord: chord)
         }

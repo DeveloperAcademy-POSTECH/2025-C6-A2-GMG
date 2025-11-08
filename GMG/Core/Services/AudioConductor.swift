@@ -16,12 +16,23 @@ enum AudioMode {
         }
     }
 
+    var mode: AVAudioSession.Mode {
+        switch self {
+        case .playback:
+            return .default
+        case .record:
+            return .default
+        }
+    }
+
     var options: AVAudioSession.CategoryOptions {
         switch self {
         case .playback:
             return []
         case .record:
-            return [.defaultToSpeaker]
+            return [
+                .defaultToSpeaker, .allowBluetoothA2DP,
+            ]
         }
     }
 }
@@ -53,7 +64,7 @@ final class AudioConductor {
     private func teardown() throws {
         self.mixer?.stop()
         self.engine?.stop()
-        
+
         self.engine?.output = nil
 
         self.mixer = nil
@@ -65,7 +76,7 @@ final class AudioConductor {
         try deactivateAudioSession()
 
         if let mode {
-            try setCategoryAudioSession(mode)
+            try setAudioSessionCategory(mode)
             try activateAudioSession()
             try setup()
         }
@@ -89,22 +100,17 @@ final class AudioConductor {
         self.mixer?.removeInput(node)
     }
 
-    func setCategoryAudioSession(_ mode: AudioMode) throws {
+    func setAudioSessionCategory(_ audioMode: AudioMode) throws {
         let audioSession = AVAudioSession.sharedInstance()
-        let category = mode.category
-        let options = mode.options
+        let category = audioMode.category
+        let mode = audioMode.mode
+        let options = audioMode.options
 
-        switch mode {
-        case .playback:
-            try audioSession.setCategory(category)
-        case .record:
-            try audioSession.setCategory(
-                category,
-                mode: .measurement,
-                options: options
-            )
-            try audioSession.setPreferredSampleRate(48_000)
-        }
+        try audioSession.setCategory(
+            category,
+            mode: mode,
+            options: options
+        )
     }
 
     func activateAudioSession() throws {

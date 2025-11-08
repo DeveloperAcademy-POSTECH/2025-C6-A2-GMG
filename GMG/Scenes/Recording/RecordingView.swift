@@ -33,7 +33,7 @@ struct RecordingView: View {
             }
             .navigationBar(leading: {}, trailing: {})
 
-            WaveForm(amplitudes: model.amplitudes)
+            WaveForm(audioLevels: model.audioLevels)
 
             VStack {
                 Spacer()
@@ -173,22 +173,22 @@ struct RecordingView: View {
     }
 
     struct WaveForm: View {
-        let amplitudes: [Float]
+        let audioLevels: [Float]
 
-        private var paddedAmplitudes: [Float] {
+        private var paddedAudioLevels: [Float] {
             Array(
                 repeating: .zero,
-                count: max(0, 34 - amplitudes.count)
-            ) + Array(amplitudes.suffix(34))
+                count: max(0, 34 - audioLevels.count)
+            ) + Array(audioLevels.suffix(34))
         }
 
         var body: some View {
             HStack(spacing: Spacing.xs) {
                 ForEach(
-                    paddedAmplitudes.enumerated(),
+                    paddedAudioLevels.enumerated(),
                     id: \.0
-                ) { _, amplitude in
-                    let height: CGFloat = clampHeight(CGFloat(amplitude) * 5000)
+                ) { _, audioLevel in
+                    let height: CGFloat = CGFloat(80 * audioLevel + 10)
 
                     Capsule()
                         .foregroundStyle(Color.gray)
@@ -300,7 +300,7 @@ struct RecordingView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: 140)
-            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 18))
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18))
             .animation(.default, value: recordingUrl)
         }
     }
