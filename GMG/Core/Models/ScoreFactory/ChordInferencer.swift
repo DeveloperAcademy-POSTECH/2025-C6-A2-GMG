@@ -59,42 +59,122 @@ final class ChordInferencer {
     }
 
     func inference(notes: [Note]) throws -> ChordInferencerResult {
-        // TODO: - note를 입력 최대 시간에 따라 잘라서 처리하기
-        let tokens: [String] =
-            notes
-            .map { note in
-                return note.tokens
-            }
-            .flatMap { tokens in
-                return tokens
-            }
-
-        let outputTokens: [[InferenceResult]] =
-            try inference(tokens: tokens)
-
-        var key: Key = Key(root: .C)
-        if let keyTokenId: Int = outputTokens.first?.first?.id,
-            let keyToken: String = vocab.chordToken(id: keyTokenId),
-            let root: NoteName = NoteName(token: keyToken)
-        {
-            key = Key(root: root)
+        guard !notes.isEmpty else {
+            return ChordInferencerResult(key: Key(root: .C), chordCells: [])
         }
 
-        let chordCells: [ChordCell] =
-            convertToChordCells(outputTokens)
+        var key: Key? = nil
+        var previousResults: [[InferenceResult]] = []
+        var chordCells: [ChordCell] = []
 
-        let result: ChordInferencerResult =
-            ChordInferencerResult(
-                key: key,
-                chordCells: chordCells
+        var startIndex: Int = 0
+        var startTime: TimeInterval = notes[0].startTime
+        var endIndex: Int = 0
+        var endTime: TimeInterval = 0
+
+        while startIndex < notes.endIndex {
+            let windowLimitTime: TimeInterval = startTime + 51.2
+            endIndex =
+                notes.firstIndex { $0.startTime >= windowLimitTime }
+                ?? notes.endIndex
+
+            let maxNotesPerSlice = (maxMelodyLength - 2) / 3
+            if (endIndex - startIndex) > maxNotesPerSlice {
+                endIndex = startIndex + maxNotesPerSlice
+            }
+
+            if startIndex >= endIndex { break }
+
+            let slicedTokens: [String] = notes[startIndex..<endIndex]
+                .map { note in
+                    Note(
+                        name: note.name,
+                        octave: note.octave,
+                        startTime: note.startTime - startTime,
+                        duration: note.duration
+                    )
+                }
+                .flatMap { $0.tokens }
+
+            let inferenceResults: [[InferenceResult]] = try inference(
+                tokens: slicedTokens,
+                previousResults: previousResults
             )
 
+            if key == nil,
+                let keyTokenId = inferenceResults.first?.first?.id,
+                let keyToken = vocab.chordToken(id: keyTokenId),
+                let root = NoteName(token: keyToken)
+            {
+                key = Key(root: root)
+            }
+
+            let slicedChordCells: [ChordCell] = convertToChordCells(
+                inferenceResults
+            )
+            .map { chordCell in
+                ChordCell(
+                    chord: chordCell.chord,
+                    chordCandidates: chordCell.chordCandidates,
+                    startTime: startTime + chordCell.startTime
+                )
+            }
+            .filter { $0.startTime >= endTime }
+
+            if !slicedChordCells.isEmpty {
+                chordCells.append(contentsOf: slicedChordCells)
+            }
+
+            let sliceLength = endIndex - startIndex
+            let advance = max(1, (sliceLength * 2) / 3)
+            startIndex += advance
+            if startIndex >= notes.endIndex { break }
+            startTime = notes[startIndex].startTime
+
+            if endIndex > 0 {
+                endTime = max(
+                    notes[endIndex - 1].startTime,
+                    chordCells.last?.startTime ?? endTime
+                )
+            }
+
+            previousResults = slicedChordCells.flatMap { chordCell in
+                let chordCell: ChordCell = ChordCell(
+                    chord: chordCell.chord,
+                    chordCandidates: chordCell.chordCandidates,
+                    startTime: chordCell.startTime - startTime
+                )
+
+                return [
+                    chordCell.tokens.map { token in
+                        let tokenId = vocab.chordId(token: token) ?? unkId
+                        return InferenceResult(id: tokenId, probability: 1.0)
+                    }
+                ]
+            }
+
+            if previousResults.count > (maxChordLength - 2) {
+                previousResults = Array(
+                    previousResults.prefix(maxChordLength - 2)
+                )
+            }
+
+            if endIndex >= notes.endIndex { break }
+        }
+
+        let result = ChordInferencerResult(
+            key: key ?? Key(root: .C),
+            chordCells: chordCells
+        )
         return result
     }
 }
 
 extension ChordInferencer {
-    private func inference(tokens: [String]) throws -> [[InferenceResult]] {
+    private func inference(
+        tokens: [String],
+        previousResults: [[InferenceResult]]? = nil
+    ) throws -> [[InferenceResult]] {
         var tokenIds: [Int] = []
 
         tokenIds.reserveCapacity(maxMelodyLength)
@@ -127,6 +207,7 @@ extension ChordInferencer {
 
         let chordInferenceResults = try generateOutputSequence(
             melodyTokens: melodyTokens,
+            previousResults: previousResults,
             topK: 5,
             temperature: 0.9
         )
@@ -136,18 +217,24 @@ extension ChordInferencer {
 
     private func generateOutputSequence(
         melodyTokens: MLMultiArray,
+        previousResults: [[InferenceResult]]? = nil,
         topK: Int? = 5,
         temperature: Float = 0.9
     ) throws -> [[InferenceResult]] {
-        var results: [[InferenceResult]] = []
+        var results: [[InferenceResult]] = previousResults ?? []
 
         var chordArray: MLShapedArray<Int32> = MLShapedArray(
             repeating: Int32(padId),
             shape: [1, maxChordLength]
         )
-        chordArray[scalarAt: [0, 0]] = Int32(sosId)
 
-        for index in 1..<maxChordLength {
+        chordArray[scalarAt: [0, 0]] = Int32(sosId)
+        for (index, result) in results.enumerated() {
+            let tokenId: Int = result.first?.id ?? unkId
+            chordArray[scalarAt: [0, index + 1]] = Int32(tokenId)
+        }
+
+        for index in (results.count + 1)..<maxChordLength {
             let chordInput: MLMultiArray = MLMultiArray(chordArray)
 
             let input: TransformerChordInferenceInput =
@@ -432,16 +519,16 @@ extension ChordQuality {
         let qualityString = token.replacingOccurrences(of: "Type_", with: "")
 
         switch qualityString {
-        case "maj": self = .maj
-        case "maj7": self = .maj7
-        case "maj9": self = .maj9
-        case "min": self = .min
-        case "min7": self = .min7
-        case "dom7": self = .dom7
-        case "dom9": self = .dom9
+        case "M": self = .maj
+        case "M7": self = .maj7
+        case "M9": self = .maj9
+        case "m": self = .min
+        case "m7": self = .min7
+        case "7": self = .dom7
+        case "9": self = .dom9
         case "dim": self = .dim
         case "dim7": self = .dim7
-        case "hdim7": self = .halfDim7
+        case "m7b5": self = .halfDim7
         default: return nil
         }
     }
@@ -507,6 +594,28 @@ extension Note {
         tokens.append(positionToken)
         tokens.append(pitchToken)
         tokens.append(durationToken)
+
+        return tokens
+    }
+}
+
+extension ChordCell {
+    fileprivate var tokens: [String] {
+        guard let chord else { return [] }
+
+        var tokens: [String] = []
+
+        let position = max(0, min(511, Int((self.startTime * 10.0).rounded())))
+        let root = chord.root.description
+        let quality = chord.quality.description
+
+        let positionToken = "Position_\(position)"
+        let rootToken = "Position_\(root)"
+        let qualityToken = "Type_\(quality)"
+
+        tokens.append(positionToken)
+        tokens.append(rootToken)
+        tokens.append(qualityToken)
 
         return tokens
     }
