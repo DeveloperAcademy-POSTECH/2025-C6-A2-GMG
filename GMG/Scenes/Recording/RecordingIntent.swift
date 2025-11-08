@@ -56,9 +56,9 @@ final class RecordingIntent: RecordingIntentProtocol {
             }
             .store(in: &cancellables)
 
-        recordManager.amplitudePublisher
-            .sink { [weak self] amplitude in
-                self?.model?.appendAmplitude(amplitude)
+        recordManager.audioLevelPublisher
+            .sink { [weak self] audioLevel in
+                self?.model?.appendAudioLevel(audioLevel)
             }
             .store(in: &cancellables)
 
@@ -117,6 +117,8 @@ final class RecordingIntent: RecordingIntentProtocol {
 
     func onTapPlayButton(_ url: URL) {
         do {
+            model?.resetAudioLevels()
+
             try playbackManager.play(url)
         } catch {
             Logger.error(String(describing: error))
@@ -128,6 +130,8 @@ final class RecordingIntent: RecordingIntentProtocol {
     }
 
     func onTapNextButton(_ url: URL, completion: @escaping () -> Void) {
+        onTapStopPlayButton()
+
         scoreCreationTask?.cancel()
 
         scoreCreationTask = Task { [weak self] in
@@ -153,6 +157,7 @@ final class RecordingIntent: RecordingIntentProtocol {
                 self.model?.finishScoreCreation(score)
                 completion()
             } catch {
+                self.model?.updateScoreFactoryState(nil)
                 Logger.error(String(describing: error))
             }
         }
