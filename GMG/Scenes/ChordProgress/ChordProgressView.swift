@@ -164,13 +164,25 @@ extension ChordProgressView {
                 Button {
                     onTapUndo()
                 } label: {
-                    Image(canUndo ? "Undo" : "Undo-unactive")
+                    Image(ImageResource.undo)
+                        .renderingMode(.template)
+                        .foregroundStyle(
+                            canUndo
+                            ? .white1
+                            : .black2
+                        )
                 }
                 
                 Button {
                     onTapRedo()
                 } label: {
-                    Image(canRedo ? "Redo" : "Redo-unactive")
+                    Image(ImageResource.redo)
+                        .renderingMode(.template)
+                        .foregroundStyle(
+                            canRedo
+                            ? .white1
+                            : .black2
+                        )
                 }
             }
         }
