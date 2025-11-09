@@ -254,7 +254,7 @@ extension ChordInferencer {
                 from: logits,
                 at: position,
                 temperature: temperature,
-                k: 5
+                k: topK ?? 5
             )
 
             if candidates.first?.id ?? eosId == eosId { break }
@@ -610,7 +610,7 @@ extension ChordCell {
         let quality = chord.quality.description
 
         let positionToken = "Position_\(position)"
-        let rootToken = "Position_\(root)"
+        let rootToken = "Root_\(root)"
         let qualityToken = "Type_\(quality)"
 
         tokens.append(positionToken)
