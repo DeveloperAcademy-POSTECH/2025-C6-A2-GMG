@@ -2,10 +2,12 @@
 
 import Combine
 import Foundation
+import UIKit
 
 protocol ChordProgressIntentProtocol {
     func onAppear(_ score: Score)
     func onDisappear()
+    func updateUndoManager(_ undoManager: UndoManager?)
     func onTapEditModeToggle(_ isEditMode: Bool)
     func onTapPlayButton()
     func onTapPauseButton()
@@ -91,7 +93,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             let model = self.model,
             chordCell.chordCandidates.contains(where: { $0 == candidate })
         else { return }
-
+        
         scorePlayer.play(chord: candidate)
 
         if chordCell.chord == candidate {
@@ -101,11 +103,15 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         model.replaceChord(with: candidate, for: chordCell)
     }
     
+    func updateUndoManager(_ undoManager: UndoManager?) {
+        self.model?.setUndoManager(undoManager)
+    }
+    
     func onTapUndoButton() {
-        self.model?.undoLastChange()
+        self.model?.performUndo()
     }
     
     func onTapRedoButton() {
-        self.model?.redoLastChange()
+        self.model?.performRedo()
     }
 }

@@ -4,6 +4,7 @@ import SwiftUI
 
 struct ChordProgressView: View {
     @Environment(Router.self) private var router: Router
+    @Environment(\.undoManager) private var undoManager
 
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
@@ -93,9 +94,14 @@ struct ChordProgressView: View {
             .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
         )
         .onAppear {
+            intent.updateUndoManager(undoManager)
             intent.onAppear(model.score)
         }
+        .onChange(of: undoManager) { _, newValue in
+            intent.updateUndoManager(newValue)
+        }
         .onDisappear {
+            intent.updateUndoManager(nil)
             intent.onDisappear()
         }
     }
