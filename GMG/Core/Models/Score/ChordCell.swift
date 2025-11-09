@@ -8,4 +8,11 @@ struct ChordCell {
     let startTime: TimeInterval
 }
 
+extension ChordCell {
+    static var empty: ChordCell {
+        ChordCell(chord: nil, chordCandidates: [], startTime: 0.0)
+    }
+}
+
 extension ChordCell: Codable {}
+extension ChordCell: Hashable {}

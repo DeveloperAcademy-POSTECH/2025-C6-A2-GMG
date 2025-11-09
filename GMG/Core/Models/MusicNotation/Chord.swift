@@ -14,3 +14,5 @@ extension Chord: CustomStringConvertible {
 extension Chord: Equatable {}
 
 extension Chord: Codable {}
+
+extension Chord: Hashable {}
