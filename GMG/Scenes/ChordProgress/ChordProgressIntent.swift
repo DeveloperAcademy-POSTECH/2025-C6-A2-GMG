@@ -2,15 +2,23 @@
 
 import Combine
 import Foundation
+import UIKit
 
 protocol ChordProgressIntentProtocol {
     func onAppear(_ score: Score)
     func onDisappear()
+    func updateUndoManager(_ undoManager: UndoManager?)
     func onTapEditModeToggle(_ isEditMode: Bool)
     func onTapPlayButton()
     func onTapPauseButton()
     func onTapStopButton()
     func onTapChordCell(_ chordCell: ChordCell)
+    func onTapCandidateChordCell(
+        _ candidate: Chord,
+        for chordCell: ChordCell
+    )
+    func onTapUndoButton()
+    func onTapRedoButton()
 }
 
 final class ChordProgressIntent: ChordProgressIntentProtocol {
@@ -74,8 +82,36 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onTapChordCell(_ chordCell: ChordCell) {
         self.scorePlayer?.seek(chordCell: chordCell)
+        self.model?.selectChordCell(chordCell)
+    }
+    
+    func onTapCandidateChordCell(
+        _ candidate: Chord,
+        for chordCell: ChordCell
+    ) {
+        guard let scorePlayer = self.scorePlayer,
+            let model = self.model,
+            chordCell.chordCandidates.contains(where: { $0 == candidate })
+        else { return }
+        
+        scorePlayer.play(chord: candidate)
 
-//        guard let chord: Chord = chordCell.chord else { return }
-//        scorePlayer?.play(chord: chord)
+        if chordCell.chord == candidate {
+            return
+        }
+
+        model.replaceChord(with: candidate, for: chordCell)
+    }
+    
+    func updateUndoManager(_ undoManager: UndoManager?) {
+        self.model?.setUndoManager(undoManager)
+    }
+    
+    func onTapUndoButton() {
+        self.model?.performUndo()
+    }
+    
+    func onTapRedoButton() {
+        self.model?.performRedo()
     }
 }
