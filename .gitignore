@@ -40,6 +40,7 @@ __MACOSX/
 *.lock
 *.idea/
 .vscode/
+AGENTS.md
 
 # === Preview & SwiftUI Cache ===
 # SwiftUI preview 캐시와 canvas 정보
