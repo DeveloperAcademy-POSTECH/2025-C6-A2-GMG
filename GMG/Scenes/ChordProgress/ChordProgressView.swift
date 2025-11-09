@@ -170,7 +170,7 @@ extension ChordProgressView {
                 Button {
                     onTapUndo()
                 } label: {
-                    Image(ImageResource.undo)
+                    Image(.undo)
                         .renderingMode(.template)
                         .foregroundStyle(
                             canUndo
@@ -182,7 +182,7 @@ extension ChordProgressView {
                 Button {
                     onTapRedo()
                 } label: {
-                    Image(ImageResource.redo)
+                    Image(.redo)
                         .renderingMode(.template)
                         .foregroundStyle(
                             canRedo
@@ -281,6 +281,7 @@ extension ChordProgressView {
                     } label: {
                         Image(.stop)
                             .renderingMode(.template)
+                            .frame(width: 24, height: 24)
                     }
                     .gridCellColumns(1)
 
@@ -295,8 +296,9 @@ extension ChordProgressView {
                     ControllerButton {
 
                     } label: {
-                        Image(.guitar)
+                        Image(.piano)
                             .renderingMode(.template)
+                            .frame(width: 24, height: 24)
                     }
                     .gridCellColumns(1)
                 }
