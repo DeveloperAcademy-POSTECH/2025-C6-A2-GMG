@@ -308,7 +308,7 @@ extension ChordProgressView {
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
-        let chordCandidateAction: (Int, ChordCell) -> Void
+        let chordCandidateAction: (Chord, ChordCell) -> Void
 
         var body: some View {
             ScrollView {
@@ -358,7 +358,7 @@ extension ChordProgressView {
         let currentChordCell: ChordCell? // 재생 중인 코드 셀
         let selectedChordCell: ChordCell? // 편집 모드에서 선택된 코드 셀
         let chordCellAction: (ChordCell) -> Void
-        let chordCandidateAction: (Int, ChordCell) -> Void
+        let chordCandidateAction: (Chord, ChordCell) -> Void
  
         @Environment(\.editMode) private var editMode
 
@@ -517,7 +517,7 @@ extension ChordProgressView {
 
         struct ChordCellCandidates: View {
             let chordCell: ChordCell
-            let onTapAction: (Int, ChordCell) -> Void
+            let onTapAction: (Chord, ChordCell) -> Void
 
             var body: some View {
                 ZStack {
@@ -526,10 +526,9 @@ extension ChordProgressView {
                     HStack {
                         Spacer()
                         
-                        ForEach(chordCell.chordCandidates.indices, id: \.self) { index in
-                            let chord = chordCell.chordCandidates[index]
+                        ForEach(chordCell.chordCandidates, id: \.self) { chord in
                             Button {
-                                onTapAction(index, chordCell)
+                                onTapAction(chord, chordCell)
                             } label: {
                                 VStack {
                                     Text(chord.description)
