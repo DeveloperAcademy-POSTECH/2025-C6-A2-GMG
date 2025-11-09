@@ -11,7 +11,10 @@ protocol ChordProgressIntentProtocol {
     func onTapPauseButton()
     func onTapStopButton()
     func onTapChordCell(_ chordCell: ChordCell)
-    func onTapCandidateChordCell(at candidateIndex: Int, for chordCell: ChordCell)
+    func onTapCandidateChordCell(
+        _ candidate: Chord,
+        for chordCell: ChordCell
+    )
     func onTapUndoButton()
     func onTapRedoButton()
 }
@@ -80,21 +83,22 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         self.model?.selectChordCell(chordCell)
     }
     
-    func onTapCandidateChordCell(at candidateIndex: Int, for chordCell: ChordCell) {
+    func onTapCandidateChordCell(
+        _ candidate: Chord,
+        for chordCell: ChordCell
+    ) {
         guard let scorePlayer = self.scorePlayer,
             let model = self.model,
-            chordCell.chordCandidates.indices.contains(candidateIndex)
+            chordCell.chordCandidates.contains(where: { $0 == candidate })
         else { return }
 
-        let selectedCandidate: Chord = chordCell.chordCandidates[candidateIndex]
+        scorePlayer.play(chord: candidate)
 
-        scorePlayer.play(chord: selectedCandidate)
-
-        if chordCell.chord == selectedCandidate {
+        if chordCell.chord == candidate {
             return
         }
 
-        model.replaceChord(with: selectedCandidate, for: chordCell)
+        model.replaceChord(with: candidate, for: chordCell)
     }
     
     func onTapUndoButton() {
