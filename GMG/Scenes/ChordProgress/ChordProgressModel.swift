@@ -1,6 +1,7 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
+import UIKit
 
 protocol ChordProgressModelStateProtocol {
     var score: Score { get }
@@ -17,8 +18,9 @@ protocol ChordProgressModelActionProtocol: AnyObject {
     func updatePlayhead(_ playhead: Playhead)
     func selectChordCell(_ chordCell: ChordCell?)
     func replaceChord(with candidate: Chord, for cell: ChordCell)
-    func undoLastChange()
-    func redoLastChange()
+    func setUndoManager(_ undoManager: UndoManager?)
+    func performUndo()
+    func performRedo()
 }
 
 @Observable
@@ -26,19 +28,12 @@ final class ChordProgressModel:
     ChordProgressModelStateProtocol,
     ChordProgressModelActionProtocol
 {
-    private struct ChordEditHistoryEntry {
-        let cellIndex: Int
-        let previousChord: Chord?
-        let newChord: Chord?
-    }
-
     private(set) var score: Score
     private(set) var isEditMode: Bool
     private(set) var playhead: Playhead
     private(set) var currentChordCell: ChordCell?
     private(set) var selectedChordCell: ChordCell?
-    private var undoStack: [ChordEditHistoryEntry]
-    private var redoStack: [ChordEditHistoryEntry]
+    private(set) var undoManager: UndoManager?
 
     init(score: Score) {
         self.score = score
@@ -46,16 +41,15 @@ final class ChordProgressModel:
         self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
         self.currentChordCell = nil
         self.selectedChordCell = nil
-        self.undoStack = []
-        self.redoStack = []
+        self.undoManager = nil
     }
     
     var canUndo: Bool {
-        !undoStack.isEmpty
+        undoManager?.canUndo ?? false
     }
     
     var canRedo: Bool {
-        !redoStack.isEmpty
+        undoManager?.canRedo ?? false
     }
 
     func setEditMode(_ isEditMode: Bool) {
@@ -92,38 +86,26 @@ final class ChordProgressModel:
             return
         }
         
-        let entry = ChordEditHistoryEntry(
+        registerUndoRedoHandlers(
             cellIndex: cellIndex,
             previousChord: previousChord,
             newChord: selectedCandidate
         )
-        undoStack.append(entry)
-        redoStack.removeAll()
 
         score.updateChordCellBy(cellIndex: cellIndex, chord: selectedCandidate)
         updateSelectedCell(at: cellIndex)
     }
     
-    func undoLastChange() {
-        guard let lastEntry = undoStack.popLast() else { return }
-        
-        applyHistoryEntry(lastEntry, chord: lastEntry.previousChord)
-        redoStack.append(lastEntry)
+    func setUndoManager(_ undoManager: UndoManager?) {
+        self.undoManager = undoManager
     }
     
-    func redoLastChange() {
-        guard let entry = redoStack.popLast() else { return }
-        
-        applyHistoryEntry(entry, chord: entry.newChord)
-        undoStack.append(entry)
+    func performUndo() {
+        undoManager?.undo()
     }
     
-    private func applyHistoryEntry(
-        _ entry: ChordEditHistoryEntry,
-        chord: Chord?
-    ) {
-        score.updateChordCellBy(cellIndex: entry.cellIndex, chord: chord)
-        updateSelectedCell(at: entry.cellIndex)
+    func performRedo() {
+        undoManager?.redo()
     }
     
     private func updateSelectedCell(at index: Int) {
@@ -132,5 +114,24 @@ final class ChordProgressModel:
         }
         
         selectedChordCell = updatedCell
+    }
+
+    private func registerUndoRedoHandlers(
+        cellIndex: Int,
+        previousChord: Chord?,
+        newChord: Chord?
+    ) {
+        guard let undoManager else { return }
+
+        undoManager.registerUndo(withTarget: self) { target in
+            target.score.updateChordCellBy(cellIndex: cellIndex, chord: previousChord)
+            target.updateSelectedCell(at: cellIndex)
+            target.registerUndoRedoHandlers(
+                cellIndex: cellIndex,
+                previousChord: newChord,
+                newChord: previousChord
+            )
+        }
+        undoManager.setActionName("Chord Change")
     }
 }
