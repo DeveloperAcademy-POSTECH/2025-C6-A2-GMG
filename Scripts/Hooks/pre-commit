@@ -1,0 +1,42 @@
+#!/bin/sh
+
+echo "Running swift-format on staged Swift files..."
+
+# Get list of staged .swift files
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.swift$')
+
+# Initialize an array to hold modified files
+MODIFIED_FILES=()
+
+for FILE in $FILES; do
+    if [ -f "$FILE" ]; then
+        # Get the SHA before formatting
+        SHA_BEFORE=$(git hash-object "$FILE")
+
+        # Format the file
+        swift-format format -i "$FILE"
+
+        # Get the SHA after formatting
+        SHA_AFTER=$(git hash-object "$FILE")
+
+        # If the SHAs are different, the file was modified
+        if [ "$SHA_BEFORE" != "$SHA_AFTER" ]; then
+            echo "Swiftly Formatted file: $FILE"
+            MODIFIED_FILES+=("$FILE")
+            # Add the file back to staging
+            git add "$FILE"
+        fi
+    fi
+done
+
+# Check if any files were modified
+if [ ${#MODIFIED_FILES[@]} -gt 0 ]; then
+    echo ""
+    echo "The following files were modified by swift-format:"
+    for FILE in "${MODIFIED_FILES[@]}"; do
+        echo " - $FILE"
+    done
+    echo ""
+else
+    echo "No files needed formatting."
+fi
