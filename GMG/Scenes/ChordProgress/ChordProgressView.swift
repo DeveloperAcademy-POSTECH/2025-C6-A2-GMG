@@ -383,18 +383,9 @@ extension ChordProgressView {
                         && chordCell.startTime < segmentEndTime
                 }
             
-            let previousChordCell: ChordCell = {
-                guard let previous = chordCells.filter({ c in c.startTime <= segmentStartTime }).last
-                else {
-                    return ChordCell(
-                        chord: nil
-                        , chordCandidates: []
-                        , startTime: segmentStartTime
-                    )
-                }
-                
-                return previous
-            }()
+            let previousChordCell: ChordCell = chordCells.filter({ v in
+                v.startTime <= segmentStartTime
+            }).last ?? ChordCell(chord: nil, chordCandidates: [], startTime: segmentStartTime)
             
             /// 세그먼트에 코드가 없는 경우, 전 세그먼트의 마지막 코드를 사용
             if targetChordCells.isEmpty {
@@ -532,7 +523,7 @@ extension ChordProgressView {
                     HStack {
                         Spacer()
                         
-                        ForEach(chordCell.chordCandidates, id: \.self) { chord in
+                        ForEach(chordCell.chordCandidates.enumerated(), id: \.0) { (_, chord) in
                             Button {
                                 onTapAction(chord, chordCell)
                             } label: {
