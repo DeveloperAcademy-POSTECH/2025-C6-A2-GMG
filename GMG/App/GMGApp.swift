@@ -25,7 +25,7 @@ struct GMGApp: App {
                     }
             }
             .environment(router)
-            .modelContainer(for: Score.self)
+            .modelContainer(for: Score.self, isUndoEnabled: true)
         }
     }
 }
