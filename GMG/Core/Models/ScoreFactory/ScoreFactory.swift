@@ -18,8 +18,7 @@ enum ScoreFactoryState: Int {
 }
 
 final class ScoreFactory {
-    private(set) var scoreFactoryStatePublisher:
-        CurrentValueSubject<ScoreFactoryState?, Never>
+    private(set) var scoreFactoryStatePublisher: CurrentValueSubject<ScoreFactoryState?, Never>
 
     init() {
         self.scoreFactoryStatePublisher =
@@ -43,10 +42,12 @@ final class ScoreFactory {
             conformingTo: .folder
         )
 
-        try FileManager.default.createDirectory(
-            at: workingFolder,
-            withIntermediateDirectories: false
-        )
+        if FileManager.default.fileExists(atPath: workingFolder.path()) == false {
+            try FileManager.default.createDirectory(
+                at: workingFolder,
+                withIntermediateDirectories: false
+            )
+        }
 
         let workingURL: URL = workingFolder.appendingPathComponent(
             audioUrl.lastPathComponent,
