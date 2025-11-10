@@ -5,6 +5,7 @@ import Foundation
 
 protocol RecordingIntentProtocol {
     func onTapRecordButton()
+    func onTapSkipButton()
     func onTapStopRecordButton()
     func onTapResetButton()
     func onTapPlayButton(_ url: URL)
@@ -22,6 +23,7 @@ final class RecordingIntent: RecordingIntentProtocol {
 
     private var cancellables: Set<AnyCancellable>
 
+    private var countdownTask: Task<Void, Never>?
     private var scoreCreationTask: Task<Void, Never>?
 
     init(model: RecordingModelActionProtocol) {
@@ -34,6 +36,7 @@ final class RecordingIntent: RecordingIntentProtocol {
 
         self.cancellables = Set<AnyCancellable>()
 
+        self.countdownTask = nil
         self.scoreCreationTask = nil
 
         setupPublishers()
@@ -92,20 +95,21 @@ final class RecordingIntent: RecordingIntentProtocol {
     }
 
     func onTapRecordButton() {
-        Task {
-            model?.updateCountdown(3)
+        self.countdownTask?.cancel()
 
-            try? await Task.sleep(for: .seconds(1))
-
-            model?.updateCountdown(2)
-
-            try? await Task.sleep(for: .seconds(1))
-
-            model?.updateCountdown(1)
-
-            try? await Task.sleep(for: .seconds(1))
-
-            model?.updateCountdown(0)
+        self.countdownTask = Task {
+            await withTaskCancellationHandler {
+                for i in (0...3).reversed() {
+                    model?.updateCountdown(i)
+                    if i > 0 {
+                        try? await Task.sleep(for: .seconds(1))
+                    }
+                }
+            } onCancel: {
+                Task { @MainActor in
+                    model?.updateCountdown(0)
+                }
+            }
 
             do {
                 try recordManager.record()
@@ -113,6 +117,12 @@ final class RecordingIntent: RecordingIntentProtocol {
                 Logger.error(String(describing: error))
             }
         }
+    }
+
+    func onTapSkipButton() {
+        self.countdownTask?.cancel()
+
+        self.countdownTask = nil
     }
 
     func onTapStopRecordButton() {

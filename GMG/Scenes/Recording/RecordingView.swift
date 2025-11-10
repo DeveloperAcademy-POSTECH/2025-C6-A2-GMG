@@ -68,7 +68,7 @@ struct RecordingView: View {
             }
             .padding()
 
-            Countdown(countdown: model.countdown)
+            Countdown(countdown: model.countdown, skipAction: intent.onTapSkipButton)
         }
         .overlay {
             ZStack {
@@ -82,6 +82,7 @@ struct RecordingView: View {
 
     struct Countdown: View {
         let countdown: Int
+        let skipAction: () -> Void
 
         var body: some View {
             ZStack {
@@ -99,6 +100,17 @@ struct RecordingView: View {
                         )
                         .foregroundStyle(Color.white1)
                         .contentTransition(.numericText())
+
+                    Button {
+                        skipAction()
+                    } label: {
+                        Text("Skip")
+                            .font(Typography.WantedSansStd.R6)
+                            .underline()
+                            .foregroundStyle(Color.white1)
+                    }
+                    .buttonStyle(.bouncy)
+                    .offset(y: 144)
                 }
             }
             .animation(.default, value: countdown)
