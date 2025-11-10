@@ -190,27 +190,16 @@ extension HomeView {
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
-                    if isEditable {
-                        TextField("", text: $tempTitle)
-                            .font(Typography.WantedSansStd.R4)
-                            .foregroundStyle(Color.white1)
-                            .focused($isTitleFocused)
-                            .onAppear {
-                                tempTitle = score.title
-                                DispatchQueue.main.async {
-                                    isTitleFocused = true
-                                }
-                            }
-                            .onSubmit { endRename(commit: true) }
-                            .submitLabel(.done)
-                            .padding(.bottom, 4)
-                    } else {
-                        Text(score.title)
-                            .font(Typography.WantedSansStd.R4)
-                            .foregroundStyle(Color.white1)
-                            .padding(.bottom, 4)
-                            .lineLimit(1)
-                    }
+                    TextField(
+                        "Enter Score Title",
+                        text: isEditable ? $tempTitle : .constant(score.title)
+                    )
+                    .font(Typography.WantedSansStd.R4)
+                    .foregroundStyle(Color.white1)
+                    .focused($isTitleFocused)
+                    .onSubmit { endRename(commit: true) }
+                    .submitLabel(.done)
+                    .disabled(isEditable == false)
                     
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
