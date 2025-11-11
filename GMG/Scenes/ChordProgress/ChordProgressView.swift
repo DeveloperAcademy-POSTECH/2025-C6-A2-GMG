@@ -59,7 +59,9 @@ struct ChordProgressView: View {
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
-                    chordCandidateAction: intent.onTapCandidateChordCell
+                    chordCandidateAction: intent.onTapCandidateChordCell,
+                    audioLevels: model.score.audioLevels,
+                    elapsedTime: model.playhead.elapsedTime
                 )
             }
             .navigationBar(
@@ -317,6 +319,8 @@ extension ChordProgressView {
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
         let chordCandidateAction: (Chord, ChordCell) -> Void
+        let audioLevels: [Float]
+        let elapsedTime: TimeInterval
 
         var body: some View {
             ScrollView {
@@ -333,7 +337,9 @@ extension ChordProgressView {
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,
                             chordCellAction: chordCellAction,
-                            chordCandidateAction: chordCandidateAction
+                            chordCandidateAction: chordCandidateAction,
+                            audioLevels: audioLevels,
+                            elapsedTime: elapsedTime
                         )
                     }
                 }
@@ -367,8 +373,12 @@ extension ChordProgressView {
         let selectedChordCell: ChordCell? // 편집 모드에서 선택된 코드 셀
         let chordCellAction: (ChordCell) -> Void
         let chordCandidateAction: (Chord, ChordCell) -> Void
+        let audioLevels: [Float]
+        let elapsedTime: TimeInterval
  
         @Environment(\.editMode) private var editMode
+        
+        private let audioSampleInterval: TimeInterval = 0.1
 
         private var segmentStartTime: TimeInterval {
             TimeInterval(index) * segmentDuration
@@ -416,6 +426,26 @@ extension ChordProgressView {
             }
 
             return targetChordCells
+        }
+        
+        private var segmentAudioLevels: [Float] {
+            guard !audioLevels.isEmpty else { return [] }
+            
+            let clampedEndTime: TimeInterval = min(segmentEndTime, totalDuration)
+            guard clampedEndTime > segmentStartTime else { return [] }
+            
+            let startIndex: Int = max(
+                0,
+                Int(floor(segmentStartTime / audioSampleInterval))
+            )
+            let endIndex: Int = min(
+                audioLevels.count,
+                Int(ceil(clampedEndTime / audioSampleInterval))
+            )
+            
+            guard startIndex < endIndex else { return [] }
+            
+            return Array(audioLevels[startIndex..<endIndex])
         }
 
         private var chordCellsWithDuration: [(chordCell: ChordCell, duration: TimeInterval)] {
@@ -502,7 +532,12 @@ extension ChordProgressView {
                 .scaleEffect(y: showCandidates ? 1.0 : 0.0)
                 .opacity(showCandidates ? 1.0 : 0.0)
 
-                Waveform()
+                Waveform(
+                    amplitudes: segmentAudioLevels,
+                    startTime: segmentStartTime,
+                    endTime: min(segmentEndTime, totalDuration),
+                    elapsedTime: elapsedTime
+                )
 
                 TimeRuler(
                     startTime: segmentStartTime,
@@ -618,20 +653,6 @@ extension ChordProgressView {
                         )
                 }
                 .buttonStyle(.bouncy)
-            }
-        }
-
-        // TODO: Waveform 구현
-        struct Waveform: View {
-            @Environment(\.editMode) private var editMode
-
-            var body: some View {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(
-                        editMode?.wrappedValue.isEditing == true
-                            ? Color.black2 : Color.white2
-                    )
-                    .frame(height: 36)
             }
         }
 
