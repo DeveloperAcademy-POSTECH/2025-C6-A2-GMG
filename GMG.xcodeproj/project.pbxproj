@@ -10,7 +10,6 @@
 		E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */ = {isa = PBXBuildFile; productRef = E32372042EB8D8A4004C5BC9 /* SwiftF0 */; };
 		E331F8DF2EB9F44400752589 /* Tonic in Frameworks */ = {isa = PBXBuildFile; productRef = E331F8DE2EB9F44400752589 /* Tonic */; };
 		E356F0842EC34EB600E92231 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = E356F0832EC34EB600E92231 /* Lottie */; };
-		E3C8F6182EB79C2F00BA3AAB /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +60,6 @@
 			files = (
 				E331F8DF2EB9F44400752589 /* Tonic in Frameworks */,
 				E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */,
-				E3C8F6182EB79C2F00BA3AAB /* AudioKitEX in Frameworks */,
 				E356F0842EC34EB600E92231 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -116,7 +114,6 @@
 			);
 			name = GMG;
 			packageProductDependencies = (
-				E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */,
 				E32372042EB8D8A4004C5BC9 /* SwiftF0 */,
 				E331F8DE2EB9F44400752589 /* Tonic */,
 				E356F0832EC34EB600E92231 /* Lottie */,
@@ -178,7 +175,6 @@
 			mainGroup = 32C5AB482EA213420007BEFD;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				E32372032EB8D8A4004C5BC9 /* XCRemoteSwiftPackageReference "SwiftF0" */,
 				E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */,
 				E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */,
@@ -575,14 +571,6 @@
 				minimumVersion = 4.5.2;
 			};
 		};
-		E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AudioKit/AudioKitEX";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.6.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -600,11 +588,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
-		};
-		E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */;
-			productName = AudioKitEX;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
