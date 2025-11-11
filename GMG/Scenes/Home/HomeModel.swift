@@ -16,7 +16,11 @@ protocol HomeModelStateProtocol {
 protocol HomeModelActionProtocol: AnyObject {
     func setSelectedScore(_ score: Score?)
     func setIsLatest(_ isLatest: Bool)
+    func toggleIsLatest()
     func setAllScores(_ scores: [Score])
+    func fetchScores()
+    func deleteScore(_ score: Score)
+    func renameScore(_ score: Score, newTitle: String)
 }
 
 @Observable
@@ -67,27 +71,38 @@ final class HomeModel:
         self.isLatest = isLatest
     }
     
+    func toggleIsLatest() {
+        self.isLatest.toggle()
+    }
+    
     func setAllScores(_ scores: [Score]) {
         self.allScores = scores
     }
     
-    func delete(_ score: Score) {
+    func fetchScores() {
         let storage = SwiftDataStorage.shared
-        
         let context = storage.modelContext
-        
-        context?.delete(score)
-    }
-    
-    func fetch() {
-        
-        let storage = SwiftDataStorage.shared
-        
-        let context = storage.modelContext
-        
         
         let scores = try? context?.fetch(FetchDescriptor<Score>())
         
         self.allScores = scores ?? []
+    }
+    
+    func deleteScore(_ score: Score) {
+        let storage = SwiftDataStorage.shared
+        let context = storage.modelContext
+        
+        context?.delete(score)
+        try? context?.save()
+    }
+    
+    func renameScore(_ score: Score, newTitle: String) {
+        let newTitle = newTitle
+        guard newTitle.isEmpty == false, newTitle != score.title else { return }
+        let storage = SwiftDataStorage.shared
+        let context = storage.modelContext
+        
+        score.title = newTitle
+        try? context?.save()
     }
 }
