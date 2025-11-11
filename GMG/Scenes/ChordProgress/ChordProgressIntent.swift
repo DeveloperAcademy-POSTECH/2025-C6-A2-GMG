@@ -101,11 +101,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         }
 
         model.replaceChord(with: candidate, for: chordCell)
-        do {
-            try scorePlayer.prepareChordCells()
-        } catch {
-            Logger.error("Failed to prepare notes for the score player")
-        }
+        scorePlayer.prepareChordCells()
     }
 
     func updateUndoManager(_ undoManager: UndoManager?) {
