@@ -2,6 +2,8 @@
 import SwiftUI
 
 struct Waveform: View {
+    @Environment(\.editMode) private var editMode
+    
     let amplitudes: [Float]
     let startTime: TimeInterval
     let endTime: TimeInterval
@@ -13,6 +15,30 @@ struct Waveform: View {
     private let minCapsuleHeight: CGFloat = 6
     private let maxCapsuleHeight: CGFloat = 21
     
+    private var backgroundColor: Color {
+        if editMode?.wrappedValue.isEditing == true {
+            Color.black2
+        } else {
+            Color.white2
+        }
+    }
+    
+    private var unFilledCapsuleColor: Color {
+        if editMode?.wrappedValue.isEditing == true {
+            Color.black7
+        } else {
+            Color.white3
+        }
+    }
+    
+    private var filledCapsuleColor: Color {
+        if editMode?.wrappedValue.isEditing == true {
+            Color.white1
+        } else {
+            Color.blue4
+        }
+    }
+    
     var body: some View {
         GeometryReader { proxy in
             let totalWidth = proxy.size.width * ((endTime - startTime) / 5)
@@ -23,16 +49,16 @@ struct Waveform: View {
             ZStack(alignment: .leading) {
                 
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white2)
+                    .fill(backgroundColor)
                 
                 CapsuleStack(
                     amplitudes: preparedAmplitudes,
-                    color: Color.white3
+                    color: unFilledCapsuleColor
                 )
                 
                 CapsuleStack(
                     amplitudes: preparedAmplitudes,
-                    color: Color.blue4
+                    color: filledCapsuleColor
                 )
                 .mask(
                     HStack(spacing: 0) {
