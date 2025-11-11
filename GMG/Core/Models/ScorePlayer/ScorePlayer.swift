@@ -152,6 +152,21 @@ final class ScorePlayer {
         self.sequencer.seek(to: .zero)
     }
 
+    func seek(to time: TimeInterval) {
+        let isPlaying: Bool = audioPlayer.isPlaying
+
+        stop()
+
+        self.audioPlayer.seek(time: time + 0.04)
+        self.sequencer.seek(to: audioPlayer.currentTime)
+
+        if isPlaying {
+            play()
+        } else {
+            pause()
+        }
+    }
+    
     func seek(chordCell: ChordCell) {
         let isPlaying: Bool = audioPlayer.isPlaying
 

@@ -538,6 +538,9 @@ extension ChordProgressView {
                     endTime: min(segmentEndTime, totalDuration),
                     elapsedTime: elapsedTime
                 )
+                .onTapGesture {
+                    intent.onTapWaveform(segmentStartTime)
+                }
 
                 TimeRuler(
                     startTime: segmentStartTime,
