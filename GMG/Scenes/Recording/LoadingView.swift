@@ -1,5 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import Lottie
 import SwiftUI
 
 struct LoadingView: View {
@@ -10,36 +11,58 @@ struct LoadingView: View {
             Color.bg1
                 .ignoresSafeArea()
 
-            VStack(spacing: 128) {
-                Text("LOADING")
-                    .font(Typography.WantedSansStd.B16)
+            VStack(spacing: 144) {
+                LottieView(animation: .named("LoadingLottie"))
+                    .configure { view in
+                        let width: Int = 800
+                        let height: Int = 800
 
-                VStack(spacing: Spacing.xs) {
-                    Text("Humming analysis in progress.")
-                        .foregroundStyle(
-                            scoreFactoryState.rawValue
-                                >= ScoreFactoryState.hummingAnalysis.rawValue
-                                ? Color.black1 : Color.black6
+                        view.viewportFrame = CGRect(
+                            x: (1920 - width) / 2,
+                            y: (1080 - height) / 2,
+                            width: width,
+                            height: height
                         )
-                    Text("AI is generating chords.")
-                        .foregroundStyle(
-                            scoreFactoryState.rawValue
-                                >= ScoreFactoryState.chordGeneration.rawValue
-                                ? Color.black1 : Color.black7
-                        )
-                    Text("Sheet music extraction in progress.")
-                        .foregroundStyle(
-                            scoreFactoryState.rawValue
-                                >= ScoreFactoryState.sheetMusicExtraction
-                                .rawValue ? Color.black1 : Color.black8
-                        )
+                    }
+                    .playing(loopMode: .loop)
+                    .frame(width: 196, height: 144)
+
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    ForEach(ScoreFactoryState.allCases, id: \.self) { state in
+                        LoadingStateRow(text: state.description)
+                            .disabled(scoreFactoryState.rawValue < state.rawValue)
+                    }
                 }
-                .font(Typography.WantedSansStd.R6)
+            }
+        }
+    }
+
+    struct LoadingStateRow: View {
+        let text: String
+
+        @Environment(\.isEnabled) private var isEnabled
+
+        private var color: Color {
+            isEnabled ? Color.black1 : Color.black7
+        }
+
+        var body: some View {
+            HStack {
+                Image(.checkmark)
+                    .frame(width: 20, height: 20)
+                    .background(color, in: Circle())
+                Text(text)
+                    .font(Typography.WantedSansStd.R6)
+                    .foregroundStyle(color)
             }
         }
     }
 }
 
 #Preview {
-    LoadingView(scoreFactoryState: .hummingAnalysis)
+    @Previewable @State var state: ScoreFactoryState = .hummingAnalysis
+
+    PhaseAnimator(ScoreFactoryState.allCases) { state in
+        LoadingView(scoreFactoryState: state)
+    }
 }
