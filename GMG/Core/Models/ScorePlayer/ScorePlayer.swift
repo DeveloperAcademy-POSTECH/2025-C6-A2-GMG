@@ -69,8 +69,8 @@ final class ScorePlayer {
             let position: TimeInterval = currentChordCell.startTime
             let duration: TimeInterval =
                 nextChordCell.startTime - position
-            let tonicChord: Tonic.Chord = chordToTonicChord(chord)
-            let midiNotes: [MIDINoteNumber] = chordToMIDINotes(tonicChord)
+            let tonicChord: Tonic.Chord = chord.tonicChord
+            let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
 
             for midiNote in midiNotes {
                 track.add(
@@ -86,8 +86,8 @@ final class ScorePlayer {
         {
             let position: TimeInterval = lastChordCell.startTime
             let duration: TimeInterval = audioDuration - position
-            let tonicChord: Tonic.Chord = chordToTonicChord(chord)
-            let midiNotes: [MIDINoteNumber] = chordToMIDINotes(tonicChord)
+            let tonicChord: Tonic.Chord = chord.tonicChord
+            let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
 
             for midiNote in midiNotes {
                 track.add(
@@ -171,8 +171,8 @@ final class ScorePlayer {
     }
 
     func play(chord: Chord) {
-        let tonicChord: Tonic.Chord = chordToTonicChord(chord)
-        let midiNotes: [MIDINoteNumber] = chordToMIDINotes(tonicChord)
+        let tonicChord: Tonic.Chord = chord.tonicChord
+        let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
 
         for midiNote in midiNotes {
             midiSampler.play(noteNumber: midiNote, velocity: 100, channel: 0)
@@ -185,10 +185,12 @@ final class ScorePlayer {
             }
         }
     }
+}
 
-    private func chordToTonicChord(_ chord: Chord) -> Tonic.Chord {
+extension Chord {
+    fileprivate var tonicChord: Tonic.Chord {
         var root: NoteClass = .C
-        switch chord.root {
+        switch self.root {
         case .C: root = .C
         case .Cs: root = .Cs
         case .Db: root = .Db
@@ -210,7 +212,7 @@ final class ScorePlayer {
         }
 
         var type: ChordType = .major
-        switch chord.quality {
+        switch self.quality {
         case .maj: type = .major
         case .maj7: type = .maj7
         case .maj9: type = .maj9
@@ -227,11 +229,15 @@ final class ScorePlayer {
 
         return tonicChord
     }
+}
 
-    private func chordToMIDINotes(_ chord: Tonic.Chord) -> [MIDINoteNumber] {
-        let pitches = chord.pitches(octave: 3)
-        let midiNotes = pitches.map { MIDINoteNumber($0.midiNoteNumber) }
+extension Tonic.Chord {
+    fileprivate var midiNoteNumbers: [MIDINoteNumber] {
+        let pitches: [Pitch] = self.pitches(octave: 3)
+        let midiNoteNumbers: [MIDINoteNumber] = pitches.map { pitch in
+            return MIDINoteNumber(pitch.midiNoteNumber)
+        }
 
-        return midiNotes
+        return midiNoteNumbers
     }
 }
