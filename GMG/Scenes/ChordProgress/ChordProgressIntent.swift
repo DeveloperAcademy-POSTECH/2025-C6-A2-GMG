@@ -84,7 +84,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         self.scorePlayer?.seek(chordCell: chordCell)
         self.model?.selectChordCell(chordCell)
     }
-    
+
     func onTapCandidateChordCell(
         _ candidate: Chord,
         for chordCell: ChordCell
@@ -93,7 +93,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             let model = self.model,
             chordCell.chordCandidates.contains(where: { $0 == candidate })
         else { return }
-        
+
         scorePlayer.play(chord: candidate)
 
         if chordCell.chord == candidate {
@@ -101,16 +101,21 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         }
 
         model.replaceChord(with: candidate, for: chordCell)
+        do {
+            try scorePlayer.prepareChordCells()
+        } catch {
+            Logger.error("Failed to prepare notes for the score player")
+        }
     }
-    
+
     func updateUndoManager(_ undoManager: UndoManager?) {
         self.model?.setUndoManager(undoManager)
     }
-    
+
     func onTapUndoButton() {
         self.model?.performUndo()
     }
-    
+
     func onTapRedoButton() {
         self.model?.performRedo()
     }
