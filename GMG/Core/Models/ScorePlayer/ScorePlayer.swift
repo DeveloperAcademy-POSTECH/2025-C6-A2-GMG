@@ -26,7 +26,7 @@ final class ScorePlayer {
         self.playheadPublisher = CurrentValueSubject<Playhead, Never>(
             Playhead(
                 isPlaying: false,
-                elapsedTime: 0.0
+                elapsedTime: .zero
             )
         )
         self.playheadPublisherTimer = nil
@@ -40,21 +40,118 @@ final class ScorePlayer {
         try AudioConductor.shared.start()
 
         // 녹음 파일 재생 준비
-        try self.audioPlayer.load(url: score.audioUrl)
-        self.audioPlayer.isLooping = false
+        try audioPlayer.load(url: score.audioUrl)
+        audioPlayer.isLooping = false
 
-        // 코드 재생 준비
+        // 사운드 폰트 불러오기 및 음량 설정
         try midiSampler.loadSoundFont("8MBGMSFX", preset: 0, bank: 0)
         midiSampler.volume = 0.8
 
-        let chordCells: [ChordCell] = score.retrieveAllChordCells()
-        let audioDuration: TimeInterval = score.totalDuration
-
+        // 시퀀서 속도 및 루프 설정
         sequencer.tempo = 60
+        sequencer.loopEnabled = false
 
+        // 시퀀서 트랙 설정
         let track: SequencerTrack = sequencer.addTrack(for: midiSampler)
         track.tempo = 60
-        track.length = audioDuration
+        track.length = score.totalDuration
+
+        try prepareChordCells()
+
+        // 타이머 설정
+        playheadPublisherTimer = Timer.publish(
+            every: 0.1,
+            on: RunLoop.main,
+            in: RunLoop.Mode.common
+        )
+        .autoconnect()
+        .sink { [weak self] _ in
+            guard let self else { return }
+
+            if self.audioPlayer.currentTime >= self.score.totalDuration {
+                self.stop()
+            }
+
+            self.playheadPublisher.send(
+                Playhead(
+                    isPlaying: self.audioPlayer.isPlaying,
+                    elapsedTime: self.audioPlayer.currentTime
+                )
+            )
+        }
+    }
+
+    /// onDisappear 시 실행될 메서드
+    func cleanupAfterPlay() {
+        playheadPublisherTimer?.cancel()
+        playheadPublisherTimer = nil
+
+        AudioConductor.shared.stop()
+        AudioConductor.shared.removeOutput(midiSampler)
+        AudioConductor.shared.removeOutput(audioPlayer)
+        try? AudioConductor.shared.setAudioMode(nil)
+    }
+
+    func play() {
+        audioPlayer.play()
+        sequencer.play()
+    }
+
+    func pause() {
+        audioPlayer.pause()
+        sequencer.pause()
+    }
+
+    func stop() {
+        audioPlayer.stop()
+        sequencer.stop()
+        sequencer.seek(to: .zero)
+    }
+
+    func seek(chordCell: ChordCell) {
+        let isPlaying: Bool = audioPlayer.isPlaying
+
+        stop()
+
+        audioPlayer.seek(time: chordCell.startTime + 0.04)
+        sequencer.seek(to: audioPlayer.currentTime)
+
+        if isPlaying {
+            play()
+        } else {
+            pause()
+
+            guard let chord: Chord = chordCell.chord else { return }
+            play(chord: chord)
+        }
+    }
+
+    func play(chord: Chord) {
+        let tonicChord: Tonic.Chord = chord.tonicChord
+        let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
+
+        for midiNote in midiNotes {
+            midiSampler.play(noteNumber: midiNote, velocity: 100, channel: 0)
+        }
+
+        Task {
+            try? await Task.sleep(for: .seconds(1))
+            for midiNote in midiNotes {
+                midiSampler.stop(noteNumber: midiNote, channel: 0)
+            }
+        }
+    }
+
+    func prepareChordCells() throws {
+        guard let track: SequencerTrack = sequencer.getTrackFor(node: midiSampler) else {
+            Logger.error("Failed to find track for MIDI sampler")
+            return
+        }
+
+        track.clear()
+
+        let chordCells: [ChordCell] = score.retrieveAllChordCells()
+        let audioDuration: TimeInterval = score.totalDuration
 
         let filteredChordCells: [ChordCell] = chordCells.filter { chordCell in
             chordCell.chord != nil && chordCell.startTime < audioDuration
@@ -95,93 +192,6 @@ final class ScorePlayer {
                     position: position,
                     duration: duration
                 )
-            }
-        }
-
-        self.sequencer.loopEnabled = false
-
-        // 타이머 설정
-        self.playheadPublisherTimer = Timer.publish(
-            every: 0.1,
-            on: RunLoop.main,
-            in: RunLoop.Mode.default
-        )
-        .autoconnect()
-        .sink { [weak self] _ in
-            guard let self else { return }
-
-            if self.playheadPublisher.value.elapsedTime
-                >= self.score.totalDuration
-            {
-                self.stop()
-            }
-
-            self.playheadPublisher.send(
-                Playhead(
-                    isPlaying: self.audioPlayer.isPlaying,
-                    elapsedTime: self.audioPlayer.currentTime
-                )
-            )
-        }
-    }
-
-    /// onDisappear 시 실행될 메서드
-    func cleanupAfterPlay() {
-        self.playheadPublisherTimer?.cancel()
-        self.playheadPublisherTimer = nil
-
-        AudioConductor.shared.stop()
-        AudioConductor.shared.removeOutput(midiSampler)
-        AudioConductor.shared.removeOutput(audioPlayer)
-        try? AudioConductor.shared.setAudioMode(nil)
-    }
-
-    func play() {
-        self.audioPlayer.play()
-        self.sequencer.play()
-    }
-
-    func pause() {
-        self.audioPlayer.pause()
-        self.sequencer.pause()
-    }
-
-    func stop() {
-        self.audioPlayer.stop()
-        self.sequencer.stop()
-        self.sequencer.seek(to: .zero)
-    }
-
-    func seek(chordCell: ChordCell) {
-        let isPlaying: Bool = audioPlayer.isPlaying
-
-        stop()
-
-        self.audioPlayer.seek(time: chordCell.startTime + 0.04)
-        self.sequencer.seek(to: audioPlayer.currentTime)
-
-        if isPlaying {
-            play()
-        } else {
-            pause()
-
-            guard let chord: Chord = chordCell.chord else { return }
-            play(chord: chord)
-        }
-    }
-
-    func play(chord: Chord) {
-        let tonicChord: Tonic.Chord = chord.tonicChord
-        let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
-
-        for midiNote in midiNotes {
-            midiSampler.play(noteNumber: midiNote, velocity: 100, channel: 0)
-        }
-
-        Task {
-            try? await Task.sleep(for: .seconds(1))
-            for midiNote in midiNotes {
-                midiSampler.stop(noteNumber: midiNote, channel: 0)
             }
         }
     }
