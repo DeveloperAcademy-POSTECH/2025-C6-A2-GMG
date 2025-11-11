@@ -26,8 +26,6 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
     }
 
     func play(_ url: URL) throws {
-        try AudioConductor.shared.setAudioMode(.playback)
-
         do {
             let audioPlayer: AVAudioPlayer = try AVAudioPlayer(contentsOf: url)
 
@@ -59,8 +57,6 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
     }
 
     func stop() {
-        try? AudioConductor.shared.setAudioMode(nil)
-
         guard let audioPlayer else { return }
 
         audioPlayer.stop()
