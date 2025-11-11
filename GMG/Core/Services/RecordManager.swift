@@ -29,11 +29,8 @@ final class RecordManager {
         try AudioConductor.shared.setAudioMode(.record)
 
         do {
-            let url = FileManager.default.temporaryDirectory
-                .appendingPathComponent(
-                    "recording-\(Date().ISO8601Format()).m4a",
-                    conformingTo: .audio
-                )
+            let url: URL = URL.temporaryDirectory
+                .appending(component: "recording-\(Date().ISO8601Format()).m4a")
             let settings: [String: Any] = [
                 AVFormatIDKey: kAudioFormatMPEG4AAC,
                 AVSampleRateKey: 48_000,
