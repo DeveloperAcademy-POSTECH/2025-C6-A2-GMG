@@ -1,17 +1,29 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-import AudioKit
-import AudioKitEX
+import AVFAudio
 import Combine
 import Foundation
 import Tonic
 
+enum ScorePlayerError: Error {
+    case audioFileNotFound
+    case soundBankNotFound
+}
+
 final class ScorePlayer {
     private let score: Score
 
-    private let midiSampler: MIDISampler
-    private let sequencer: Sequencer
-    private let audioPlayer: AudioPlayer
+    private let engine: AVAudioEngine
+
+    private let sampler: AVAudioUnitSampler
+    private let sequencer: AVAudioSequencer
+    private let player: AVAudioPlayerNode
+
+    private var audioFile: AVAudioFile?
+    private var pausedTime: TimeInterval = .zero
+
+    private var sampleRate: Double
+    private var totalFrames: AVAudioFramePosition
 
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
     private var playheadPublisherTimer: AnyCancellable?
@@ -19,9 +31,18 @@ final class ScorePlayer {
     init(score: Score) {
         self.score = score
 
-        self.midiSampler = MIDISampler()
-        self.sequencer = Sequencer()
-        self.audioPlayer = AudioPlayer()
+        let engine = AVAudioEngine()
+
+        self.engine = engine
+
+        self.sampler = AVAudioUnitSampler()
+        self.sequencer = AVAudioSequencer(audioEngine: engine)
+        self.player = AVAudioPlayerNode()
+
+        self.sampleRate = 48_000
+        self.totalFrames = .zero
+
+        self.audioFile = nil
 
         self.playheadPublisher = CurrentValueSubject<Playhead, Never>(
             Playhead(
@@ -34,48 +55,43 @@ final class ScorePlayer {
 
     /// onAppear 시 실행될 메서드
     func prepareToPlay() throws {
-        try AudioConductor.shared.setAudioMode(.playback)
-        AudioConductor.shared.addOutput(midiSampler)
-        AudioConductor.shared.addOutput(audioPlayer)
-        try AudioConductor.shared.start()
+        engine.attach(sampler)
+        engine.connect(sampler, to: engine.mainMixerNode, format: nil)
+
+        engine.attach(player)
+        engine.connect(player, to: engine.mainMixerNode, format: nil)
+
+        try loadAudioFile(score.audioUrl)
+
+        try engine.start()
 
         // 녹음 파일 재생 준비
-        try audioPlayer.load(url: score.audioUrl)
-        audioPlayer.isLooping = false
+        scheduleAudioFile(from: .zero)
 
-        // 사운드 폰트 불러오기 및 음량 설정
-        try midiSampler.loadSoundFont("8MBGMSFX", preset: 0, bank: 0)
-        midiSampler.volume = 0.8
+        // 코드 재생 준비
+        try loadSoundBank()
 
-        // 시퀀서 속도 및 루프 설정
-        sequencer.tempo = 60
-        sequencer.loopEnabled = false
-
-        // 시퀀서 트랙 설정
-        let track: SequencerTrack = sequencer.addTrack(for: midiSampler)
-        track.tempo = 60
-        track.length = score.totalDuration
-
-        try prepareChordCells()
+        // 시퀀서 설정
+        prepareChordCells()
 
         // 타이머 설정
-        playheadPublisherTimer = Timer.publish(
+        self.playheadPublisherTimer = Timer.publish(
             every: 0.1,
             on: RunLoop.main,
-            in: RunLoop.Mode.common
+            in: RunLoop.Mode.default
         )
         .autoconnect()
         .sink { [weak self] _ in
             guard let self else { return }
 
-            if self.audioPlayer.currentTime >= self.score.totalDuration {
+            if self.currentPlaybackTime() >= self.score.totalDuration {
                 self.stop()
             }
 
             self.playheadPublisher.send(
                 Playhead(
-                    isPlaying: self.audioPlayer.isPlaying,
-                    elapsedTime: self.audioPlayer.currentTime
+                    isPlaying: self.player.isPlaying,
+                    elapsedTime: self.currentPlaybackTime()
                 )
             )
         }
@@ -86,41 +102,46 @@ final class ScorePlayer {
         playheadPublisherTimer?.cancel()
         playheadPublisherTimer = nil
 
-        AudioConductor.shared.stop()
-        AudioConductor.shared.removeOutput(midiSampler)
-        AudioConductor.shared.removeOutput(audioPlayer)
-        try? AudioConductor.shared.setAudioMode(nil)
+        engine.stop()
     }
 
     func play() {
-        audioPlayer.play()
-        sequencer.play()
+        scheduleAudioFile(from: pausedTime)
+        player.play()
+
+        do {
+            /// Sequencer는 `rate`에 따라 재생 속도가 결정되므로 재생 시간을 변경시에는 `rate`를 곱해줘야 함
+            sequencer.currentPositionInSeconds = max(
+                .zero, pausedTime * Double(sequencer.rate) - 0.01)
+            try sequencer.start()
+        } catch {
+            Logger.error(String(describing: error))
+        }
     }
 
     func pause() {
-        audioPlayer.pause()
-        sequencer.pause()
+        let pausedTime = currentPlaybackTime()
+
+        player.pause()
+        sequencer.stop()
+
+        self.pausedTime = pausedTime
     }
 
     func stop() {
-        audioPlayer.stop()
+        player.stop()
         sequencer.stop()
-        sequencer.seek(to: .zero)
+        pausedTime = .zero
     }
 
     func seek(chordCell: ChordCell) {
-        let isPlaying: Bool = audioPlayer.isPlaying
+        let wasPlaying: Bool = player.isPlaying
 
-        stop()
+        self.pausedTime = chordCell.startTime
 
-        audioPlayer.seek(time: chordCell.startTime + 0.04)
-        sequencer.seek(to: audioPlayer.currentTime)
-
-        if isPlaying {
+        if wasPlaying {
             play()
         } else {
-            pause()
-
             guard let chord: Chord = chordCell.chord else { return }
             play(chord: chord)
         }
@@ -128,30 +149,29 @@ final class ScorePlayer {
 
     func play(chord: Chord) {
         let tonicChord: Tonic.Chord = chord.tonicChord
-        let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
+        let midiNotes: [Int8] = tonicChord.midiNoteNumbers
 
         for midiNote in midiNotes {
-            midiSampler.play(noteNumber: midiNote, velocity: 100, channel: 0)
-        }
-
-        Task {
-            try? await Task.sleep(for: .seconds(1))
-            for midiNote in midiNotes {
-                midiSampler.stop(noteNumber: midiNote, channel: 0)
-            }
+            sampler.startNote(
+                UInt8(midiNote),
+                withVelocity: 100,
+                onChannel: .zero
+            )
         }
     }
 
-    func prepareChordCells() throws {
-        guard let track: SequencerTrack = sequencer.getTrackFor(node: midiSampler) else {
-            Logger.error("Failed to find track for MIDI sampler")
-            return
+    func prepareChordCells() {
+        for track in sequencer.tracks {
+            sequencer.removeTrack(track)
         }
-
-        track.clear()
 
         let chordCells: [ChordCell] = score.retrieveAllChordCells()
         let audioDuration: TimeInterval = score.totalDuration
+
+        sequencer.rate = 60 / 120
+
+        let track: AVMusicTrack = sequencer.createAndAppendTrack()
+        track.lengthInSeconds = audioDuration
 
         let filteredChordCells: [ChordCell] = chordCells.filter { chordCell in
             chordCell.chord != nil && chordCell.startTime < audioDuration
@@ -167,14 +187,16 @@ final class ScorePlayer {
             let duration: TimeInterval =
                 nextChordCell.startTime - position
             let tonicChord: Tonic.Chord = chord.tonicChord
-            let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
+            let midiNotes: [Int8] = tonicChord.midiNoteNumbers
 
             for midiNote in midiNotes {
-                track.add(
-                    noteNumber: midiNote,
-                    position: position,
+                let noteEvent: AVExtendedNoteOnEvent = AVExtendedNoteOnEvent(
+                    midiNote: Float(midiNote),
+                    velocity: 100,
+                    groupID: .zero,
                     duration: duration
                 )
+                track.addEvent(noteEvent, at: position)
             }
         }
 
@@ -184,15 +206,74 @@ final class ScorePlayer {
             let position: TimeInterval = lastChordCell.startTime
             let duration: TimeInterval = audioDuration - position
             let tonicChord: Tonic.Chord = chord.tonicChord
-            let midiNotes: [MIDINoteNumber] = tonicChord.midiNoteNumbers
+            let midiNotes: [Int8] = tonicChord.midiNoteNumbers
 
             for midiNote in midiNotes {
-                track.add(
-                    noteNumber: midiNote,
-                    position: position,
+                let noteEvent: AVExtendedNoteOnEvent = AVExtendedNoteOnEvent(
+                    midiNote: Float(midiNote),
+                    velocity: 100,
+                    groupID: .zero,
                     duration: duration
                 )
+                track.addEvent(noteEvent, at: position)
             }
+        }
+    }
+
+    private func loadAudioFile(_ url: URL) throws {
+        let audioFile: AVAudioFile = try AVAudioFile(forReading: url)
+
+        let format: AVAudioFormat = audioFile.processingFormat
+
+        engine.connect(player, to: engine.mainMixerNode, format: format)
+
+        sampleRate = format.sampleRate
+        totalFrames = audioFile.length
+
+        self.audioFile = audioFile
+    }
+
+    private func loadSoundBank() throws {
+        guard
+            let url: URL = Bundle.main.url(
+                forResource: "8MBGMSFX",
+                withExtension: "sf2"
+            )
+        else { throw ScorePlayerError.soundBankNotFound }
+
+        try sampler.loadSoundBankInstrument(
+            at: url,
+            program: .zero,
+            bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
+            bankLSB: UInt8(kAUSampler_DefaultBankLSB)
+        )
+    }
+
+    private func scheduleAudioFile(from startTime: TimeInterval) {
+        guard let audioFile = self.audioFile else { return }
+
+        player.stop()
+
+        let startFrame = AVAudioFramePosition(startTime * sampleRate)
+        let availableFrames = audioFile.length - startFrame
+        guard availableFrames > 0 else { return }
+
+        let frameCount = AVAudioFrameCount(availableFrames)
+
+        player.scheduleSegment(
+            audioFile,
+            startingFrame: startFrame,
+            frameCount: frameCount,
+            at: nil,
+            completionHandler: nil
+        )
+    }
+
+    private func currentPlaybackTime() -> TimeInterval {
+        if player.isPlaying {
+            return pausedTime + player.currentTime(sampleRate: sampleRate)
+        } else {
+            return pausedTime
         }
     }
 }
@@ -242,12 +323,27 @@ extension Chord {
 }
 
 extension Tonic.Chord {
-    fileprivate var midiNoteNumbers: [MIDINoteNumber] {
+    fileprivate var midiNoteNumbers: [Int8] {
         let pitches: [Pitch] = self.pitches(octave: 3)
-        let midiNoteNumbers: [MIDINoteNumber] = pitches.map { pitch in
-            return MIDINoteNumber(pitch.midiNoteNumber)
+        let midiNoteNumbers: [Int8] = pitches.map { pitch in
+            return pitch.midiNoteNumber
         }
 
         return midiNoteNumbers
+    }
+}
+
+extension AVAudioPlayerNode {
+    fileprivate var currentFrame: AVAudioFramePosition {
+        guard let lastRenderTime = self.lastRenderTime,
+            let playerTime = self.playerTime(forNodeTime: lastRenderTime)
+        else {
+            return .zero
+        }
+        return playerTime.sampleTime
+    }
+
+    fileprivate func currentTime(sampleRate: Double) -> TimeInterval {
+        return Double(currentFrame) / sampleRate
     }
 }
