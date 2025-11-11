@@ -1,6 +1,7 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
+import SwiftData
 
 protocol HomeModelStateProtocol {
     var selectedScore: Score? { get }
@@ -68,5 +69,25 @@ final class HomeModel:
     
     func setAllScores(_ scores: [Score]) {
         self.allScores = scores
+    }
+    
+    func delete(_ score: Score) {
+        let storage = SwiftDataStorage.shared
+        
+        let context = storage.modelContext
+        
+        context?.delete(score)
+    }
+    
+    func fetch() {
+        
+        let storage = SwiftDataStorage.shared
+        
+        let context = storage.modelContext
+        
+        
+        let scores = try? context?.fetch(FetchDescriptor<Score>())
+        
+        self.allScores = scores ?? []
     }
 }
