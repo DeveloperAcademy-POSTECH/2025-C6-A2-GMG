@@ -42,21 +42,11 @@ final class HomeModel:
     var isScoresEmpty: Bool { allScores.isEmpty }
     
     var sortedScores: [Score] {
-        allScores.sorted {
-            if isLatest {
-                if $0.updatedAt != $1.updatedAt {
-                    return $0.updatedAt > $1.updatedAt
-                } else {
-                    return $0.createdAt > $1.createdAt
-                }
-            } else {
-                if $0.createdAt != $1.createdAt {
-                    return $0.createdAt < $1.createdAt
-                } else {
-                    return $0.updatedAt < $1.updatedAt
-                }
-            }
+        let comparator: (Score, Score) -> Bool = {
+            self.isLatest ? ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) : ($0.createdAt, $0.updatedAt) < ($1.createdAt, $1.updatedAt)
         }
+        
+        return allScores.sorted(by: comparator)
     }
     
     var recentScores: [Score] {
@@ -91,7 +81,6 @@ final class HomeModel:
     func deleteScore(_ score: Score, context: ModelContext) {
         context.delete(score)
         do {
-            try? context.save()
             self.allScores.removeAll { $0.persistentModelID == score.persistentModelID }
             if selectedScore?.persistentModelID == score.persistentModelID {
                 selectedScore = nil
@@ -106,6 +95,5 @@ final class HomeModel:
         let context = storage.modelContext
         
         score.title = newTitle
-        try? context?.save()
     }
 }
