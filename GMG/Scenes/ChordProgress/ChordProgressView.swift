@@ -60,6 +60,7 @@ struct ChordProgressView: View {
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
                     chordCandidateAction: intent.onTapCandidateChordCell,
+                    waveFormAction: intent.onTapWaveform,
                     audioLevels: model.score.audioLevels,
                     elapsedTime: model.playhead.elapsedTime
                 )
@@ -319,6 +320,7 @@ extension ChordProgressView {
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
         let chordCandidateAction: (Chord, ChordCell) -> Void
+        let waveFormAction: (_ time: TimeInterval) -> Void
         let audioLevels: [Float]
         let elapsedTime: TimeInterval
 
@@ -338,6 +340,7 @@ extension ChordProgressView {
                             selectedChordCell: selectedChordCell,
                             chordCellAction: chordCellAction,
                             chordCandidateAction: chordCandidateAction,
+                            waveFormAction: waveFormAction,
                             audioLevels: audioLevels,
                             elapsedTime: elapsedTime
                         )
@@ -373,6 +376,7 @@ extension ChordProgressView {
         let selectedChordCell: ChordCell? // 편집 모드에서 선택된 코드 셀
         let chordCellAction: (ChordCell) -> Void
         let chordCandidateAction: (Chord, ChordCell) -> Void
+        let waveFormAction: (_ time: TimeInterval) -> Void
         let audioLevels: [Float]
         let elapsedTime: TimeInterval
  
@@ -539,7 +543,7 @@ extension ChordProgressView {
                     elapsedTime: elapsedTime
                 )
                 .onTapGesture {
-                    intent.onTapWaveform(segmentStartTime)
+                    waveFormAction(segmentStartTime)
                 }
 
                 TimeRuler(
