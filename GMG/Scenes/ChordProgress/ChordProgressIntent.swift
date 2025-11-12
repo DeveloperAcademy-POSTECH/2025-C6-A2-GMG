@@ -92,6 +92,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     func onTapWaveform(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
         
+        scorePlayer.pause()
         scorePlayer.seek(to: time)
     }
     
