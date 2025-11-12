@@ -23,20 +23,15 @@ struct NavigationBar<Leading: View, Trailing: View>: View {
     }
 
     var body: some View {
-        ZStack {
-            HStack {
-                if !isBackButtonHidden {
-                    BackButton()
-                }
-
-                leading
-
-                Spacer()
-
-                trailing
+        HStack {
+            if !isBackButtonHidden {
+                BackButton()
             }
-            .buttonStyle(NavigationBarButtonStyle())
-
+            
+            leading
+            
+            Spacer()
+            
             if let title {
                 Text(title)
                     .font(Typography.WantedSansStd.R6)
@@ -45,8 +40,13 @@ struct NavigationBar<Leading: View, Trailing: View>: View {
                             ? Color.black1 : Color.white1
                     )
             }
+            
+            Spacer()
+
+            trailing
         }
         .padding(Spacing.md)
+        .buttonStyle(NavigationBarButtonStyle())
     }
 }
 

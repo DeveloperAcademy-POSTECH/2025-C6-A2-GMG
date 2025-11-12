@@ -13,12 +13,17 @@ extension View {
 extension View {
     func navigationBar<Leading: View, Trailing: View>(
         _ title: String? = nil,
+        isTitleEditable: Bool = false,
+        onEnterTitle: ((String) -> Void)? = nil,
         isBackButtonHidden: Bool = false,
         @ViewBuilder leading: () -> Leading,
         @ViewBuilder trailing: () -> Trailing
     ) -> some View {
         VStack {
-            NavigationBar(title) {
+            NavigationBar(
+                title,
+                isBackButtonHidden: isBackButtonHidden
+            ) {
                 leading()
             } trailing: {
                 trailing()
