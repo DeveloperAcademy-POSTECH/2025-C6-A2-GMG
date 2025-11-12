@@ -493,22 +493,20 @@ extension ChordProgressView {
                 GeometryReader { proxy in
                     let totalSpacing = Spacing.xs * CGFloat(chordCellsWithDuration.count - 1)
                     let availableWidth = proxy.size.width - totalSpacing
-                    let segmentWidth = proxy.size.width * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
                     
                     HStack(spacing: Spacing.xs) {
                         ForEach(chordCellsWithDuration, id: \.0) { (chordCell, duration) in
                             let widthRatio = duration / max(1, segmentDuration)
-                            let cellWidth = max(1, availableWidth * widthRatio)
+                            let cellWidth = availableWidth * widthRatio
+                            let clampedWidth = cellWidth < 1 ? 0 : cellWidth
                             
                             ZStack {
                                 if let chord = chordCell.chord {
                                     ChordCellButton(
                                         chord: chord,
-                                        isCurrentChord: currentChordCell?
-                                            .startTime
-                                            == chordCell.startTime,
-                                        isSelected: selectedChordCell?.startTime
-                                            == chordCell.startTime
+                                        showText: widthRatio >= 0.2,
+                                        isCurrentChord: currentChordCell?.startTime == chordCell.startTime,
+                                        isSelected: selectedChordCell?.startTime == chordCell.startTime
                                     ) {
                                         chordCellAction(chordCell)
                                     }
@@ -516,11 +514,11 @@ extension ChordProgressView {
                                     Color.clear
                                 }
                             }
-                            .frame(width: cellWidth, height: 64)
+                            .frame(width: clampedWidth, height: 62)
                         }
                     }
                 }
-                .frame(maxWidth: .infinity, minHeight: 64, maxHeight: 64)
+                .frame(maxWidth: .infinity, minHeight: 62, maxHeight: 62)
 
                 let showCandidates: Bool =
                     editMode?.wrappedValue.isEditing == true
@@ -610,6 +608,7 @@ extension ChordProgressView {
 
         struct ChordCellButton: View {
             let chord: Chord
+            let showText: Bool
             let isCurrentChord: Bool
             let isSelected: Bool
             let action: () -> Void
@@ -656,7 +655,7 @@ extension ChordProgressView {
                 Button {
                     action()
                 } label: {
-                    Text(chord.description)
+                    Text(showText ? chord.description : "")
                         .font(Typography.WantedSansStd.R7)
                         .foregroundStyle(
                             foregroundColor
