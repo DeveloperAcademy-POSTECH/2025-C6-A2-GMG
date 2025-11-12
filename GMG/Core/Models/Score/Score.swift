@@ -2,13 +2,18 @@
 
 import Foundation
 import SwiftData
+internal import UniformTypeIdentifiers
 
 @Model
 class Score {
     var id: UUID = UUID()
     var title: String
     var key: Key
-    var audioUrl: URL
+    var audioFileName: String
+    var audioUrl: URL {
+        return Self.recordingFolder
+            .appending(component: audioFileName)
+    }
     var totalDuration: TimeInterval
     var createdAt: Date
     var updatedAt: Date
@@ -18,7 +23,7 @@ class Score {
     init(
         title: String,
         key: Key,
-        audioUrl: URL,
+        audioFileName: String,
         totalDuration: TimeInterval,
         createdAt: Date,
         updatedAt: Date,
@@ -27,7 +32,7 @@ class Score {
     ) {
         self.title = title
         self.key = key
-        self.audioUrl = audioUrl
+        self.audioFileName = audioFileName
         self.totalDuration = totalDuration
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -87,7 +92,7 @@ extension Score {
         Score(
             title: "Untitled",
             key: Key(root: .C),
-            audioUrl: Bundle.main.bundleURL,
+            audioFileName: "Untitled.m4a",
             totalDuration: 31.0,
             createdAt: Date(),
             updatedAt: Date(),
@@ -95,30 +100,55 @@ extension Score {
             chordCells: [
                 ChordCell(
                     chord: Chord(root: .C, quality: .maj),
-                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 0.0
                 ),
                 ChordCell(
                     chord: Chord(root: .D, quality: .min),
-                    chordCandidates: [Chord(root: .D, quality: .min), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .D, quality: .min), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 2.5
                 ),
                 ChordCell(
                     chord: Chord(root: .E, quality: .dim),
-                    chordCandidates: [Chord(root: .E, quality: .dim), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .E, quality: .dim), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 5.0
                 ),
                 ChordCell(
                     chord: Chord(root: .F, quality: .maj9),
-                    chordCandidates: [Chord(root: .F, quality: .maj9), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .F, quality: .maj9), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 11.3
                 ),
                 ChordCell(
                     chord: Chord(root: .Bb, quality: .maj),
-                    chordCandidates: [Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 13.0
                 ),
             ]
         )
     }
+}
+
+extension Score {
+    static let recordingFolder: URL = URL.documentsDirectory
+        .appending(component: "Recording", directoryHint: .isDirectory)
 }
