@@ -83,6 +83,10 @@ class Score {
 
         chordCells[cellIndex] = newChordCell
     }
+    
+    func updateTitle(_ title: String) {
+        self.title = title
+    }
 }
 
 extension Score {
