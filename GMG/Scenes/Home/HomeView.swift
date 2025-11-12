@@ -67,8 +67,10 @@ extension HomeView {
                     .onSubmit { endRename(commit: true) }
                     .submitLabel(.done)
                     .disabled(isEditable == false)
-                    .onChange(of: tempTitle) { newTitle in
-                        if newTitle.count > 15 { tempTitle = String(newTitle.prefix(15)) }
+                    .onChange(of: tempTitle) {
+                        if tempTitle.count > 15 {
+                            tempTitle = String(tempTitle.prefix(15))
+                        }
                     }
                     
                     Text("\(score.key.description) Key")
@@ -334,30 +336,27 @@ extension HomeView {
                         )
                         .padding(.trailing, 12)
                         .onTapGesture { if model.isLatest == true { intent.toggleIsLatest() } }
-
+                    
                     Spacer()
                 }
-
+                
                 if model.songCount == 0 {
-                    let font: Font = .custom(
-                        Typography.WantedSansStd.Bold,
-                        size: 42
-                    )
-
                     VStack(alignment: .leading, spacing: Spacing.xs) {
                         Text("An experience")
-                            .font(font)
                             .foregroundStyle(Color.white3.opacity(0.6))
                         Text("where humming")
-                            .font(font)
                             .foregroundStyle(Color.black8.opacity(0.4))
                         Text("becomes the")
-                            .font(font)
                             .foregroundStyle(Color.black4.opacity(0.4))
                         Text("start of a song")
-                            .font(font)
                             .foregroundStyle(Color.black4.opacity(0.55))
                     }
+                    .font(
+                        .custom(
+                            Typography.WantedSansStd.Bold,
+                            size: 42
+                        )
+                    )
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 48)
                 } else {
