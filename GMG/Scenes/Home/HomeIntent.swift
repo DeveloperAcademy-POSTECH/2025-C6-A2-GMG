@@ -1,11 +1,12 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
+import SwiftData
 
 protocol HomeIntentProtocol {
-    func loadScores()
-    func toggleSortOrder()
-    func deleteScore(_ score: Score)
+    func loadScores(_ context: ModelContext)
+    func toggleIsLatest()
+    func deleteScore(_ score: Score, context: ModelContext)
     func selectScore(_ score: Score?)
     func renameScore(_ score: Score, newTitle: String)
 }
@@ -17,16 +18,16 @@ final class HomeIntent: HomeIntentProtocol {
         self.model = model
     }
     
-    func loadScores() {
-        model?.fetchScores()
+    func loadScores(_ context: ModelContext) {
+        model?.fetchScores(context)
     }
     
-    func toggleSortOrder() {
+    func toggleIsLatest() {
         model?.toggleIsLatest()
     }
     
-    func deleteScore(_ score: Score) {
-        model?.deleteScore(score)
+    func deleteScore(_ score: Score, context: ModelContext) {
+        model?.deleteScore(score, context: context)
     }
     
     func selectScore(_ score: Score?) {
