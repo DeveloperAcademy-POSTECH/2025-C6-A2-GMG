@@ -137,7 +137,7 @@ extension HomeView {
                 maxHeight: 128
             )
             .background(
-                colorForIndex(index),
+                backgroundColor,
                 in: RoundedRectangle(cornerRadius: 32)
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
@@ -171,11 +171,11 @@ extension HomeView {
             isTitleFocused = false
             isEditable = false
         }
-
+        
         // MARK: - Color Helpers
-        private func colorForIndex(_ i: Int) -> Color {
+        private var backgroundColor: Color {
             let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
-            return palette[i % palette.count]
+            return palette[index % palette.count]
         }
     }
     
@@ -327,7 +327,7 @@ extension HomeView {
                             model.isLatest ? Color.black5 : Color.black3
                         )
                         .padding(.trailing, 12)
-                        .onTapGesture { if model.isLatest == false { intent.toggleIsLatest() } }
+                        .onTapGesture { if model.isLatest == false { intent.setIsLatest(true) } }
 
                     Text("Earliest")
                         .font(Typography.WantedSansStd.R5)
@@ -335,7 +335,7 @@ extension HomeView {
                             model.isLatest ? Color.black3 : Color.black5
                         )
                         .padding(.trailing, 12)
-                        .onTapGesture { if model.isLatest == true { intent.toggleIsLatest() } }
+                        .onTapGesture { if model.isLatest == true { intent.setIsLatest(false) } }
                     
                     Spacer()
                 }
