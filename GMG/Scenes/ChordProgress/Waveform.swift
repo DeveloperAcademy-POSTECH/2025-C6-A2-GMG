@@ -4,6 +4,7 @@ import SwiftUI
 struct Waveform: View {
     @Environment(\.editMode) private var editMode
     
+    let width: CGFloat
     let amplitudes: [Float]
     let startTime: TimeInterval
     let endTime: TimeInterval
@@ -39,15 +40,13 @@ struct Waveform: View {
         }
     }
     
+    private var capsuleCount: Int { capsuleCount(for: width) }
+    private var preparedAmplitudes: [Float] { amplitudesForRendering(targetCount: capsuleCount) }
+    private var progressWidth: CGFloat { fillWidth(totalWidth: width) }
+    
     var body: some View {
-        GeometryReader { proxy in
-            let totalWidth = proxy.size.width * ((endTime - startTime) / 5)
-            let capsuleCount = capsuleCount(for: totalWidth)
-            let preparedAmplitudes = amplitudesForRendering(targetCount: capsuleCount)
-            let progressWidth = fillWidth(totalWidth: totalWidth)
-            
+        HStack {
             ZStack(alignment: .leading) {
-                
                 RoundedRectangle(cornerRadius: 12)
                     .fill(backgroundColor)
                 
@@ -69,9 +68,10 @@ struct Waveform: View {
                 )
                 .animation(.easeInOut(duration: 0.25), value: progressWidth)
             }
-            .frame(width: totalWidth)
+            .frame(width: width)
+            
+            Spacer()
         }
-        .frame(height: 35)
     }
     
     struct CapsuleStack: View {

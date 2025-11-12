@@ -493,6 +493,7 @@ extension ChordProgressView {
                 GeometryReader { proxy in
                     let totalSpacing = Spacing.xs * CGFloat(chordCellsWithDuration.count - 1)
                     let availableWidth = proxy.size.width - totalSpacing
+                    let segmentWidth = proxy.size.width * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
                     
                     HStack(spacing: Spacing.xs) {
                         ForEach(chordCellsWithDuration, id: \.0) { (chordCell, duration) in
@@ -536,21 +537,31 @@ extension ChordProgressView {
                 .scaleEffect(y: showCandidates ? 1.0 : 0.0)
                 .opacity(showCandidates ? 1.0 : 0.0)
 
-                Waveform(
-                    amplitudes: segmentAudioLevels,
-                    startTime: segmentStartTime,
-                    endTime: min(segmentEndTime, totalDuration),
-                    elapsedTime: elapsedTime
-                )
-                .onTapGesture {
-                    waveFormAction(segmentStartTime)
-                }
+                GeometryReader { proxy in
+                    let segmentWidth = proxy.size.width * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
+                    
+                    VStack(spacing: Spacing.xs) {
+                        
+                        Waveform(
+                            width: segmentWidth,
+                            amplitudes: segmentAudioLevels,
+                            startTime: segmentStartTime,
+                            endTime: min(segmentEndTime, totalDuration),
+                            elapsedTime: elapsedTime
+                        )
+                        .onTapGesture {
+                            waveFormAction(segmentStartTime)
+                        }
 
-                TimeRuler(
-                    startTime: segmentStartTime,
-                    endTime: segmentEndTime,
-                    dotCount: Int(segmentDuration * 2) - 1
-                )
+                        TimeRuler(
+                            width: segmentWidth,
+                            startTime: segmentStartTime,
+                            endTime: segmentEndTime,
+                            dotCount: Int(segmentDuration * 2) - 1
+                        )
+                    }
+                }
+                .frame(height: 55)
             }
             .animation(.default, value: editMode?.wrappedValue)
             .animation(.default, value: selectedChordCell?.startTime)
@@ -664,6 +675,7 @@ extension ChordProgressView {
         }
 
         struct TimeRuler: View {
+            let width: CGFloat
             let startTime: TimeInterval
             let endTime: TimeInterval
             let dotCount: Int
