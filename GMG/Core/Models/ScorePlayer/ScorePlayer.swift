@@ -20,10 +20,12 @@ final class ScorePlayer {
     private let player: AVAudioPlayerNode
 
     private var audioFile: AVAudioFile?
-    private var pausedTime: TimeInterval = .zero
+    private var pausedTime: TimeInterval
 
     private var sampleRate: Double
     private var totalFrames: AVAudioFramePosition
+
+    let isPlayerMutedPublisher: CurrentValueSubject<Bool, Never>
 
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
     private var playheadPublisherTimer: AnyCancellable?
@@ -39,10 +41,13 @@ final class ScorePlayer {
         self.sequencer = AVAudioSequencer(audioEngine: engine)
         self.player = AVAudioPlayerNode()
 
+        self.audioFile = nil
+        self.pausedTime = .zero
+
         self.sampleRate = 48_000
         self.totalFrames = .zero
 
-        self.audioFile = nil
+        self.isPlayerMutedPublisher = CurrentValueSubject<Bool, Never>(false)
 
         self.playheadPublisher = CurrentValueSubject<Playhead, Never>(
             Playhead(
@@ -158,6 +163,16 @@ final class ScorePlayer {
                 onChannel: .zero
             )
         }
+    }
+
+    func setPlayerMuted(_ isMuted: Bool) {
+        if isMuted {
+            player.volume = 0.0
+        } else {
+            player.volume = 1.0
+        }
+
+        isPlayerMutedPublisher.send(isMuted)
     }
 
     func prepareChordCells() {
