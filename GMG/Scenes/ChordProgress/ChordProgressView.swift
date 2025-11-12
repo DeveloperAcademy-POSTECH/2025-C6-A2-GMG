@@ -28,16 +28,14 @@ struct ChordProgressView: View {
                     )
 
                     Spacer()
-                    
-                    HStack(spacing: 20){
+
+                    HStack(spacing: 20) {
                         EditController(
-                            canUndo: model.canUndo
-                            , canRedo: model.canRedo
-                            , onTapUndo: intent.onTapUndoButton
-                            , onTapRedo: intent.onTapRedoButton
+                            canUndo: model.canUndo, canRedo: model.canRedo,
+                            onTapUndo: intent.onTapUndoButton, onTapRedo: intent.onTapRedoButton
                         )
                         .opacity(model.isEditMode ? 1.0 : 0.0)
-                        
+
                         EditModeToggle(
                             isEditMode: Binding<Bool>(
                                 get: {
@@ -67,6 +65,8 @@ struct ChordProgressView: View {
             }
             .navigationBar(
                 model.score.title,
+                isTitleEditable: true,
+                onEnterTitle: intent.onEnterTitle,
                 leading: {
 
                 },
@@ -167,7 +167,7 @@ extension ChordProgressView {
         let canRedo: Bool
         let onTapUndo: () -> Void
         let onTapRedo: () -> Void
-        
+
         var body: some View {
             HStack(spacing: 24) {
                 Button {
@@ -177,11 +177,11 @@ extension ChordProgressView {
                         .renderingMode(.template)
                         .foregroundStyle(
                             canUndo
-                            ? .white1
-                            : .black2
+                                ? .white1
+                                : .black2
                         )
                 }
-                
+
                 Button {
                     onTapRedo()
                 } label: {
@@ -189,14 +189,14 @@ extension ChordProgressView {
                         .renderingMode(.template)
                         .foregroundStyle(
                             canRedo
-                            ? .white1
-                            : .black2
+                                ? .white1
+                                : .black2
                         )
                 }
             }
         }
     }
-    
+
     struct EditModeToggle: View {
         @Binding var isEditMode: Bool
         @Namespace var namespace
@@ -370,18 +370,18 @@ extension ChordProgressView {
     struct Segment: View {
         let index: Int
         let totalDuration: TimeInterval
-        let chordCells: [ChordCell] // 전체 악보의 코드 셀 리스트
+        let chordCells: [ChordCell]  // 전체 악보의 코드 셀 리스트
         let segmentDuration: TimeInterval
-        let currentChordCell: ChordCell? // 재생 중인 코드 셀
-        let selectedChordCell: ChordCell? // 편집 모드에서 선택된 코드 셀
+        let currentChordCell: ChordCell?  // 재생 중인 코드 셀
+        let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
         let chordCellAction: (ChordCell) -> Void
         let chordCandidateAction: (Chord, ChordCell) -> Void
         let waveFormAction: (_ time: TimeInterval) -> Void
         let audioLevels: [Float]
         let elapsedTime: TimeInterval
- 
+
         @Environment(\.editMode) private var editMode
-        
+
         private let audioSampleInterval: TimeInterval = 0.1
 
         private var segmentStartTime: TimeInterval {
@@ -394,24 +394,25 @@ extension ChordProgressView {
 
         private var targetChordCells: [ChordCell] {
             var targetChordCells: [ChordCell] = chordCells.filter {
-                    chordCell in
-                    segmentStartTime <= chordCell.startTime
-                        && chordCell.startTime < segmentEndTime
-                }
-            
-            let previousChordCell: ChordCell = chordCells.filter({ v in
-                v.startTime <= segmentStartTime
-            }).last ?? ChordCell(chord: nil, chordCandidates: [], startTime: segmentStartTime)
-            
+                chordCell in
+                segmentStartTime <= chordCell.startTime
+                    && chordCell.startTime < segmentEndTime
+            }
+
+            let previousChordCell: ChordCell =
+                chordCells.filter({ v in
+                    v.startTime <= segmentStartTime
+                }).last ?? ChordCell(chord: nil, chordCandidates: [], startTime: segmentStartTime)
+
             /// 세그먼트에 코드가 없는 경우, 전 세그먼트의 마지막 코드를 사용
             if targetChordCells.isEmpty {
                 targetChordCells = [previousChordCell]
             }
-            
+
             /// 코드가 존재하고, 첫 코드가 segmentStartTime보다 늦게 시작하는 경우,
             ///  전 세그먼트의 마지막 코드를 사용
-            if let firstStartTime = targetChordCells.first?.startTime
-                , firstStartTime > segmentStartTime
+            if let firstStartTime = targetChordCells.first?.startTime,
+                firstStartTime > segmentStartTime
             {
                 targetChordCells.insert(previousChordCell, at: 0)
             }
@@ -431,13 +432,13 @@ extension ChordProgressView {
 
             return targetChordCells
         }
-        
+
         private var segmentAudioLevels: [Float] {
             guard !audioLevels.isEmpty else { return [] }
-            
+
             let clampedEndTime: TimeInterval = min(segmentEndTime, totalDuration)
             guard clampedEndTime > segmentStartTime else { return [] }
-            
+
             let startIndex: Int = max(
                 0,
                 Int(floor(segmentStartTime / audioSampleInterval))
@@ -446,9 +447,9 @@ extension ChordProgressView {
                 audioLevels.count,
                 Int(ceil(clampedEndTime / audioSampleInterval))
             )
-            
+
             guard startIndex < endIndex else { return [] }
-            
+
             return Array(audioLevels[startIndex..<endIndex])
         }
 
@@ -456,35 +457,37 @@ extension ChordProgressView {
             guard !targetChordCells.isEmpty else { return [] }
 
             var result: [(chordCell: ChordCell, duration: TimeInterval)] = []
-            
+
             for index in 0..<targetChordCells.endIndex - 1 {
                 let currentChordCell = targetChordCells[index]
                 let nextChordCell = targetChordCells[index + 1]
 
                 let clampedCurStartTime = max(currentChordCell.startTime, segmentStartTime)
                 let clampedNextStartTime = min(nextChordCell.startTime, segmentEndTime)
-                
+
                 let curDuration = clampedNextStartTime - clampedCurStartTime
                 let clampedDuration = min(segmentDuration, curDuration)
-                
-                result.append((
-                    chordCell: currentChordCell,
-                    duration: clampedDuration
-                ))
+
+                result.append(
+                    (
+                        chordCell: currentChordCell,
+                        duration: clampedDuration
+                    ))
             }
 
             guard let lastChordCell = targetChordCells.last else {
                 return result
             }
-            
+
             let clampedStartTime = max(lastChordCell.startTime, segmentStartTime)
             let clampedDuration = segmentEndTime - clampedStartTime
-            
-            result.append((
-                chordCell: lastChordCell,
-                duration: clampedDuration
-            ))
-            
+
+            result.append(
+                (
+                    chordCell: lastChordCell,
+                    duration: clampedDuration
+                ))
+
             return result
         }
 
@@ -493,20 +496,22 @@ extension ChordProgressView {
                 GeometryReader { proxy in
                     let totalSpacing = Spacing.xs * CGFloat(chordCellsWithDuration.count - 1)
                     let availableWidth = proxy.size.width - totalSpacing
-                    
+
                     HStack(spacing: Spacing.xs) {
                         ForEach(chordCellsWithDuration, id: \.0) { (chordCell, duration) in
                             let widthRatio = duration / max(1, segmentDuration)
                             let cellWidth = availableWidth * widthRatio
                             let clampedWidth = cellWidth < 1 ? 0 : cellWidth
-                            
+
                             ZStack {
                                 if let chord = chordCell.chord {
                                     ChordCellButton(
                                         chord: chord,
                                         showText: widthRatio >= 0.2,
-                                        isCurrentChord: currentChordCell?.startTime == chordCell.startTime,
-                                        isSelected: selectedChordCell?.startTime == chordCell.startTime
+                                        isCurrentChord: currentChordCell?.startTime
+                                            == chordCell.startTime,
+                                        isSelected: selectedChordCell?.startTime
+                                            == chordCell.startTime
                                     ) {
                                         chordCellAction(chordCell)
                                     }
@@ -536,10 +541,12 @@ extension ChordProgressView {
                 .opacity(showCandidates ? 1.0 : 0.0)
 
                 GeometryReader { proxy in
-                    let segmentWidth = proxy.size.width * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
-                    
+                    let segmentWidth =
+                        proxy.size.width
+                        * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
+
                     VStack(spacing: Spacing.xs) {
-                        
+
                         Waveform(
                             width: segmentWidth,
                             amplitudes: segmentAudioLevels,
@@ -575,7 +582,7 @@ extension ChordProgressView {
 
                     HStack {
                         Spacer()
-                        
+
                         ForEach(chordCell.chordCandidates.enumerated(), id: \.0) { (_, chord) in
                             Button {
                                 onTapAction(chord, chordCell)
@@ -596,7 +603,7 @@ extension ChordProgressView {
                                 }
                             }
                         }
-                        
+
                         Spacer()
                     }
                     .frame(maxWidth: .infinity)

@@ -22,7 +22,9 @@ extension View {
         VStack {
             NavigationBar(
                 title,
-                isBackButtonHidden: isBackButtonHidden
+                isBackButtonHidden: isBackButtonHidden,
+                isTitleEditable: isTitleEditable,
+                onEnterTitle: onEnterTitle
             ) {
                 leading()
             } trailing: {
