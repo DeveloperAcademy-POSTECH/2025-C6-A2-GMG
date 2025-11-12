@@ -23,12 +23,7 @@ struct HomeView: View {
 
             ScrollView {
                 LazyVStack(spacing: Spacing.xl) {
-                    HStack {
-                        Logo()
-                        Spacer()
-                        SongCount(count: model.songCount)
-                            .padding(.top, 60)
-                    }
+                    HeaderSection(count: model.songCount)
 
                     VStack(spacing: Spacing.md) {
                         HStack {
@@ -296,6 +291,7 @@ extension HomeView {
             isEditable = false
         }
 
+        // MARK: - Color Helpers
         private func colorForIndex(_ i: Int) -> Color {
             let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
             return palette[i % palette.count]
@@ -319,6 +315,20 @@ extension HomeView {
                     )
             }
             .frame(width: isExpanded ? 156 : 77)
+        }
+    }
+    
+    //MARK: - HeaderSection
+    struct HeaderSection: View {
+        var count: Int
+        
+        var body: some View {
+            HStack {
+                Logo()
+                Spacer()
+                SongCount(count: count)
+                    .padding(.top, 60)
+            }
         }
     }
 
