@@ -559,7 +559,7 @@ extension ChordProgressView {
                         }
 
                         TimeRuler(
-                            width: segmentWidth,
+                            visibleWidth: segmentWidth,
                             startTime: segmentStartTime,
                             endTime: segmentEndTime,
                             dotCount: Int(segmentDuration * 2) - 1
@@ -681,7 +681,7 @@ extension ChordProgressView {
         }
 
         struct TimeRuler: View {
-            let width: CGFloat
+            let visibleWidth: CGFloat
             let startTime: TimeInterval
             let endTime: TimeInterval
             let dotCount: Int
@@ -701,6 +701,14 @@ extension ChordProgressView {
                     Text("\(endTime, specifier: "%.0f")s")
                         .font(Typography.WantedSansStd.R2)
                         .fixedSize()
+                }
+                .mask {
+                    HStack {
+                        Rectangle()
+                            .frame(width: visibleWidth)
+
+                        Spacer()
+                    }
                 }
                 .foregroundStyle(
                     editMode?.wrappedValue.isEditing == true
