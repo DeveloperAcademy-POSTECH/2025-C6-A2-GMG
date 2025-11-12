@@ -18,8 +18,8 @@ protocol HomeModelActionProtocol: AnyObject {
     func setIsLatest(_ isLatest: Bool)
     func toggleIsLatest()
     func setAllScores(_ scores: [Score])
-    func fetchScores()
-    func deleteScore(_ score: Score)
+    func fetchScores(_ context: ModelContext)
+    func deleteScore(_ score: Score, context: ModelContext)
     func renameScore(_ score: Score, newTitle: String)
 }
 
@@ -79,21 +79,24 @@ final class HomeModel:
         self.allScores = scores
     }
     
-    func fetchScores() {
-        let storage = SwiftDataStorage.shared
-        let context = storage.modelContext
-        
-        let scores = try? context?.fetch(FetchDescriptor<Score>())
-        
-        self.allScores = scores ?? []
+    func fetchScores(_ context: ModelContext) {
+        do {
+            let scores = try context.fetch(FetchDescriptor<Score>())
+            self.allScores = scores
+        } catch {
+            self.allScores = []
+        }
     }
     
-    func deleteScore(_ score: Score) {
-        let storage = SwiftDataStorage.shared
-        let context = storage.modelContext
-        
-        context?.delete(score)
-        try? context?.save()
+    func deleteScore(_ score: Score, context: ModelContext) {
+        context.delete(score)
+        do {
+            try? context.save()
+            self.allScores.removeAll { $0.persistentModelID == score.persistentModelID }
+            if selectedScore?.persistentModelID == score.persistentModelID {
+                selectedScore = nil
+            }
+        }
     }
     
     func renameScore(_ score: Score, newTitle: String) {
