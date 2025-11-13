@@ -11,25 +11,21 @@ extension View {
 }
 
 extension View {
-    func navigationBar<Leading: View, Trailing: View>(
-        _ title: String? = nil,
+    func navigationBar<Leading: View, Center: View, Trailing: View>(
         isTitleEditable: Bool = false,
         onEnterTitle: ((String) -> Void)? = nil,
         isBackButtonHidden: Bool = false,
         @ViewBuilder leading: () -> Leading,
+        @ViewBuilder center: () -> Center,
         @ViewBuilder trailing: () -> Trailing
     ) -> some View {
         VStack {
-            NavigationBar(
-                title,
+            NavigationBar<Leading, Center, Trailing>(
                 isBackButtonHidden: isBackButtonHidden,
-                isTitleEditable: isTitleEditable,
-                onEnterTitle: onEnterTitle
-            ) {
-                leading()
-            } trailing: {
-                trailing()
-            }
+                leading: leading,
+                center: center,
+                trailing: trailing
+            )
 
             self
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

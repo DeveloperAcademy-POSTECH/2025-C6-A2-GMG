@@ -64,11 +64,14 @@ struct ChordProgressView: View {
                 )
             }
             .navigationBar(
-                model.score.title,
                 isTitleEditable: true,
                 onEnterTitle: intent.onEnterTitle,
-                leading: {
-
+                leading: {},
+                center: {
+                    NavigationTitle(
+                        title: model.score.title,
+                        onEnterTitle: intent.onEnterTitle
+                    )
                 },
                 trailing: {
                     Button {
@@ -111,6 +114,93 @@ struct ChordProgressView: View {
 }
 
 extension ChordProgressView {
+    struct NavigationTitle: View {
+        @Environment(\.colorScheme) private var colorScheme: ColorScheme
+
+        @State var title: String
+        @State private var isTitleEditing = false
+        @FocusState private var isTitleFieldFocused: Bool
+
+        let onEnterTitle: (String) -> Void
+
+        init(
+            title: String,
+            onEnterTitle: @escaping (String) -> Void
+        ) {
+            self.title = title
+            self.onEnterTitle = onEnterTitle
+        }
+
+        private func toggleTitleEditing() {
+
+            if isTitleEditing {
+                finishEditingTitle()
+                return
+            }
+
+            isTitleEditing = true
+            DispatchQueue.main.async {
+                isTitleFieldFocused = true
+            }
+        }
+
+        func finishEditingTitle() {
+            isTitleEditing = false
+            isTitleFieldFocused = false
+            onEnterTitle(title)
+        }
+
+        var body: some View {
+            ZStack(alignment: .center) {
+                TextField("Untitled", text: $title)
+                    .multilineTextAlignment(.center)
+                    .font(Typography.WantedSansStd.R6)
+                    .foregroundStyle(
+                        colorScheme == .light
+                            ? Color.black1 : Color.white1
+                    )
+                    .focused($isTitleFieldFocused)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        finishEditingTitle()
+                    }
+                    .opacity(
+                        isTitleFieldFocused ? 1 : 0
+                    )
+
+                HStack(spacing: 5) {
+                    Text(title)
+                        .font(Typography.WantedSansStd.R6)
+                        .foregroundStyle(
+                            colorScheme == .light
+                                ? Color.black1 : Color.white1
+                        )
+                        .opacity(
+                            isTitleEditing ? 0 : 1
+                        )
+
+                    Image(systemName: "pencil")
+                        .opacity(
+                            isTitleEditing ? 0 : 1
+                        )
+                }
+            }
+            .onTapGesture {
+                toggleTitleEditing()
+            }
+            .frame(width: 177, height: 26)
+            .background {
+                if isTitleEditing {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(
+                            colorScheme == .light
+                                ? Color.white3 : Color.black7
+                        )
+                }
+            }
+        }
+    }
+
     struct Background: View {
         @Environment(\.editMode) private var editMode
 

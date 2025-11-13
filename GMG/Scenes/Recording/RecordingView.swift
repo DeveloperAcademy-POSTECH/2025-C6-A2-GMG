@@ -31,7 +31,7 @@ struct RecordingView: View {
 
                 Spacer()
             }
-            .navigationBar(leading: {}, trailing: {})
+            .navigationBar(leading: {}, center: {}, trailing: {})
 
             WaveForm(audioLevels: model.audioLevels)
 

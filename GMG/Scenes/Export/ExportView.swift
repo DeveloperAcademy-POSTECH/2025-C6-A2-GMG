@@ -23,7 +23,7 @@ struct ExportView: View {
                 )
                 Spacer()
             }
-            .navigationBar(leading: {}, trailing: {})
+            .navigationBar(leading: {}, center: {}, trailing: {})
         }
         .sheet(isPresented: $isSharing) {
             ActivityView(activityItems: shareItems)
@@ -126,8 +126,7 @@ extension ExportView {
     struct ActivityView: UIViewControllerRepresentable {
         let activityItems: [Any]
 
-        func makeUIViewController(context: Context) -> UIActivityViewController
-        {
+        func makeUIViewController(context: Context) -> UIActivityViewController {
             UIActivityViewController(
                 activityItems: activityItems,
                 applicationActivities: nil
