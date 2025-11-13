@@ -6,15 +6,22 @@ import Foundation
 import SwiftF0
 
 enum ScoreFactoryError: Error {
-    case documentDirectoryNotFound
     case pitchDetectModelNotFound
     case failedToChordInference
 }
 
-enum ScoreFactoryState: Int {
+enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible {
     case hummingAnalysis
     case chordGeneration
     case sheetMusicExtraction
+
+    var description: String {
+        switch self {
+        case .hummingAnalysis: return "Humming analysis in progress."
+        case .chordGeneration: return "AI is generating chords."
+        case .sheetMusicExtraction: return "Sheet music extraction in progress."
+        }
+    }
 }
 
 final class ScoreFactory {
@@ -28,31 +35,17 @@ final class ScoreFactory {
     func createScore(
         audioUrl: URL
     ) throws -> Score {
-        guard
-            let documentDirectory: URL = FileManager.default.urls(
-                for: .documentDirectory,
-                in: .userDomainMask
-            ).first
-        else {
-            throw ScoreFactoryError.documentDirectoryNotFound
-        }
+        let audioFileName: String = audioUrl.lastPathComponent
 
-        let workingFolder: URL = documentDirectory.appendingPathComponent(
-            "Scores",
-            conformingTo: .folder
-        )
-
-        if FileManager.default.fileExists(atPath: workingFolder.path()) == false {
+        if FileManager.default.fileExists(atPath: Score.recordingFolder.path()) == false {
             try FileManager.default.createDirectory(
-                at: workingFolder,
+                at: Score.recordingFolder,
                 withIntermediateDirectories: false
             )
         }
 
-        let workingURL: URL = workingFolder.appendingPathComponent(
-            audioUrl.lastPathComponent,
-            conformingTo: .audio
-        )
+        let workingURL: URL = Score.recordingFolder
+            .appending(component: audioFileName)
 
         try FileManager.default.copyItem(at: audioUrl, to: workingURL)
 
@@ -97,7 +90,7 @@ final class ScoreFactory {
         return Score(
             title: "Untitled",
             key: key,
-            audioUrl: workingURL,
+            audioFileName: audioFileName,
             totalDuration: totalDuration,
             createdAt: Date(),
             updatedAt: Date(),

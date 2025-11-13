@@ -26,14 +26,11 @@ final class RecordManager {
     }
 
     func record() throws {
-        try AudioConductor.shared.setAudioMode(.record)
+        try activateAudioSession()
 
         do {
-            let url = FileManager.default.temporaryDirectory
-                .appendingPathComponent(
-                    "recording-\(Date().ISO8601Format()).m4a",
-                    conformingTo: .audio
-                )
+            let url: URL = URL.temporaryDirectory
+                .appending(component: "recording-\(Date().ISO8601Format()).m4a")
             let settings: [String: Any] = [
                 AVFormatIDKey: kAudioFormatMPEG4AAC,
                 AVSampleRateKey: 48_000,
@@ -72,7 +69,7 @@ final class RecordManager {
     }
 
     func stop() -> URL? {
-        try? AudioConductor.shared.setAudioMode(nil)
+        try? deactiveAudioSession()
 
         guard let audioRecorder else { return nil }
 
@@ -84,6 +81,24 @@ final class RecordManager {
         self.isRecordingPublisher.send(audioRecorder.isRecording)
 
         return audioRecorder.url
+    }
+
+    private func activateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setCategory(
+            .playAndRecord,
+            mode: .default,
+            options: [.defaultToSpeaker]
+        )
+        try audioSession.setActive(true)
+    }
+
+    private func deactiveAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setActive(false)
+
     }
 
     private func updateRecordedDuration() {

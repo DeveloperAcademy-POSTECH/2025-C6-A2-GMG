@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */ = {isa = PBXBuildFile; productRef = E32372042EB8D8A4004C5BC9 /* SwiftF0 */; };
 		E331F8DF2EB9F44400752589 /* Tonic in Frameworks */ = {isa = PBXBuildFile; productRef = E331F8DE2EB9F44400752589 /* Tonic */; };
-		E3C8F6182EB79C2F00BA3AAB /* AudioKitEX in Frameworks */ = {isa = PBXBuildFile; productRef = E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */; };
+		E356F0842EC34EB600E92231 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = E356F0832EC34EB600E92231 /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,7 +60,7 @@
 			files = (
 				E331F8DF2EB9F44400752589 /* Tonic in Frameworks */,
 				E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */,
-				E3C8F6182EB79C2F00BA3AAB /* AudioKitEX in Frameworks */,
+				E356F0842EC34EB600E92231 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,9 +114,9 @@
 			);
 			name = GMG;
 			packageProductDependencies = (
-				E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */,
 				E32372042EB8D8A4004C5BC9 /* SwiftF0 */,
 				E331F8DE2EB9F44400752589 /* Tonic */,
+				E356F0832EC34EB600E92231 /* Lottie */,
 			);
 			productName = GMG;
 			productReference = 32C5AB512EA213420007BEFD /* GMG.app */;
@@ -153,7 +153,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					32C5AB502EA213420007BEFD = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -170,13 +170,14 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = 32C5AB482EA213420007BEFD;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */,
 				E32372032EB8D8A4004C5BC9 /* XCRemoteSwiftPackageReference "SwiftF0" */,
 				E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */,
+				E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 32C5AB522EA213420007BEFD /* Products */;
@@ -266,6 +267,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 8ZUB5C2R66;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -289,7 +291,9 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -328,6 +332,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 8ZUB5C2R66;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -344,7 +349,9 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
@@ -355,6 +362,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8ZUB5C2R66;
 				ENABLE_APP_SANDBOX = YES;
@@ -406,6 +414,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8ZUB5C2R66;
 				ENABLE_APP_SANDBOX = YES;
@@ -554,12 +563,12 @@
 				minimumVersion = 2.1.0;
 			};
 		};
-		E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */ = {
+		E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AudioKit/AudioKitEX";
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.6.2;
+				minimumVersion = 4.5.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -575,10 +584,10 @@
 			package = E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */;
 			productName = Tonic;
 		};
-		E3C8F6172EB79C2F00BA3AAB /* AudioKitEX */ = {
+		E356F0832EC34EB600E92231 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E3C8F6162EB79C2F00BA3AAB /* XCRemoteSwiftPackageReference "AudioKitEX" */;
-			productName = AudioKitEX;
+			package = E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
