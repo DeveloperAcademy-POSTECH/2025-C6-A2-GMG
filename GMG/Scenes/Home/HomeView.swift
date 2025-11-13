@@ -20,18 +20,20 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
-
-            ScrollView {
-                LazyVStack(spacing: Spacing.xl) {
-                    HeaderSection(count: model.songCount)
-                    RecentFileSection(model: model, intent: intent)
-                    AllFilesSection(model: model, intent: intent)
+            VStack {
+                HeaderSection(count: model.songCount)
+                    .safeAreaPadding()
+                ScrollView {
+                    LazyVStack(spacing: Spacing.xl) {
+                        RecentFileSection(model: model, intent: intent)
+                        AllFilesSection(model: model, intent: intent)
+                    }
+                    .safeAreaPadding()
                 }
-                .safeAreaPadding()
-            }
-            .scrollIndicators(.hidden)
-            .task {
-                intent.loadScores(context)
+                .scrollIndicators(.hidden)
+                .task {
+                    intent.loadScores(context)
+                }
             }
         }
     }
