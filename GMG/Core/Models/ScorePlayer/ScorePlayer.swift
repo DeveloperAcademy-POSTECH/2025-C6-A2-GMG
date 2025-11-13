@@ -176,7 +176,9 @@ final class ScorePlayer {
     }
 
     func prepareChordCells() {
-        for track in sequencer.tracks {
+        pause()
+
+        for track in Array(sequencer.tracks) {
             sequencer.removeTrack(track)
         }
 
