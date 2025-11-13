@@ -2,11 +2,13 @@
 
 import Foundation
 import SwiftData
+import UIKit
 
 protocol HomeModelStateProtocol {
     var selectedScore: Score? { get }
     var isLatest: Bool { get }
     var allScores: [Score] { get }
+    var isPlaying: Bool { get }
     var songCount: Int { get }
     var isScoresEmpty: Bool { get }
     var sortedScores: [Score] { get }
@@ -21,6 +23,9 @@ protocol HomeModelActionProtocol: AnyObject {
     func fetchScores(_ context: ModelContext)
     func deleteScore(_ score: Score, context: ModelContext)
     func renameScore(_ score: Score, newTitle: String)
+    func startPlaying()
+    func stopPlaying()
+    func updatePlayhead(_ playhead: Playhead)
 }
 
 @Observable
@@ -31,11 +36,15 @@ final class HomeModel:
     private(set) var selectedScore: Score?
     private(set) var isLatest: Bool
     private(set) var allScores: [Score]
+    private(set) var isPlaying: Bool
+    private(set) var playhead: Playhead
     
     init() {
         self.selectedScore = nil
         self.isLatest = true
         self.allScores = []
+        self.isPlaying = false
+        self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
     }
     
     var songCount: Int { allScores.count }
@@ -95,5 +104,20 @@ final class HomeModel:
         let context = storage.modelContext
         
         score.title = newTitle
+    }
+    
+    func startPlaying() {
+        self.isPlaying = true
+    }
+
+    func stopPlaying() {
+        self.isPlaying = false
+    }
+    
+    
+    func updatePlayhead(_ playhead: Playhead) {
+        if self.isPlaying != playhead.isPlaying {
+            self.isPlaying = playhead.isPlaying
+        }
     }
 }
