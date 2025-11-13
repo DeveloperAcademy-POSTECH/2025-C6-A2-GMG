@@ -558,11 +558,15 @@ extension ChordProgressView {
                 let curDuration = clampedNextStartTime - clampedCurStartTime
                 let clampedDuration = min(segmentDuration, curDuration)
 
-                result.append(
-                    (
-                        chordCell: currentChordCell,
-                        duration: clampedDuration
-                    ))
+                let ratio = clampedDuration / max(1, segmentDuration)
+
+                if ratio > 0.02 {
+                    result.append(
+                        (
+                            chordCell: currentChordCell,
+                            duration: clampedDuration
+                        ))
+                }
             }
 
             guard let lastChordCell = targetChordCells.last else {
@@ -572,11 +576,15 @@ extension ChordProgressView {
             let clampedStartTime = max(lastChordCell.startTime, segmentStartTime)
             let clampedDuration = segmentEndTime - clampedStartTime
 
-            result.append(
-                (
-                    chordCell: lastChordCell,
-                    duration: clampedDuration
-                ))
+            let ratio = clampedDuration / max(1, segmentDuration)
+
+            if ratio > 0.02 {
+                result.append(
+                    (
+                        chordCell: lastChordCell,
+                        duration: clampedDuration
+                    ))
+            }
 
             return result
         }
@@ -605,8 +613,6 @@ extension ChordProgressView {
                                     ) {
                                         chordCellAction(chordCell)
                                     }
-                                } else {
-                                    Color.clear
                                 }
                             }
                             .frame(width: clampedWidth, height: 62)
@@ -637,6 +643,7 @@ extension ChordProgressView {
 
                     VStack(spacing: Spacing.xs) {
 
+                        /// TODO: 웨이브 폼 시작 시점이 아니야 ^^
                         Waveform(
                             width: segmentWidth,
                             amplitudes: segmentAudioLevels,
@@ -759,6 +766,16 @@ extension ChordProgressView {
                                 .foregroundStyle(
                                     foregroundColor
                                 )
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity
+                                )
+                                .background(
+                                    backgroundColor,
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                        } else {
+                            VStack {}
                                 .frame(
                                     maxWidth: .infinity,
                                     maxHeight: .infinity
