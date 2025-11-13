@@ -3,19 +3,19 @@ import SwiftUI
 
 struct Waveform: View {
     @Environment(\.editMode) private var editMode
-    
+
     let width: CGFloat
     let amplitudes: [Float]
     let startTime: TimeInterval
     let endTime: TimeInterval
     let elapsedTime: TimeInterval
-    
+
     private let capsuleWidth: CGFloat = 3
     private let capsuleSpacing: CGFloat = 4
     private let horizontalPadding: CGFloat = 11
     private let minCapsuleHeight: CGFloat = 6
     private let maxCapsuleHeight: CGFloat = 21
-    
+
     private var backgroundColor: Color {
         if editMode?.wrappedValue.isEditing == true {
             Color.black2
@@ -23,7 +23,7 @@ struct Waveform: View {
             Color.white2
         }
     }
-    
+
     private var unFilledCapsuleColor: Color {
         if editMode?.wrappedValue.isEditing == true {
             Color.black7
@@ -31,7 +31,7 @@ struct Waveform: View {
             Color.white3
         }
     }
-    
+
     private var filledCapsuleColor: Color {
         if editMode?.wrappedValue.isEditing == true {
             Color.white1
@@ -39,25 +39,87 @@ struct Waveform: View {
             Color.blue4
         }
     }
-    
-    private var capsuleCount: Int { capsuleCount(for: width) }
-    private var preparedAmplitudes: [Float] { amplitudesForRendering(targetCount: capsuleCount) }
-    private var progressWidth: CGFloat { fillWidth(totalWidth: width) }
-    
+
+    private var capsuleCount: Int {
+        let contentWidth = max(0, width - (horizontalPadding * 2))
+        let unit = capsuleWidth + capsuleSpacing
+        guard unit > 0 else { return max(1, amplitudes.count) }
+
+        let count = Int(floor((contentWidth + capsuleSpacing) / unit))
+
+        return max(1, count)
+    }
+
+    private var preparedAmplitudes: [Float] {
+        guard capsuleCount > 0 else { return [] }
+
+        if amplitudes.isEmpty {
+            return Array(repeating: 0.0, count: capsuleCount)
+        }
+
+        if amplitudes.count == capsuleCount {
+            return amplitudes
+        } else if amplitudes.count > capsuleCount {
+            return resample(amplitudes, to: capsuleCount)
+        } else {
+            return resample(amplitudes, to: capsuleCount)
+        }
+    }
+
+    private var progressWidth: CGFloat {
+        guard endTime > startTime else { return 0 }
+
+        let clampedElapsed = min(max(elapsedTime, startTime), endTime)
+        let ratio = (clampedElapsed - startTime) / (endTime - startTime)
+
+        return width * CGFloat(ratio)
+    }
+
+    private func resample(_ source: [Float], to targetCount: Int) -> [Float] {
+        guard targetCount > 1, source.count > 1 else {
+            let value = source.first ?? 0
+            return Array(repeating: value, count: targetCount)
+        }
+
+        return (0..<targetCount).map { index in
+            let position = Float(index) / Float(targetCount - 1)
+            let scaled = position * Float(source.count - 1)
+            let lower = Int(floor(scaled))
+            let upper = Int(ceil(scaled))
+
+            if lower == upper {
+                return source[lower]
+            }
+
+            let interpolationFactor = scaled - Float(lower)
+            return source[lower] * (1 - interpolationFactor) + source[upper] * interpolationFactor
+        }
+    }
+
     var body: some View {
         HStack {
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(backgroundColor)
-                
+
                 CapsuleStack(
                     amplitudes: preparedAmplitudes,
-                    color: unFilledCapsuleColor
+                    color: unFilledCapsuleColor,
+                    capsuleWidth: capsuleWidth,
+                    capsuleSpacing: capsuleSpacing,
+                    horizontalPadding: horizontalPadding,
+                    minCapsuleHeight: minCapsuleHeight,
+                    maxCapsuleHeight: maxCapsuleHeight
                 )
-                
+
                 CapsuleStack(
                     amplitudes: preparedAmplitudes,
-                    color: filledCapsuleColor
+                    color: filledCapsuleColor,
+                    capsuleWidth: capsuleWidth,
+                    capsuleSpacing: capsuleSpacing,
+                    horizontalPadding: horizontalPadding,
+                    minCapsuleHeight: minCapsuleHeight,
+                    maxCapsuleHeight: maxCapsuleHeight
                 )
                 .mask(
                     HStack(spacing: 0) {
@@ -69,29 +131,31 @@ struct Waveform: View {
                 .animation(.easeInOut(duration: 0.25), value: progressWidth)
             }
             .frame(width: width)
-            
+
             Spacer()
         }
     }
-    
+}
+
+extension Waveform {
     struct CapsuleStack: View {
         let amplitudes: [Float]
         let color: Color
 
-        private let capsuleWidth: CGFloat
-        private let capsuleSpacing: CGFloat
-        private let horizontalPadding: CGFloat
-        private let minCapsuleHeight: CGFloat
-        private let maxCapsuleHeight: CGFloat
-        
+        let capsuleWidth: CGFloat
+        let capsuleSpacing: CGFloat
+        let horizontalPadding: CGFloat
+        let minCapsuleHeight: CGFloat
+        let maxCapsuleHeight: CGFloat
+
         init(
             amplitudes: [Float],
             color: Color,
-            capsuleWidth: CGFloat = 3,
-            capsuleSpacing: CGFloat = 4,
-            horizontalPadding: CGFloat = 11,
-            minCapsuleHeight: CGFloat = 6,
-            maxCapsuleHeight: CGFloat = 21
+            capsuleWidth: CGFloat,
+            capsuleSpacing: CGFloat,
+            horizontalPadding: CGFloat,
+            minCapsuleHeight: CGFloat,
+            maxCapsuleHeight: CGFloat
         ) {
             self.amplitudes = amplitudes
             self.color = color
@@ -101,11 +165,16 @@ struct Waveform: View {
             self.minCapsuleHeight = minCapsuleHeight
             self.maxCapsuleHeight = maxCapsuleHeight
         }
-        
+
+        private func capsuleHeight(for amplitude: Float) -> CGFloat {
+            let clamped = max(0, min(1, amplitude))
+            let range = maxCapsuleHeight - minCapsuleHeight
+            return minCapsuleHeight + range * CGFloat(clamped)
+        }
+
         var body: some View {
             HStack(alignment: .center, spacing: capsuleSpacing) {
-                ForEach(amplitudes.indices, id: \.self) { index in
-                    let amplitude = amplitudes[index]
+                ForEach(amplitudes.enumerated(), id: \.offset) { (index, amplitude) in
                     Capsule()
                         .fill(color)
                         .frame(
@@ -117,65 +186,6 @@ struct Waveform: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, horizontalPadding)
 
-        }
-        
-        func capsuleHeight(for amplitude: Float) -> CGFloat {
-            let clamped = max(0, min(1, amplitude))
-            let range = maxCapsuleHeight - minCapsuleHeight
-            return minCapsuleHeight + range * CGFloat(clamped)
-        }
-    }
-    
-    private func fillWidth(totalWidth: CGFloat) -> CGFloat {
-        guard endTime > startTime else { return 0 }
-        let clampedElapsed = min(max(elapsedTime, startTime), endTime)
-        let ratio = (clampedElapsed - startTime) / (endTime - startTime)
-        return totalWidth * CGFloat(ratio)
-    }
-    
-    private func capsuleCount(for totalWidth: CGFloat) -> Int {
-        let contentWidth = max(0, totalWidth - (horizontalPadding * 2))
-        let unit = capsuleWidth + capsuleSpacing
-        guard unit > 0 else { return max(1, amplitudes.count) }
-        
-        let count = Int(floor((contentWidth + capsuleSpacing) / unit))
-        return max(1, count)
-    }
-    
-    private func amplitudesForRendering(targetCount: Int) -> [Float] {
-        guard targetCount > 0 else { return [] }
-        
-        if amplitudes.isEmpty {
-            return Array(repeating: 0.0, count: targetCount)
-        }
-        
-        if amplitudes.count == targetCount {
-            return amplitudes
-        } else if amplitudes.count > targetCount {
-            return resample(amplitudes, to: targetCount)
-        } else {
-            return resample(amplitudes, to: targetCount)
-        }
-    }
-    
-    private func resample(_ source: [Float], to targetCount: Int) -> [Float] {
-        guard targetCount > 1, source.count > 1 else {
-            let value = source.first ?? 0
-            return Array(repeating: value, count: targetCount)
-        }
-        
-        return (0..<targetCount).map { index in
-            let position = Float(index) / Float(targetCount - 1)
-            let scaled = position * Float(source.count - 1)
-            let lower = Int(floor(scaled))
-            let upper = Int(ceil(scaled))
-            
-            if lower == upper {
-                return source[lower]
-            }
-            
-            let t = scaled - Float(lower)
-            return source[lower] * (1 - t) + source[upper] * t
         }
     }
 }
