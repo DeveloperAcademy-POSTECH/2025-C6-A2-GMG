@@ -48,7 +48,9 @@ extension HomeView {
         let score: Score
         let index: Int
         let isSmall: Bool
+        let isLatest: Bool
         let tapAction: () -> Void
+        let playButtonAction: () -> Void
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
@@ -115,7 +117,7 @@ extension HomeView {
                         .padding(.trailing, 1)
                     
                     Button {
-                        // TODO: 오디오 재생 기능
+                        playButtonAction()
                     } label: {
                         Image(systemName: "play.fill")
                             .resizable()
@@ -137,7 +139,7 @@ extension HomeView {
                 maxHeight: 128
             )
             .background(
-                backgroundColor,
+                isLatest ? latestBackgroundColor : earliestBackgroundColor,
                 in: RoundedRectangle(cornerRadius: 32)
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
@@ -173,8 +175,12 @@ extension HomeView {
         }
         
         // MARK: - Color Helpers
-        private var backgroundColor: Color {
+        private var latestBackgroundColor: Color {
             let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
+            return palette[index % palette.count]
+        }
+        private var earliestBackgroundColor: Color {
+            let palette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
             return palette[index % palette.count]
         }
         
@@ -280,18 +286,28 @@ extension HomeView {
                             ScoreCard(
                                 score: score,
                                 index: index,
-                                isSmall: true
-                            ) {
-                                router.push(
-                                    .chordProgress(score: score)
-                                )
-                            } renameScoreAction: { newTitle in
-                                intent.renameScore(score, newTitle: newTitle)
-                            } exportScoreAction: { score in
-                                router.push(.export)
-                            } deleteScoreAction: { score in
-                                intent.deleteScore(score, context: context)
-                            }
+                                isSmall: true,
+                                isLatest: model.isLatest,
+                                tapAction: {
+                                    router.push(
+                                        .chordProgress(score: score)
+                                    )
+                                },
+                                playButtonAction: {
+                                    router.push(
+                                        .chordProgress(score: score)
+                                    )
+                                },
+                                renameScoreAction: { newTitle in
+                                    intent.renameScore(score, newTitle: newTitle)
+                                },
+                                exportScoreAction: { score in
+                                    router.push(.export)
+                                },
+                                deleteScoreAction: { score in
+                                    intent.deleteScore(score, context: context)
+                                }
+                            )
                         }
                     }
                 }
@@ -381,29 +397,51 @@ extension HomeView {
                         ) { (index, score) in
                             let isSelected: Bool =
                             model.selectedScore == score
-                            
+
                             ScoreCard(
                                 score: score,
                                 index: index,
-                                isSmall: false
-                            ) {
-                                if isSelected {
-                                    router.push(
-                                        .chordProgress(score: score)
-                                    )
-                                } else {
-                                    intent.selectScore(score)
+                                isSmall: false,
+                                isLatest: model.isLatest,
+                                tapAction: {
+                                    if isSelected {
+                                        router.push(
+                                            .chordProgress(score: score)
+                                        )
+                                    } else {
+                                        intent.selectScore(score)
+                                        intent.onAppear(score)
+                                    }
+                                },
+                                playButtonAction: {
+                                    if isSelected {
+                                        // 이미 선택된 카드라면 토글
+                                        if model.isPlaying {
+                                            intent.onTapStopButton()
+                                        } else {
+                                            intent.onTapPlayButton()
+                                        }
+                                    } else {
+                                        // 선택 → 준비 → 재생
+                                        intent.selectScore(score)
+                                        intent.onAppear(score)
+                                        intent.onTapPlayButton()
+                                    }
+                                },
+                                renameScoreAction: { newTitle in
+                                    intent.renameScore(score, newTitle: newTitle)
+                                },
+                                exportScoreAction: { score in
+                                    router.push(.export)
+                                },
+                                deleteScoreAction: { score in
+                                    intent.deleteScore(score, context: context)
                                 }
-                            } renameScoreAction: { newTitle in
-                                intent.renameScore(score, newTitle: newTitle)
-                            } exportScoreAction: { score in
-                                router.push(.export)
-                            } deleteScoreAction: { score in
-                                intent.deleteScore(score, context: context)
-                            }
+                            )
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
                     }
+                    .animation(.smooth, value: model.sortedScores)
                     .animation(.default, value: model.selectedScore)
                 }
             }
