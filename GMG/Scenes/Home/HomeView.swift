@@ -104,7 +104,7 @@ extension HomeView {
                             exportScoreAction(score)
                         }
 
-                        Button("Delete", systemImage: "trash") {
+                        Button("Delete", systemImage: "trash", role: .destructive) {
                             deleteScoreAction(score)
                         }
                     } label: {
