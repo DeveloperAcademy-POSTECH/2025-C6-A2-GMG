@@ -5,28 +5,42 @@ import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
-    @State private var isSharing = false
-    @State private var shareItems: [Any] = []
+    @State private var model: any ExportModelStateProtocol
+    @State private var intent: any ExportIntentProtocol
+
+    init(score: Score) {
+        let model = ExportModel(score: score)
+        self._model = State(initialValue: model)
+        self._intent = State(initialValue: ExportIntent(model: model))
+    }
 
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
             VStack(spacing: 0) {
-                //                Header()
-                Title()
-                KeyDate()
-                Image("DummyScore")
+                // Header() 필요하면 살리기
+                Title(title: model.title)
+                KeyDate(
+                    keyDescription: model.keyDescription,
+                    dateString: model.dateString
+                )
+                Image(model.imageName)
                     .padding(.bottom, 69.5)
                 ExportButton(
-                    exportSheet: exportSheet,
-                    exportAudio: exportAudio
+                    exportSheet: { intent.onTapExportSheet() },
+                    exportAudio: { intent.onTapExportAudio() }
                 )
                 Spacer()
             }
             .navigationBar(leading: {}, trailing: {})
         }
-        .sheet(isPresented: $isSharing) {
-            ActivityView(activityItems: shareItems)
+        .sheet(
+            isPresented: Binding(
+                get: { model.isSharing },
+                set: { intent.onChangeSharing($0) }
+            )
+        ) {
+            ActivityView(activityItems: model.shareItems)
         }
     }
 }
@@ -53,9 +67,11 @@ extension ExportView {
     }
 
     struct Title: View {
+        let title: String
+
         var body: some View {
             HStack(spacing: 0) {
-                Text("Title 1")
+                Text(title)
                     .font(Typography.WantedSansStd.B15)
                     .foregroundStyle(Color.black1)
                 Spacer()
@@ -66,13 +82,16 @@ extension ExportView {
     }
 
     struct KeyDate: View {
+        let keyDescription: String
+        let dateString: String
+
         var body: some View {
             HStack(spacing: 0) {
-                Text("E Key")
+                Text(keyDescription)
                     .font(Typography.WantedSansStd.R7)
                     .foregroundStyle(Color.black1)
                 Spacer()
-                Text("25. 11. 05")
+                Text(dateString)
                     .font(Typography.WantedSansStd.R4)
                     .foregroundStyle(Color.black5)
             }
@@ -97,9 +116,8 @@ extension ExportView {
                     .padding(.vertical, 20)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 18).foregroundStyle(
-                            Color.black1
-                        )
+                        RoundedRectangle(cornerRadius: 18)
+                            .foregroundStyle(Color.black1)
                     )
                 }
 
@@ -113,9 +131,8 @@ extension ExportView {
                     .padding(.vertical, 20)
                     .frame(maxWidth: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 18).foregroundStyle(
-                            Color.black1
-                        )
+                        RoundedRectangle(cornerRadius: 18)
+                            .foregroundStyle(Color.black1)
                     )
                 }
             }
@@ -126,8 +143,7 @@ extension ExportView {
     struct ActivityView: UIViewControllerRepresentable {
         let activityItems: [Any]
 
-        func makeUIViewController(context: Context) -> UIActivityViewController
-        {
+        func makeUIViewController(context: Context) -> UIActivityViewController {
             UIActivityViewController(
                 activityItems: activityItems,
                 applicationActivities: nil
@@ -141,34 +157,6 @@ extension ExportView {
     }
 }
 
-extension ExportView {
-    func exportSheet() {
-        if let url = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "png"
-        ) {
-            print("image success")
-            shareItems = [url]
-            isSharing = true
-        } else {
-            print("err: image not found")
-        }
-    }
-
-    func exportAudio() {
-        if let url = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "m4a"
-        ) {
-            print("audio success")
-            shareItems = [url]
-            isSharing = true
-        } else {
-            print("err: audio not found")
-        }
-    }
-}
-
-#Preview {
-    ExportView()
-}
+//#Preview {
+//    ExportView(score: Score)
+//}

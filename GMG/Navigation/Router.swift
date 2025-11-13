@@ -6,29 +6,29 @@ enum Route: Hashable {
     case home
     case recording
     case chordProgress(score: Score)
-    case export
+    case export(score: Score)
 }
 
 @Observable
 final class Router {
     var path: NavigationPath
-    
+
     init() {
         self.path = NavigationPath()
     }
-    
+
     func push(_ route: Route) {
         path.append(route)
     }
-    
+
     func pop() {
         path.removeLast()
     }
-    
+
     func popToRoot() {
         path = NavigationPath()
     }
-    
+
     @ViewBuilder
     func view(_ route: Route) -> some View {
         switch route {
@@ -38,8 +38,8 @@ final class Router {
             RecordingView()
         case .chordProgress(let score):
             ChordProgressView(score: score)
-        case .export:
-            ExportView()
+        case .export(let score):
+            ExportView(score: score)
         }
     }
 }
