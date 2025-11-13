@@ -16,21 +16,12 @@ struct HomeView: View {
     private var songCount: Int { allScores.count }
 
     private var sortedScores: [Score] {
-        allScores.sorted {
-            if isLatest {
-                if $0.updatedAt != $1.updatedAt {
-                    return $0.updatedAt > $1.updatedAt
-                } else {
-                    return $0.createdAt > $1.createdAt
-                }
-            } else {
-                if $0.createdAt != $1.createdAt {
-                    return $0.createdAt < $1.createdAt
-                } else {
-                    return $0.updatedAt < $1.updatedAt
-                }
-            }
-        }
+        let comparator: (Score, Score) -> Bool =
+            isLatest
+            ? { ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) }
+            : { ($0.createdAt, $0.updatedAt) < ($1.createdAt, $1.updatedAt) }
+
+        return allScores.sorted(by: comparator)
     }
 
     private var recentScores: [Score] {
@@ -57,16 +48,16 @@ struct HomeView: View {
                                 .foregroundStyle(Color.black1)
                             Spacer()
                         }
-                        
+
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: Spacing.md) {
-                                AddScoreButton (
+                                AddScoreButton(
                                     action: {
                                         router.push(.recording)
                                     },
                                     songCount: songCount
                                 )
-                                
+
                                 ForEach(
                                     Array(recentScores.prefix(3).enumerated()),
                                     id: \.element.persistentModelID
@@ -176,14 +167,14 @@ extension HomeView {
     struct ScoreCard: View {
         @Environment(\.modelContext) private var modelContext
         @Environment(Router.self) private var router: Router
-        
+
         @State private var showActions = false
         @State private var isEditable: Bool = false
         @FocusState private var isTitleFocused: Bool
-        
+
         // 로컬 편집 버퍼
         @State private var tempTitle: String = ""
-        
+
         let score: Score
         let minWidth: CGFloat?
         let maxWidth: CGFloat?
@@ -192,7 +183,7 @@ extension HomeView {
         let isMove: Bool
         @Binding var isSelected: Bool
         let action: () -> Void
-        
+
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
@@ -217,22 +208,22 @@ extension HomeView {
                             .padding(.bottom, 4)
                             .lineLimit(1)
                     }
-                    
+
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
-                    
+
                     Spacer()
-                    
+
                     Text(HomeView.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.black6)
                 }
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .trailing, spacing: .zero) {
-                    
+
                     Menu {
                         Button {
                             startRename()
@@ -245,7 +236,7 @@ extension HomeView {
                                     .foregroundStyle(Color.black1)
                             }
                         }
-                        
+
                         Button {
                             router.push(.export)
                         } label: {
@@ -257,7 +248,7 @@ extension HomeView {
                                     .foregroundStyle(Color.black1)
                             }
                         }
-                        
+
                         Button {
                             modelContext.delete(score)
                         } label: {
@@ -274,14 +265,16 @@ extension HomeView {
                             .foregroundStyle(Color.white1)
                     }
                     .menuIndicator(.hidden)
-                    
+
                     Spacer()
-                    
-                    Text(HomeView.formatDuration(score.totalDuration))                        .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
-                        .padding(.bottom, 9.5)
-                        .padding(.trailing, 1)
-                    
+
+                    Text(HomeView.formatDuration(score.totalDuration)).font(
+                        Typography.WantedSansStd.R2
+                    )
+                    .foregroundStyle(Color.white1)
+                    .padding(.bottom, 9.5)
+                    .padding(.trailing, 1)
+
                     Button {
                         // TODO: 오디오 재생 기능
                     } label: {
@@ -322,7 +315,7 @@ extension HomeView {
             }
             .padding(.bottom, isSelected && isMove ? 60 : 0)
         }
-        
+
         // MARK: - Rename Helpers
         private func startRename() {
             tempTitle = score.title
@@ -331,7 +324,7 @@ extension HomeView {
                 isTitleFocused = true
             }
         }
-        
+
         private func endRename(commit: Bool) {
             if commit {
                 let new = tempTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -344,7 +337,7 @@ extension HomeView {
             isTitleFocused = false
             isEditable = false
         }
-        
+
         private func colorForIndex(_ i: Int) -> Color {
             let palette: [Color] = [
                 Color.blue3, Color.blue4, Color.blue5, Color.blue1, Color.blue2,
@@ -353,11 +346,11 @@ extension HomeView {
             return palette[(safe - 1) % palette.count]
         }
     }
-    
+
     struct AddScoreButton: View {
         let action: () -> Void
         let songCount: Int
-        
+
         var body: some View {
             Button {
                 action()
@@ -424,14 +417,14 @@ extension HomeView {
         formatted.dateFormat = "yy. MM. dd"
         return formatted.string(from: date)
     }
-    
+
     static func formatDuration(_ seconds: Double) -> String {
         let totalSeconds = Int(seconds.rounded())
         let minutes = totalSeconds / 60
         let seconds = totalSeconds % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
-    
+
     private func bindingForAll(index i: Int) -> Binding<Bool> {
         Binding(
             get: { expandedAll == i },
