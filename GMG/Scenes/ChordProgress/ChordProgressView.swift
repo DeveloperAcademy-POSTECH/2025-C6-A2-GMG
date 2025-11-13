@@ -597,7 +597,7 @@ extension ChordProgressView {
                                 if let chord = chordCell.chord {
                                     ChordCellButton(
                                         chord: chord,
-                                        showText: widthRatio >= 0.2,
+                                        showChordDescription: widthRatio >= 0.2,
                                         isCurrentChord: currentChordCell?.startTime
                                             == chordCell.startTime,
                                         isSelected: selectedChordCell?.startTime
@@ -705,7 +705,7 @@ extension ChordProgressView {
 
         struct ChordCellButton: View {
             let chord: Chord
-            let showText: Bool
+            let showChordDescription: Bool
             let isCurrentChord: Bool
             let isSelected: Bool
             let action: () -> Void
@@ -752,19 +752,23 @@ extension ChordProgressView {
                 Button {
                     action()
                 } label: {
-                    Text(showText ? chord.description : "")
-                        .font(Typography.WantedSansStd.R7)
-                        .foregroundStyle(
-                            foregroundColor
-                        )
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity
-                        )
-                        .background(
-                            backgroundColor,
-                            in: RoundedRectangle(cornerRadius: 12)
-                        )
+                    ZStack {
+                        if showChordDescription {
+                            Text(chord.description)
+                                .font(Typography.WantedSansStd.R7)
+                                .foregroundStyle(
+                                    foregroundColor
+                                )
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity
+                                )
+                                .background(
+                                    backgroundColor,
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                        }
+                    }
                 }
                 .buttonStyle(.bouncy)
             }
