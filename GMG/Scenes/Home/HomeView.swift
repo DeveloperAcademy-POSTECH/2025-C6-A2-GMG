@@ -120,6 +120,7 @@ extension HomeView {
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 9.5)
                         .padding(.trailing, 1)
+                        .padding(.top, -6)
 
                     Button {
                         playButtonAction()
