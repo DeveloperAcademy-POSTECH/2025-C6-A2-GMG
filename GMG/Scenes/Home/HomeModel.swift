@@ -2,7 +2,6 @@
 
 import Foundation
 import SwiftData
-import UIKit
 
 protocol HomeModelStateProtocol {
     var selectedScore: Score? { get }
