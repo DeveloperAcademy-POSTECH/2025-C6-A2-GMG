@@ -368,6 +368,7 @@ extension HomeView {
         }
     }
 
+    //MARK: - AllFilesSection
     struct AllFilesSection: View {
         @Environment(\.modelContext) private var context
         @Environment(Router.self) private var router: Router
@@ -445,6 +446,7 @@ extension HomeView {
                                 progress: progressForThisScore,
                                 tapAction: {
                                     if isSelected {
+                                        intent.openScore(score, context: context)
                                         router.push(
                                             .chordProgress(score: score)
                                         )
@@ -455,14 +457,13 @@ extension HomeView {
                                 },
                                 playButtonAction: {
                                     if isSelected {
-                                        // 이미 선택된 카드라면 토글
                                         if model.isPlaying {
                                             intent.onTapStopButton()
                                         } else {
                                             intent.onTapPlayButton()
                                         }
                                     } else {
-                                        // 선택 → 준비 → 재생
+                                        intent.openScore(score, context: context)
                                         intent.selectScore(score)
                                         intent.onAppear(score)
                                         intent.onTapPlayButton()

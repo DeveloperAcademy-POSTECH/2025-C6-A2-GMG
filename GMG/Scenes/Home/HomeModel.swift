@@ -26,6 +26,7 @@ protocol HomeModelActionProtocol: AnyObject {
     func startPlaying()
     func stopPlaying()
     func updatePlayhead(_ playhead: Playhead)
+    func setUpdatedAt(_ score: Score, at date: Date)
 }
 
 @Observable
@@ -54,14 +55,17 @@ final class HomeModel:
         let comparator: (Score, Score) -> Bool = {
             self.isLatest
                 ? ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
-                : ($0.createdAt, $0.updatedAt) < ($1.createdAt, $1.updatedAt)
+                : ($0.updatedAt, $0.createdAt) < ($1.updatedAt, $1.createdAt)
         }
 
         return allScores.sorted(by: comparator)
     }
 
     var recentScores: [Score] {
-        Array(sortedScores.prefix(3))
+        allScores
+            .sorted {
+                ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
+            }
     }
 
     func setSelectedScore(_ score: Score?) {
@@ -102,8 +106,6 @@ final class HomeModel:
     func renameScore(_ score: Score, newTitle: String) {
         let newTitle = newTitle
         guard newTitle.isEmpty == false, newTitle != score.title else { return }
-        let storage = SwiftDataStorage.shared
-        let context = storage.modelContext
 
         score.title = newTitle
     }
@@ -122,5 +124,11 @@ final class HomeModel:
         if self.isPlaying != playhead.isPlaying {
             self.isPlaying = playhead.isPlaying
         }
+    }
+
+    func setUpdatedAt(_ score: Score, at date: Date = .now) {
+        score.updatedAt = date
+
+        self.allScores = self.allScores
     }
 }
