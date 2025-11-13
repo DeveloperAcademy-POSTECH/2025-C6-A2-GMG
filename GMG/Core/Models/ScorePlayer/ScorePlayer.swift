@@ -135,17 +135,12 @@ final class ScorePlayer {
     }
 
     func seek(to time: TimeInterval) {
-        let isPlaying: Bool = audioPlayer.isPlaying
+        let wasPlaying: Bool = player.isPlaying
 
-        stop()
+        self.pausedTime = time
 
-        self.audioPlayer.seek(time: time + 0.04)
-        self.sequencer.seek(to: audioPlayer.currentTime)
-
-        if isPlaying {
+        if wasPlaying {
             play()
-        } else {
-            pause()
         }
     }
 
