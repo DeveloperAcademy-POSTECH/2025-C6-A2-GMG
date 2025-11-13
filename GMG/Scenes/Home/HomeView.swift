@@ -110,10 +110,10 @@ extension HomeView {
                     } label: {
                         Image(systemName: "ellipsis")
                             .foregroundStyle(Color.white1)
+                            .frame(width: 30, height: 30, alignment: .top)
+                            .contentShape(Rectangle())
                     }
                     .menuIndicator(.hidden)
-
-                    Spacer()
 
                     Text(Self.formatDuration(score.totalDuration))
                         .font(Typography.WantedSansStd.R2)
