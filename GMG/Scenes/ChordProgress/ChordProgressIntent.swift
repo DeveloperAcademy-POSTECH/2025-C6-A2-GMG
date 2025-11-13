@@ -85,18 +85,18 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     func onTapChordCell(_ chordCell: ChordCell) {
         guard let scorePlayer = self.scorePlayer else { return }
         guard let model = self.model else { return }
-        
+
         scorePlayer.seek(chordCell: chordCell)
         model.selectChordCell(chordCell)
     }
-    
+
     func onTapWaveform(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
-        
+
         scorePlayer.pause()
         scorePlayer.seek(to: time)
     }
-    
+
     func onTapCandidateChordCell(
         _ candidate: Chord,
         for chordCell: ChordCell
@@ -105,7 +105,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             let model = self.model,
             chordCell.chordCandidates.contains(where: { $0 == candidate })
         else { return }
-        
+
         scorePlayer.play(chord: candidate)
 
         if chordCell.chord == candidate {
@@ -113,23 +113,24 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         }
 
         model.replaceChord(with: candidate, for: chordCell)
+        scorePlayer.prepareChordCells()
     }
-    
+
     func updateUndoManager(_ undoManager: UndoManager?) {
         self.model?.setUndoManager(undoManager)
     }
-    
+
     func onTapUndoButton() {
         self.model?.performUndo()
     }
-    
+
     func onTapRedoButton() {
         self.model?.performRedo()
     }
-    
+
     func onEnterTitle(_ title: String) {
         guard let model = self.model else { return }
-        
+
         model.updateTitle(title)
     }
 }

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Ensure Homebrew's bin is in PATH for Apple Silicon Macs
+if [[ "$(uname -m)" == arm64 ]]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+fi
+
 echo "Running swift-format on staged Swift files..."
 
 # Get list of staged .swift files

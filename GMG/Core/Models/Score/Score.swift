@@ -2,24 +2,29 @@
 
 import Foundation
 import SwiftData
+internal import UniformTypeIdentifiers
 
 @Model
 class Score {
     var id: UUID = UUID()
     var title: String
     var key: Key
-    var audioUrl: URL
+    var audioFileName: String
+    var audioUrl: URL {
+        return Self.recordingFolder
+            .appending(component: audioFileName)
+    }
     var totalDuration: TimeInterval
     var createdAt: Date
     var updatedAt: Date
     var notes: [Note]
     var chordCells: [ChordCell]
-    var audioLevels: [Float] // 0.1s초 간격으로 audio의 amplitude 값이 저장
+    var audioLevels: [Float]  // 0.1s초 간격으로 audio의 amplitude 값이 저장
 
     init(
         title: String,
         key: Key,
-        audioUrl: URL,
+        audioFileName: String,
         totalDuration: TimeInterval,
         createdAt: Date,
         updatedAt: Date,
@@ -29,7 +34,7 @@ class Score {
     ) {
         self.title = title
         self.key = key
-        self.audioUrl = audioUrl
+        self.audioFileName = audioFileName
         self.totalDuration = totalDuration
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -83,7 +88,7 @@ class Score {
 
         chordCells[cellIndex] = newChordCell
     }
-    
+
     func updateTitle(_ title: String) {
         self.title = title
     }
@@ -94,7 +99,7 @@ extension Score {
         Score(
             title: "Untitled",
             key: Key(root: .C),
-            audioUrl: Bundle.main.bundleURL,
+            audioFileName: "Untitled.m4a",
             totalDuration: 31.0,
             createdAt: Date(),
             updatedAt: Date(),
@@ -102,27 +107,47 @@ extension Score {
             chordCells: [
                 ChordCell(
                     chord: Chord(root: .C, quality: .maj),
-                    chordCandidates: [Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 0.0
                 ),
                 ChordCell(
                     chord: Chord(root: .D, quality: .min),
-                    chordCandidates: [Chord(root: .D, quality: .min), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .D, quality: .min), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 2.5
                 ),
                 ChordCell(
                     chord: Chord(root: .E, quality: .dim),
-                    chordCandidates: [Chord(root: .E, quality: .dim), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .E, quality: .dim), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 5.0
                 ),
                 ChordCell(
                     chord: Chord(root: .F, quality: .maj9),
-                    chordCandidates: [Chord(root: .F, quality: .maj9), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .F, quality: .maj9), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 11.3
                 ),
                 ChordCell(
                     chord: Chord(root: .Bb, quality: .maj),
-                    chordCandidates: [Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj), Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj), Chord(root: .Eb, quality: .maj)],
+                    chordCandidates: [
+                        Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
                     startTime: 13.0
                 ),
             ],
@@ -133,7 +158,7 @@ extension Score {
                 0.60, 0.63, 0.66, 0.69, 0.72, 0.75, 0.78, 0.81, 0.84, 0.87,
 
                 // 3.0s–4.0s: 1초 정적(0 유지) #1
-                0,0,0,0,0,0,0,0,0,0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
                 // 4.0s–9.0s: 선형 상승 재개
                 0.20, 0.23, 0.26, 0.29, 0.32, 0.35, 0.38, 0.41, 0.44, 0.47,
@@ -143,7 +168,7 @@ extension Score {
                 0.61, 0.58, 0.55, 0.52, 0.49, 0.46, 0.43, 0.40, 0.37, 0.34,
 
                 // 9.0s–10.0s: 1초 정적(0 유지) #2
-                0,0,0,0,0,0,0,0,0,0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
                 // 10.0s–15.0s: 선형 상승/하강
                 0.10, 0.13, 0.16, 0.19, 0.22, 0.25, 0.28, 0.31, 0.34, 0.37,
@@ -153,7 +178,7 @@ extension Score {
                 0.70, 0.67, 0.64, 0.61, 0.58, 0.55, 0.52, 0.49, 0.46, 0.43,
 
                 // 15.0s–16.0s: 1초 정적(0 유지) #3
-                0,0,0,0,0,0,0,0,0,0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
                 // 16.0s–21.0s: 선형 상승/하강
                 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39, 0.42,
@@ -163,7 +188,7 @@ extension Score {
                 0.67, 0.64, 0.61, 0.58, 0.55, 0.52, 0.49, 0.46, 0.43, 0.40,
 
                 // 21.0s–22.0s: 1초 정적(0 유지) #4
-                0,0,0,0,0,0,0,0,0,0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
                 // 22.0s–31.0s: 선형 패턴 + 중간중간 0 삽입
                 0.12, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39,
@@ -179,8 +204,13 @@ extension Score {
                 // 마지막으로 서서히 감소, 간헐적 0
                 0.00,
                 0.36, 0.33, 0.30, 0.27, 0.24, 0.21, 0.18, 0.15, 0.12, 0.09,
-                0.06, 0.03, 0.00, 0.00, 0.00
-              ]
+                0.06, 0.03, 0.00, 0.00, 0.00,
+            ]
         )
     }
+}
+
+extension Score {
+    static let recordingFolder: URL = URL.documentsDirectory
+        .appending(component: "Recording", directoryHint: .isDirectory)
 }
