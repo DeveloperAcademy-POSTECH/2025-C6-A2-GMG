@@ -6,21 +6,21 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     @Environment(Router.self) private var router: Router
-    
+
     @State private var model: HomeModelStateProtocol
     @State private var intent: HomeIntentProtocol
-    
+
     init() {
         let model: HomeModel = HomeModel()
-        
+
         self.model = model
         self.intent = HomeIntent(model: model)
     }
-    
+
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
-            
+
             ScrollView {
                 LazyVStack(spacing: Spacing.xl) {
                     HeaderSection(count: model.songCount)
@@ -38,13 +38,13 @@ struct HomeView: View {
 }
 
 extension HomeView {
-    
+
     //MARK: - ScoreCard
     struct ScoreCard: View {
         @State private var isEditable: Bool = false
         @FocusState private var isTitleFocused: Bool
         @State private var tempTitle: String = ""
-        
+
         let score: Score
         let index: Int
         let isSmall: Bool
@@ -52,7 +52,7 @@ extension HomeView {
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
-        
+
         var body: some View {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
@@ -72,31 +72,31 @@ extension HomeView {
                             tempTitle = String(tempTitle.prefix(15))
                         }
                     }
-                    
+
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
-                    
+
                     Spacer()
-                    
+
                     Text(Self.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.black6)
                 }
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .trailing, spacing: .zero) {
-                    
+
                     Menu {
                         Button("Rename", systemImage: "pencil") {
                             startRename()
                         }
-                        
+
                         Button("Export", systemImage: "square.and.arrow.up") {
                             exportScoreAction(score)
                         }
-                        
+
                         Button("Delete", systemImage: "trash") {
                             deleteScoreAction(score)
                         }
@@ -105,15 +105,15 @@ extension HomeView {
                             .foregroundStyle(Color.white1)
                     }
                     .menuIndicator(.hidden)
-                    
+
                     Spacer()
-                    
+
                     Text(Self.formatDuration(score.totalDuration))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 9.5)
                         .padding(.trailing, 1)
-                    
+
                     Button {
                         // TODO: 오디오 재생 기능
                     } label: {
@@ -149,8 +149,7 @@ extension HomeView {
                 }
             }
         }
-        
-        
+
         // MARK: - Rename Helpers
         private func startRename() {
             tempTitle = score.title
@@ -159,7 +158,7 @@ extension HomeView {
                 isTitleFocused = true
             }
         }
-        
+
         private func endRename(commit: Bool) {
             if commit {
                 let newTitle = tempTitle.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -171,20 +170,20 @@ extension HomeView {
             isTitleFocused = false
             isEditable = false
         }
-        
+
         // MARK: - Color Helpers
         private var backgroundColor: Color {
             let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
             return palette[index % palette.count]
         }
-        
+
         // MARK: - data Helpers
         private static func dateConverter(_ date: Date) -> String {
             let formatted = DateFormatter()
             formatted.dateFormat = "yy. MM. dd"
             return formatted.string(from: date)
         }
-        
+
         private static func formatDuration(_ seconds: Double) -> String {
             let totalSeconds = Int(seconds.rounded())
             let minutes = totalSeconds / 60
@@ -192,11 +191,11 @@ extension HomeView {
             return String(format: "%02d:%02d", minutes, seconds)
         }
     }
-    
+
     //MARK: - HeaderSection
     struct HeaderSection: View {
         var count: Int
-        
+
         var body: some View {
             HStack {
                 Logo()
@@ -206,55 +205,55 @@ extension HomeView {
             }
         }
     }
-    
+
     struct Logo: View {
         private var reString: AttributedString {
             var string: AttributedString = AttributedString("Re:")
             string.foregroundColor = Color.black3
             return string
         }
-        
+
         private var chordString: AttributedString {
             var string: AttributedString = AttributedString("chord")
             string.foregroundColor = Color.black1
             return string
         }
-        
+
         var body: some View {
             Text("\(reString)\n\(chordString)")
                 .font(Typography.WantedSansStd.B16)
         }
     }
-    
+
     struct SongCount: View {
         let count: Int
-        
+
         private var countString: AttributedString {
             var string: AttributedString = AttributedString("\(count)")
             string.font = Typography.WantedSansStd.R10.font
             return string
         }
-        
+
         private var unitString: AttributedString {
             var string: AttributedString = AttributedString("songs")
             string.font = Typography.WantedSansStd.R7.font
             return string
         }
-        
+
         var body: some View {
             Text("\(countString) \(unitString)")
                 .foregroundStyle(Color.black1)
         }
     }
-    
+
     //MARK: - recentFileSection
     struct RecentFileSection: View {
         @Environment(\.modelContext) private var context
         @Environment(Router.self) private var router: Router
-        
+
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
-        
+
         var body: some View {
             VStack(spacing: Spacing.md) {
                 HStack {
@@ -263,7 +262,7 @@ extension HomeView {
                         .foregroundStyle(Color.black1)
                     Spacer()
                 }
-                
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Spacing.md) {
                         AddScoreButton(
@@ -272,7 +271,7 @@ extension HomeView {
                             },
                             isExpanded: model.isScoresEmpty
                         )
-                        
+
                         ForEach(
                             Array(model.recentScores.prefix(3).enumerated()),
                             id: \.element.persistentModelID
@@ -288,7 +287,7 @@ extension HomeView {
                             } renameScoreAction: { newTitle in
                                 intent.renameScore(score, newTitle: newTitle)
                             } exportScoreAction: { score in
-                                router.push(.export)
+                                router.push(.export(score: model.selectedScore!))
                             } deleteScoreAction: { score in
                                 intent.deleteScore(score, context: context)
                             }
@@ -299,11 +298,11 @@ extension HomeView {
             }
         }
     }
-    
+
     struct AddScoreButton: View {
         let action: () -> Void
         let isExpanded: Bool
-        
+
         var body: some View {
             Button {
                 action()
@@ -319,14 +318,14 @@ extension HomeView {
             .frame(width: isExpanded ? 156 : 77)
         }
     }
-    
+
     struct AllFilesSection: View {
         @Environment(\.modelContext) private var context
         @Environment(Router.self) private var router: Router
-        
+
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
-        
+
         var body: some View {
             VStack(spacing: Spacing.md) {
                 HStack(alignment: .lastTextBaseline, spacing: 0) {
@@ -334,7 +333,7 @@ extension HomeView {
                         .font(Typography.WantedSansStd.R7)
                         .foregroundStyle(Color.black1)
                         .padding(.trailing, 20)
-                    
+
                     Text("Latest")
                         .font(Typography.WantedSansStd.R5)
                         .foregroundStyle(
@@ -342,7 +341,7 @@ extension HomeView {
                         )
                         .padding(.trailing, 12)
                         .onTapGesture { if model.isLatest == false { intent.setIsLatest(true) } }
-                    
+
                     Text("Earliest")
                         .font(Typography.WantedSansStd.R5)
                         .foregroundStyle(
@@ -350,10 +349,10 @@ extension HomeView {
                         )
                         .padding(.trailing, 12)
                         .onTapGesture { if model.isLatest == true { intent.setIsLatest(false) } }
-                    
+
                     Spacer()
                 }
-                
+
                 if model.songCount == 0 {
                     VStack(alignment: .leading, spacing: Spacing.xs) {
                         Text("An experience")
@@ -380,8 +379,8 @@ extension HomeView {
                             id: \.element.persistentModelID
                         ) { (index, score) in
                             let isSelected: Bool =
-                            model.selectedScore == score
-                            
+                                model.selectedScore == score
+
                             ScoreCard(
                                 score: score,
                                 index: index,
@@ -397,7 +396,7 @@ extension HomeView {
                             } renameScoreAction: { newTitle in
                                 intent.renameScore(score, newTitle: newTitle)
                             } exportScoreAction: { score in
-                                router.push(.export)
+                                router.push(.export(score: model.selectedScore!))
                             } deleteScoreAction: { score in
                                 intent.deleteScore(score, context: context)
                             }
@@ -407,12 +406,11 @@ extension HomeView {
                     .animation(.default, value: model.selectedScore)
                 }
             }
-            
+
         }
     }
-    
-}
 
+}
 
 #Preview(traits: .routerModifier) {
     HomeView()
