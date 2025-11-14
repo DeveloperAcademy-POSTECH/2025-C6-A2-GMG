@@ -321,22 +321,17 @@ extension HomeView {
                                 isPlaying: isPlayingForThisScore,
                                 progress: progressForThisScore,
                                 tapAction: {
+                                    intent.onTapScore(score, context: context)
                                     router.push(
                                         .chordProgress(score: score)
                                     )
                                 },
                                 playButtonAction: {
-                                    if isSelected {
-                                        if model.isPlaying {
-                                            intent.onTapStopButton()
-                                        } else {
-                                            intent.onTapPlayButton()
-                                        }
+                                    if isSelected && model.isPlaying {
+                                        intent.onTapStopButton()
                                     } else {
-
-                                        intent.selectScore(score)
-                                        intent.onAppear(score)
-                                        intent.onTapPlayButton()
+                                        intent.onTapPlayButton(
+                                            score: score, selectedScore: model.selectedScore)
                                     }
                                 },
                                 renameScoreAction: { newTitle in
@@ -455,7 +450,7 @@ extension HomeView {
                                 progress: progressForThisScore,
                                 tapAction: {
                                     if isSelected {
-                                        intent.openScore(score, context: context)
+                                        intent.onTapScore(score, context: context)
                                         router.push(
                                             .chordProgress(score: score)
                                         )
@@ -465,17 +460,11 @@ extension HomeView {
                                     }
                                 },
                                 playButtonAction: {
-                                    if isSelected {
-                                        if model.isPlaying {
-                                            intent.onTapStopButton()
-                                        } else {
-                                            intent.onTapPlayButton()
-                                        }
+                                    if isSelected && model.isPlaying {
+                                        intent.onTapStopButton()
                                     } else {
-                                        intent.openScore(score, context: context)
-                                        intent.selectScore(score)
-                                        intent.onAppear(score)
-                                        intent.onTapPlayButton()
+                                        intent.onTapPlayButton(
+                                            score: score, selectedScore: model.selectedScore)
                                     }
                                 },
                                 renameScoreAction: { newTitle in

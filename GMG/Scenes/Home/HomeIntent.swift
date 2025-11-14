@@ -11,9 +11,9 @@ protocol HomeIntentProtocol {
     func selectScore(_ score: Score?)
     func renameScore(_ score: Score, newTitle: String)
     func onAppear(_ score: Score)
-    func onTapPlayButton()
+    func onTapPlayButton(score: Score, selectedScore: Score?)
     func onTapStopButton()
-    func openScore(_ score: Score, context: ModelContext)
+    func onTapScore(_ score: Score, context: ModelContext)
 }
 
 final class HomeIntent: HomeIntentProtocol {
@@ -47,7 +47,8 @@ final class HomeIntent: HomeIntentProtocol {
         model?.renameScore(score, newTitle: newTitle)
     }
 
-    func onAppear(_ score: Score) {
+    // 공통으로 쓰는 player 세팅 로직
+    private func setupPlayer(for score: Score) {
         // Clean up previous player and subscriptions
         cancellables.removeAll()
         scorePlayer?.cleanupAfterPlay()
@@ -68,7 +69,16 @@ final class HomeIntent: HomeIntentProtocol {
         }
     }
 
-    func onTapPlayButton() {
+    func onAppear(_ score: Score) {
+        setupPlayer(for: score)
+    }
+
+    func onTapPlayButton(score: Score, selectedScore: Score?) {
+        if selectedScore?.persistentModelID != score.persistentModelID {
+            model?.setSelectedScore(score)
+            setupPlayer(for: score)
+        }
+
         model?.startPlaying()
         scorePlayer?.play()
     }
@@ -78,14 +88,11 @@ final class HomeIntent: HomeIntentProtocol {
         scorePlayer?.stop()
     }
 
-    func openScore(_ score: Score, context: ModelContext) {
-        // 1. updatedAt 갱신
+    func onTapScore(_ score: Score, context: ModelContext) {
         model?.setUpdatedAt(score, at: .now)
 
-        // 2. 선택 상태로 만들어 주고
         model?.setSelectedScore(score)
 
-        // 3. 정렬 바뀐 걸 반영하고 싶으면 필요 시 다시 fetch
         model?.fetchScores(context)
     }
 }
