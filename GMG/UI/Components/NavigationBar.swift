@@ -38,7 +38,7 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
 
             center
         }
-        .padding(Spacing.md)
+        .padding(Spacing.xs)
         .buttonStyle(NavigationBarButtonStyle())
     }
 }
