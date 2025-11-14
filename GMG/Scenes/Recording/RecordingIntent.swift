@@ -1,12 +1,19 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import AVFAudio
 import Combine
 import Foundation
+import UIKit
 
 protocol RecordingIntentProtocol {
+    func onAppear() async
+    func onTapOpenSettingsButton()
+    func onTapRecordPermissionAlertCancelButton()
     func onTapRecordButton()
     func onTapSkipButton()
     func onTapStopRecordButton()
+    func onTapShowResetConfirmationAlertButton()
+    func onTapResetConfirmationAlertCancelButton()
     func onTapResetButton()
     func onTapPlayButton(_ url: URL)
     func onTapStopPlayButton()
@@ -94,20 +101,49 @@ final class RecordingIntent: RecordingIntentProtocol {
             .store(in: &cancellables)
     }
 
+    func onAppear() async {
+        if AVAudioApplication.shared.recordPermission == .undetermined {
+            await AVAudioApplication.requestRecordPermission()
+        }
+    }
+
+    func onTapOpenSettingsButton() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+
+        guard UIApplication.shared.canOpenURL(url) else { return }
+
+        UIApplication.shared.open(url)
+
+        onTapRecordPermissionAlertCancelButton()
+    }
+
+    func onTapRecordPermissionAlertCancelButton() {
+        guard let model else { return }
+
+        model.setRecordPermissionAlertPresented(false)
+    }
+
     func onTapRecordButton() {
+        guard let model else { return }
+
+        guard AVAudioApplication.shared.recordPermission == .granted else {
+            model.setRecordPermissionAlertPresented(true)
+            return
+        }
+
         self.countdownTask?.cancel()
 
         self.countdownTask = Task {
             await withTaskCancellationHandler {
                 for i in (0...3).reversed() {
-                    model?.updateCountdown(i)
+                    model.updateCountdown(i)
                     if i > 0 {
                         try? await Task.sleep(for: .seconds(1))
                     }
                 }
             } onCancel: {
                 Task { @MainActor in
-                    model?.updateCountdown(0)
+                    model.updateCountdown(0)
                 }
             }
 
@@ -126,20 +162,40 @@ final class RecordingIntent: RecordingIntentProtocol {
     }
 
     func onTapStopRecordButton() {
+        guard let model else { return }
+
         let url: URL? = recordManager.stop()
 
-        model?.updateRecordingURL(url)
+        model.updateRecordingURL(url)
+    }
+
+    func onTapShowResetConfirmationAlertButton() {
+        guard let model else { return }
+
+        model.setResetConfirmationAlertPresented(true)
+    }
+
+    func onTapResetConfirmationAlertCancelButton() {
+        guard let model else { return }
+
+        model.setResetConfirmationAlertPresented(false)
     }
 
     func onTapResetButton() {
         onTapStopPlayButton()
 
-        model?.reset()
+        guard let model else { return }
+
+        model.reset()
+
+        onTapResetConfirmationAlertCancelButton()
     }
 
     func onTapPlayButton(_ url: URL) {
+        guard let model else { return }
+
         do {
-            model?.resetAudioLevels()
+            model.resetAudioLevels()
 
             try playbackManager.play(url)
         } catch {
