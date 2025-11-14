@@ -326,9 +326,18 @@ extension HomeView {
                                     )
                                 },
                                 playButtonAction: {
-                                    router.push(
-                                        .chordProgress(score: score)
-                                    )
+                                    if isSelected {
+                                        if model.isPlaying {
+                                            intent.onTapStopButton()
+                                        } else {
+                                            intent.onTapPlayButton()
+                                        }
+                                    } else {
+
+                                        intent.selectScore(score)
+                                        intent.onAppear(score)
+                                        intent.onTapPlayButton()
+                                    }
                                 },
                                 renameScoreAction: { newTitle in
                                     intent.renameScore(score, newTitle: newTitle)
