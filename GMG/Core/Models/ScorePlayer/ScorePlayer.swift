@@ -139,6 +139,16 @@ final class ScorePlayer {
         pausedTime = .zero
     }
 
+    func seek(to time: TimeInterval) {
+        let wasPlaying: Bool = player.isPlaying
+
+        self.pausedTime = time
+
+        if wasPlaying {
+            play()
+        }
+    }
+
     func seek(chordCell: ChordCell) {
         let wasPlaying: Bool = player.isPlaying
 

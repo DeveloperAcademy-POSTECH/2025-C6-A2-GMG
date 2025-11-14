@@ -11,18 +11,19 @@ extension View {
 }
 
 extension View {
-    func navigationBar<Leading: View, Trailing: View>(
-        _ title: String? = nil,
+    func navigationBar<Leading: View, Center: View, Trailing: View>(
         isBackButtonHidden: Bool = false,
         @ViewBuilder leading: () -> Leading,
+        @ViewBuilder center: () -> Center,
         @ViewBuilder trailing: () -> Trailing
     ) -> some View {
         VStack {
-            NavigationBar(title) {
-                leading()
-            } trailing: {
-                trailing()
-            }
+            NavigationBar<Leading, Center, Trailing>(
+                isBackButtonHidden: isBackButtonHidden,
+                leading: leading,
+                center: center,
+                trailing: trailing
+            )
 
             self
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
