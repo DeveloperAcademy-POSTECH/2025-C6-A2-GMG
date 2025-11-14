@@ -157,7 +157,8 @@ final class RecordingIntent: RecordingIntentProtocol {
         scoreCreationTask?.cancel()
 
         scoreCreationTask = Task { [weak self] in
-            guard let self else { return }
+            guard let self, let model = self.model
+            else { return }
 
             do {
                 // TODO: Swift Concurrency 방법 찾아보기!
@@ -175,11 +176,11 @@ final class RecordingIntent: RecordingIntentProtocol {
                     }
                 }
 
-                self.model?.updateScoreFactoryState(nil)
-                self.model?.finishScoreCreation(score)
+                model.updateScoreFactoryState(nil)
+                model.finishScoreCreation(score)
                 completion()
             } catch {
-                self.model?.updateScoreFactoryState(nil)
+                model.updateScoreFactoryState(nil)
                 Logger.error(String(describing: error))
             }
         }
