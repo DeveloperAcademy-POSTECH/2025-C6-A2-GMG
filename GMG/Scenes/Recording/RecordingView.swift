@@ -44,7 +44,7 @@ struct RecordingView: View {
                     isPlaying: model.isPlaying,
                     recordAction: intent.onTapRecordButton,
                     stopRecordAction: intent.onTapStopRecordButton,
-                    resetAction: intent.onTapResetButton,
+                    resetAction: intent.onTapShowResetConfirmationAlertButton,
                     playAction: {
                         guard let url = model.recordingURL else { return }
 
@@ -77,6 +77,31 @@ struct RecordingView: View {
                 }
             }
             .animation(.default, value: model.scoreFactoryState)
+        }
+        .task {
+            await intent.onAppear()
+        }
+        .alert(
+            .requestMicrophoneAccessPermission,
+            isPresented: .constant(model.isRecordPermissionAlertPresented)
+        ) {
+            Button(.openSettings, role: .confirm) {
+                intent.onTapOpenSettingsButton()
+            }
+            .keyboardShortcut(.defaultAction)
+            Button(.cancel, role: .cancel) {
+                intent.onTapRecordPermissionAlertCancelButton()
+            }
+        }
+        .alert(
+            .resetConfirmationAlert, isPresented: .constant(model.isResetConfirmationAlertPresented)
+        ) {
+            Button(.reset, role: .destructive) {
+                intent.onTapResetButton()
+            }
+            Button(.cancel, role: .cancel) {
+                intent.onTapResetConfirmationAlertCancelButton()
+            }
         }
     }
 
