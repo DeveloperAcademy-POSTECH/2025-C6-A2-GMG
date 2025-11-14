@@ -552,8 +552,7 @@ extension ChordProgressView {
                     entries.append(
                         SegmentChordEntry(
                             chordCell: currentTargetChord,
-                            duration: clampedDuration,
-                            showChordDescription: occupancyRatio > 0.2
+                            duration: clampedDuration
                         )
                     )
                 }
@@ -572,8 +571,7 @@ extension ChordProgressView {
                 entries.append(
                     SegmentChordEntry(
                         chordCell: lastChordCell,
-                        duration: clampedDuration,
-                        showChordDescription: lastOccupancyRatio > 0.2
+                        duration: clampedDuration
                     )
                 )
             }
@@ -597,7 +595,6 @@ extension ChordProgressView {
                                 if let chord = cell.chordCell.chord {
                                     ChordCellButton(
                                         chord: chord,
-                                        showChordDescription: cell.showChordDescription,
                                         isCurrentChord: currentChordCell?.startTime
                                             == cell.chordCell.startTime,
                                         isSelected: selectedChordCell?.startTime
@@ -665,7 +662,6 @@ extension ChordProgressView {
             let id = UUID()
             let chordCell: ChordCell
             let duration: TimeInterval
-            let showChordDescription: Bool
         }
 
         struct ChordCellCandidates: View {
@@ -711,7 +707,6 @@ extension ChordProgressView {
 
         struct ChordCellButton: View {
             let chord: Chord
-            let showChordDescription: Bool
             let isCurrentChord: Bool
             let isSelected: Bool
             let action: () -> Void
@@ -759,7 +754,8 @@ extension ChordProgressView {
                     action()
                 } label: {
                     ZStack {
-                        if showChordDescription {
+                        ViewThatFits(in: .horizontal) {
+                            /// CASE 1: one line
                             Text(chord.description)
                                 .font(Typography.WantedSansStd.R7)
                                 .foregroundStyle(
@@ -773,6 +769,25 @@ extension ChordProgressView {
                                     backgroundColor,
                                     in: RoundedRectangle(cornerRadius: 12)
                                 )
+
+                            /// CASE 2: multi line
+                            VStack(alignment: .center) {
+                                Text(chord.root.description)
+                                Text(chord.quality.description)
+                            }
+                            .font(Typography.WantedSansStd.R7)
+                            .foregroundStyle(
+                                foregroundColor
+                            )
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: .infinity
+                            )
+                            .background(
+                                backgroundColor,
+                                in: RoundedRectangle(cornerRadius: 12)
+                            )
+                            .minimumScaleFactor(0.1)
                         }
                     }
                     .frame(
