@@ -64,8 +64,6 @@ struct ChordProgressView: View {
                 )
             }
             .navigationBar(
-                isTitleEditable: true,
-                onEnterTitle: intent.onEnterTitle,
                 leading: {},
                 center: {
                     NavigationTitle(

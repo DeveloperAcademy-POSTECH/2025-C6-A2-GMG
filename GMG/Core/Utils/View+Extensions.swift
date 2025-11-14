@@ -12,8 +12,6 @@ extension View {
 
 extension View {
     func navigationBar<Leading: View, Center: View, Trailing: View>(
-        isTitleEditable: Bool = false,
-        onEnterTitle: ((String) -> Void)? = nil,
         isBackButtonHidden: Bool = false,
         @ViewBuilder leading: () -> Leading,
         @ViewBuilder center: () -> Center,
