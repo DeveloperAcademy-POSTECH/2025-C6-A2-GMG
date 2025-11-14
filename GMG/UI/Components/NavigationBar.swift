@@ -23,20 +23,20 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
     }
 
     var body: some View {
-        HStack {
-            if !isBackButtonHidden {
-                BackButton()
+        ZStack {
+            HStack {
+                if !isBackButtonHidden {
+                    BackButton()
+                }
+
+                leading
+
+                Spacer()
+
+                trailing
             }
 
-            leading
-
-            Spacer()
-
             center
-
-            Spacer()
-
-            trailing
         }
         .padding(Spacing.md)
         .buttonStyle(NavigationBarButtonStyle())
