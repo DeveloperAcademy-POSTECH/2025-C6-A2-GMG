@@ -88,9 +88,11 @@ struct ChordProgressView: View {
 
                 Controller(
                     isPlaying: model.playhead.isPlaying,
+                    isMuted: model.isMuted,
                     playAction: intent.onTapPlayButton,
                     pauseAction: intent.onTapPauseButton,
-                    stopAction: intent.onTapStopButton
+                    stopAction: intent.onTapStopButton,
+                    muteAction: intent.onTapMuteButton
                 )
             }
             .padding()
@@ -340,9 +342,11 @@ extension ChordProgressView {
 
     struct Controller: View {
         let isPlaying: Bool
+        let isMuted: Bool
         let playAction: () -> Void
         let pauseAction: () -> Void
         let stopAction: () -> Void
+        let muteAction: (Bool) -> Void
 
         private var primaryButtonImage: ImageResource {
             if isPlaying {
@@ -381,9 +385,9 @@ extension ChordProgressView {
                     .gridCellColumns(3)
 
                     ControllerButton {
-
+                        muteAction(!isMuted)
                     } label: {
-                        Image(.piano)
+                        Image(isMuted ? .waveform : .piano)
                             .renderingMode(.template)
                             .frame(width: 24, height: 24)
                     }
