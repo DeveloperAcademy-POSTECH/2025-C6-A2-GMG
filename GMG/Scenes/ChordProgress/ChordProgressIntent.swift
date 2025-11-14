@@ -47,7 +47,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
             self.scorePlayer = scorePlayer
 
-            scorePlayer.isPlayerMutedPublisher
+            scorePlayer.playerMutedPublisher
                 .sink { [weak self] isPlayerMuted in
                     self?.model?.setMuted(isPlayerMuted)
                 }
