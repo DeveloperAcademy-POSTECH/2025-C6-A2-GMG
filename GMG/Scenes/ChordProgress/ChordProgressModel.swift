@@ -20,6 +20,7 @@ protocol ChordProgressModelActionProtocol: AnyObject {
     func setMuted(_ isMuted: Bool)
     func selectChordCell(_ chordCell: ChordCell?)
     func replaceChord(with candidate: Chord, for cell: ChordCell)
+    func updateTitle(_ title: String)
     func setUndoManager(_ undoManager: UndoManager?)
     func performUndo()
     func performRedo()
@@ -103,7 +104,11 @@ final class ChordProgressModel:
         score.updateChordCellBy(cellIndex: cellIndex, chord: selectedCandidate)
         updateSelectedCell(at: cellIndex)
     }
-
+    
+    func updateTitle(_ title: String) {
+        score.updateTitle(title)
+    }
+    
     func setUndoManager(_ undoManager: UndoManager?) {
         self.undoManager = undoManager
     }

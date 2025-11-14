@@ -14,12 +14,14 @@ protocol ChordProgressIntentProtocol {
     func onTapStopButton()
     func onTapMuteButton(_ isMuted: Bool)
     func onTapChordCell(_ chordCell: ChordCell)
+    func onTapWaveform(_ time: TimeInterval)
     func onTapCandidateChordCell(
         _ candidate: Chord,
         for chordCell: ChordCell
     )
     func onTapUndoButton()
     func onTapRedoButton()
+    func onEnterTitle(_ title: String)
 }
 
 final class ChordProgressIntent: ChordProgressIntentProtocol {
@@ -92,8 +94,18 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     }
 
     func onTapChordCell(_ chordCell: ChordCell) {
-        self.scorePlayer?.seek(chordCell: chordCell)
-        self.model?.selectChordCell(chordCell)
+        guard let scorePlayer = self.scorePlayer else { return }
+        guard let model = self.model else { return }
+
+        scorePlayer.seek(chordCell: chordCell)
+        model.selectChordCell(chordCell)
+    }
+
+    func onTapWaveform(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+
+        scorePlayer.pause()
+        scorePlayer.seek(to: time)
     }
 
     func onTapCandidateChordCell(
@@ -125,5 +137,11 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onTapRedoButton() {
         self.model?.performRedo()
+    }
+
+    func onEnterTitle(_ title: String) {
+        guard let model = self.model else { return }
+
+        model.updateTitle(title)
     }
 }

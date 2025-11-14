@@ -9,9 +9,9 @@ final class SwiftDataStorage {
     var modelContext: ModelContext? {
         modelContainer?.mainContext
     }
-    
+
     static let shared: SwiftDataStorage = SwiftDataStorage()
-    
+
     private init() {
         let configurations = ModelConfiguration(
             isStoredInMemoryOnly: false,

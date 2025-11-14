@@ -31,44 +31,46 @@ final class HomeModel:
     private(set) var selectedScore: Score?
     private(set) var isLatest: Bool
     private(set) var allScores: [Score]
-    
+
     init() {
         self.selectedScore = nil
         self.isLatest = true
         self.allScores = []
     }
-    
+
     var songCount: Int { allScores.count }
     var isScoresEmpty: Bool { allScores.isEmpty }
-    
+
     var sortedScores: [Score] {
         let comparator: (Score, Score) -> Bool = {
-            self.isLatest ? ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt) : ($0.createdAt, $0.updatedAt) < ($1.createdAt, $1.updatedAt)
+            self.isLatest
+                ? ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
+                : ($0.createdAt, $0.updatedAt) < ($1.createdAt, $1.updatedAt)
         }
-        
+
         return allScores.sorted(by: comparator)
     }
-    
+
     var recentScores: [Score] {
         Array(sortedScores.prefix(3))
     }
-    
+
     func setSelectedScore(_ score: Score?) {
         self.selectedScore = score
     }
-    
+
     func setIsLatest(_ isLatest: Bool) {
         self.isLatest = isLatest
     }
-    
+
     func toggleIsLatest() {
         self.isLatest.toggle()
     }
-    
+
     func setAllScores(_ scores: [Score]) {
         self.allScores = scores
     }
-    
+
     func fetchScores(_ context: ModelContext) {
         do {
             let scores = try context.fetch(FetchDescriptor<Score>())
@@ -77,7 +79,7 @@ final class HomeModel:
             self.allScores = []
         }
     }
-    
+
     func deleteScore(_ score: Score, context: ModelContext) {
         context.delete(score)
         do {
@@ -87,13 +89,13 @@ final class HomeModel:
             }
         }
     }
-    
+
     func renameScore(_ score: Score, newTitle: String) {
         let newTitle = newTitle
         guard newTitle.isEmpty == false, newTitle != score.title else { return }
         let storage = SwiftDataStorage.shared
         let context = storage.modelContext
-        
+
         score.title = newTitle
     }
 }
