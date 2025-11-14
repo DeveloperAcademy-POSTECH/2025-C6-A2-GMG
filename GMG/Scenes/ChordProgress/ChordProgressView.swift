@@ -131,20 +131,14 @@ extension ChordProgressView {
             self.onEnterTitle = onEnterTitle
         }
 
-        private func toggleTitleEditing() {
-
-            if isTitleEditing {
-                finishEditingTitle()
-                return
-            }
-
+        private func startTitleEditing() {
             isTitleEditing = true
             DispatchQueue.main.async {
                 isTitleFieldFocused = true
             }
         }
 
-        func finishEditingTitle() {
+        private func finishEditingTitle() {
             isTitleEditing = false
             isTitleFieldFocused = false
             onEnterTitle(title)
@@ -186,7 +180,7 @@ extension ChordProgressView {
                 }
             }
             .onTapGesture {
-                toggleTitleEditing()
+                startTitleEditing()
             }
             .frame(width: 177, height: 26)
             .background {
@@ -482,7 +476,27 @@ extension ChordProgressView {
             segmentStartTime + segmentDuration
         }
 
-        private var targetChordCells: [ChordCell] {
+        private var segmentAudioLevels: [Float] {
+            guard !audioLevels.isEmpty else { return [] }
+
+            let clampedEndTime: TimeInterval = min(segmentEndTime, totalDuration)
+            guard clampedEndTime > segmentStartTime else { return [] }
+
+            let startIndex: Int = max(
+                0,
+                Int(floor(segmentStartTime / audioSampleInterval))
+            )
+            let endIndex: Int = min(
+                audioLevels.count,
+                Int(ceil(clampedEndTime / audioSampleInterval))
+            )
+
+            guard startIndex < endIndex else { return [] }
+
+            return Array(audioLevels[startIndex..<endIndex])
+        }
+
+        private var segmentChordEntries: [SegmentChordEntry] {
             var targetChordCells: [ChordCell] = chordCells.filter {
                 chordCell in
                 segmentStartTime <= chordCell.startTime
@@ -520,98 +534,76 @@ extension ChordProgressView {
                 )
             }
 
-            return targetChordCells
-        }
-
-        private var segmentAudioLevels: [Float] {
-            guard !audioLevels.isEmpty else { return [] }
-
-            let clampedEndTime: TimeInterval = min(segmentEndTime, totalDuration)
-            guard clampedEndTime > segmentStartTime else { return [] }
-
-            let startIndex: Int = max(
-                0,
-                Int(floor(segmentStartTime / audioSampleInterval))
-            )
-            let endIndex: Int = min(
-                audioLevels.count,
-                Int(ceil(clampedEndTime / audioSampleInterval))
-            )
-
-            guard startIndex < endIndex else { return [] }
-
-            return Array(audioLevels[startIndex..<endIndex])
-        }
-
-        private var chordCellsWithDuration: [(chordCell: ChordCell, duration: TimeInterval)] {
-            guard !targetChordCells.isEmpty else { return [] }
-
-            var result: [(chordCell: ChordCell, duration: TimeInterval)] = []
+            var entries: [SegmentChordEntry] = []
 
             for index in 0..<targetChordCells.endIndex - 1 {
-                let currentChordCell = targetChordCells[index]
-                let nextChordCell = targetChordCells[index + 1]
+                let currentTargetChord = targetChordCells[index]
+                let nextTargetChord = targetChordCells[index + 1]
 
-                let clampedCurStartTime = max(currentChordCell.startTime, segmentStartTime)
-                let clampedNextStartTime = min(nextChordCell.startTime, segmentEndTime)
+                let clampedCurrentStart = max(currentTargetChord.startTime, segmentStartTime)
+                let clampedNextStart = min(nextTargetChord.startTime, segmentEndTime)
 
-                let curDuration = clampedNextStartTime - clampedCurStartTime
-                let clampedDuration = min(segmentDuration, curDuration)
+                let rawDuration = clampedNextStart - clampedCurrentStart
+                let clampedDuration = min(segmentDuration, rawDuration)
 
-                let ratio = clampedDuration / max(1, segmentDuration)
+                let occupancyRatio = clampedDuration / max(1, segmentDuration)
 
-                if ratio > 0.02 {
-                    result.append(
-                        (
-                            chordCell: currentChordCell,
-                            duration: clampedDuration
-                        ))
+                if occupancyRatio > 0.02 {
+                    entries.append(
+                        SegmentChordEntry(
+                            chordCell: currentTargetChord,
+                            duration: clampedDuration,
+                            showChordDescription: occupancyRatio > 0.2
+                        )
+                    )
                 }
             }
 
             guard let lastChordCell = targetChordCells.last else {
-                return result
+                return entries
             }
 
             let clampedStartTime = max(lastChordCell.startTime, segmentStartTime)
             let clampedDuration = segmentEndTime - clampedStartTime
 
-            let ratio = clampedDuration / max(1, segmentDuration)
+            let lastOccupancyRatio = clampedDuration / max(1, segmentDuration)
 
-            if ratio > 0.02 {
-                result.append(
-                    (
+            if lastOccupancyRatio > 0.02 {
+                entries.append(
+                    SegmentChordEntry(
                         chordCell: lastChordCell,
-                        duration: clampedDuration
-                    ))
+                        duration: clampedDuration,
+                        showChordDescription: lastOccupancyRatio > 0.2
+                    )
+                )
             }
 
-            return result
+            return entries
         }
 
         var body: some View {
             VStack(spacing: Spacing.xs) {
                 GeometryReader { proxy in
-                    let totalSpacing = Spacing.xs * CGFloat(chordCellsWithDuration.count - 1)
+                    let totalSpacing = Spacing.xs * CGFloat(segmentChordEntries.count - 1)
                     let availableWidth = proxy.size.width - totalSpacing
 
                     HStack(spacing: Spacing.xs) {
-                        ForEach(chordCellsWithDuration, id: \.0) { (chordCell, duration) in
-                            let widthRatio = duration / max(1, segmentDuration)
+                        ForEach(segmentChordEntries) { cell in
+                            let widthRatio = cell.duration / max(1, segmentDuration)
                             let cellWidth = availableWidth * widthRatio
                             let clampedWidth = cellWidth < 1 ? 0 : cellWidth
 
                             ZStack {
-                                if let chord = chordCell.chord {
+                                if let chord = cell.chordCell.chord {
                                     ChordCellButton(
                                         chord: chord,
-                                        showChordDescription: widthRatio >= 0.2,
+                                        showChordDescription: cell.showChordDescription,
                                         isCurrentChord: currentChordCell?.startTime
-                                            == chordCell.startTime,
+                                            == cell.chordCell.startTime,
                                         isSelected: selectedChordCell?.startTime
-                                            == chordCell.startTime
+                                            == cell.chordCell.startTime
                                     ) {
-                                        chordCellAction(chordCell)
+                                        chordCellAction(cell.chordCell)
                                     }
                                 }
                             }
@@ -623,8 +615,8 @@ extension ChordProgressView {
 
                 let showCandidates: Bool =
                     editMode?.wrappedValue.isEditing == true
-                    && targetChordCells.contains(where: {
-                        $0.startTime == selectedChordCell?.startTime
+                    && segmentChordEntries.contains(where: {
+                        $0.chordCell.startTime == selectedChordCell?.startTime
                     })
                     && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
 
@@ -667,6 +659,13 @@ extension ChordProgressView {
             }
             .animation(.default, value: editMode?.wrappedValue)
             .animation(.default, value: selectedChordCell?.startTime)
+        }
+
+        struct SegmentChordEntry: Identifiable {
+            let id = UUID()
+            let chordCell: ChordCell
+            let duration: TimeInterval
+            let showChordDescription: Bool
         }
 
         struct ChordCellCandidates: View {
@@ -774,18 +773,16 @@ extension ChordProgressView {
                                     backgroundColor,
                                     in: RoundedRectangle(cornerRadius: 12)
                                 )
-                        } else {
-                            VStack {}
-                                .frame(
-                                    maxWidth: .infinity,
-                                    maxHeight: .infinity
-                                )
-                                .background(
-                                    backgroundColor,
-                                    in: RoundedRectangle(cornerRadius: 12)
-                                )
                         }
                     }
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity
+                    )
+                    .background(
+                        backgroundColor,
+                        in: RoundedRectangle(cornerRadius: 12)
+                    )
                 }
                 .buttonStyle(.bouncy)
             }
