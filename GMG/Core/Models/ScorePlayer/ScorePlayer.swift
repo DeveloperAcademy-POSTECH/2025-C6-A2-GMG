@@ -25,7 +25,7 @@ final class ScorePlayer {
     private var sampleRate: Double
     private var totalFrames: AVAudioFramePosition
 
-    let isPlayerMutedPublisher: CurrentValueSubject<Bool, Never>
+    let playerMutedPublisher: CurrentValueSubject<Bool, Never>
 
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
     private var playheadPublisherTimer: AnyCancellable?
@@ -47,7 +47,7 @@ final class ScorePlayer {
         self.sampleRate = 48_000
         self.totalFrames = .zero
 
-        self.isPlayerMutedPublisher = CurrentValueSubject<Bool, Never>(false)
+        self.playerMutedPublisher = CurrentValueSubject<Bool, Never>(false)
 
         self.playheadPublisher = CurrentValueSubject<Playhead, Never>(
             Playhead(
@@ -172,7 +172,7 @@ final class ScorePlayer {
             player.volume = 1.0
         }
 
-        isPlayerMutedPublisher.send(isMuted)
+        playerMutedPublisher.send(isMuted)
     }
 
     func prepareChordCells() {
