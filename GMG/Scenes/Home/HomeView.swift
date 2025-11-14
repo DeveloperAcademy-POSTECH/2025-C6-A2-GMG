@@ -307,7 +307,7 @@ extension HomeView {
                             id: \.element.persistentModelID
                         ) { (index, score) in
                             let isSelected = model.selectedScore == score
-                            let isPlayingForThisScore = isSelected && model.isPlaying
+                            let isPlayingForThisScore = isSelected && model.playhead.isPlaying
                             let progressForThisScore =
                                 (isSelected && score.totalDuration > 0)
                                 ? model.playhead.elapsedTime / score.totalDuration
@@ -327,7 +327,7 @@ extension HomeView {
                                     )
                                 },
                                 playButtonAction: {
-                                    if isSelected && model.isPlaying {
+                                    if isSelected && model.playhead.isPlaying {
                                         intent.onTapStopButton()
                                     } else {
                                         intent.onTapPlayButton(
@@ -434,7 +434,7 @@ extension HomeView {
                         ) { (index, score) in
                             let isSelected: Bool =
                                 model.selectedScore == score
-                            let isPlayingForThisScore = isSelected && model.isPlaying
+                            let isPlayingForThisScore = isSelected && model.playhead.isPlaying
                             let progressForThisScore =
                                 (isSelected && score.totalDuration > 0)
                                 ? model.playhead.elapsedTime / score.totalDuration
@@ -460,7 +460,7 @@ extension HomeView {
                                     }
                                 },
                                 playButtonAction: {
-                                    if isSelected && model.isPlaying {
+                                    if isSelected && model.playhead.isPlaying {
                                         intent.onTapStopButton()
                                     } else {
                                         intent.onTapPlayButton(

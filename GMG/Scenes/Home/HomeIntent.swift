@@ -47,9 +47,7 @@ final class HomeIntent: HomeIntentProtocol {
         model?.renameScore(score, newTitle: newTitle)
     }
 
-    // 공통으로 쓰는 player 세팅 로직
     private func setupPlayer(for score: Score) {
-        // Clean up previous player and subscriptions
         cancellables.removeAll()
         scorePlayer?.cleanupAfterPlay()
         scorePlayer = nil
@@ -79,12 +77,10 @@ final class HomeIntent: HomeIntentProtocol {
             setupPlayer(for: score)
         }
 
-        model?.startPlaying()
         scorePlayer?.play()
     }
 
     func onTapStopButton() {
-        model?.stopPlaying()
         scorePlayer?.stop()
     }
 
