@@ -176,6 +176,8 @@ final class RecordingIntent: RecordingIntentProtocol {
                     }
                 }
 
+                try? await Task.sleep(for: .seconds(0.5))
+
                 model.updateScoreFactoryState(nil)
                 model.finishScoreCreation(score)
                 completion()
