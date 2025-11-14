@@ -12,13 +12,16 @@ protocol ChordProgressIntentProtocol {
     func onTapPlayButton()
     func onTapPauseButton()
     func onTapStopButton()
+    func onTapMuteButton(_ isMuted: Bool)
     func onTapChordCell(_ chordCell: ChordCell)
+    func onTapWaveform(_ time: TimeInterval)
     func onTapCandidateChordCell(
         _ candidate: Chord,
         for chordCell: ChordCell
     )
     func onTapUndoButton()
     func onTapRedoButton()
+    func onEnterTitle(_ title: String)
 }
 
 final class ChordProgressIntent: ChordProgressIntentProtocol {
@@ -45,6 +48,12 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             try scorePlayer.prepareToPlay()
 
             self.scorePlayer = scorePlayer
+
+            scorePlayer.playerMutedPublisher
+                .sink { [weak self] isPlayerMuted in
+                    self?.model?.setMuted(isPlayerMuted)
+                }
+                .store(in: &cancellables)
 
             scorePlayer.playheadPublisher
                 .sink { [weak self] playhead in
@@ -80,9 +89,23 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         self.scorePlayer?.stop()
     }
 
+    func onTapMuteButton(_ isMuted: Bool) {
+        self.scorePlayer?.setPlayerMuted(isMuted)
+    }
+
     func onTapChordCell(_ chordCell: ChordCell) {
-        self.scorePlayer?.seek(chordCell: chordCell)
-        self.model?.selectChordCell(chordCell)
+        guard let scorePlayer = self.scorePlayer else { return }
+        guard let model = self.model else { return }
+
+        scorePlayer.seek(chordCell: chordCell)
+        model.selectChordCell(chordCell)
+    }
+
+    func onTapWaveform(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+
+        scorePlayer.pause()
+        scorePlayer.seek(to: time)
     }
 
     func onTapCandidateChordCell(
@@ -114,5 +137,11 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onTapRedoButton() {
         self.model?.performRedo()
+    }
+
+    func onEnterTitle(_ title: String) {
+        guard let model = self.model else { return }
+
+        model.updateTitle(title)
     }
 }

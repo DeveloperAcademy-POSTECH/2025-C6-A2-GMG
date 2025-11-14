@@ -2,23 +2,23 @@
 
 import SwiftUI
 
-struct NavigationBar<Leading: View, Trailing: View>: View {
-    let title: String?
-    let isBackButtonHidden: Bool
-    let leading: Leading
-    let trailing: Trailing
-
+struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
+    let isBackButtonHidden: Bool
+    let leading: Leading
+    let center: Center
+    let trailing: Trailing
+
     init(
-        _ title: String? = nil,
         isBackButtonHidden: Bool = false,
         @ViewBuilder leading: () -> Leading,
+        @ViewBuilder center: () -> Center,
         @ViewBuilder trailing: () -> Trailing
     ) {
-        self.title = title
         self.isBackButtonHidden = isBackButtonHidden
         self.leading = leading()
+        self.center = center()
         self.trailing = trailing()
     }
 
@@ -35,25 +35,20 @@ struct NavigationBar<Leading: View, Trailing: View>: View {
 
                 trailing
             }
-            .buttonStyle(NavigationBarButtonStyle())
 
-            if let title {
-                Text(title)
-                    .font(Typography.WantedSansStd.R6)
-                    .foregroundStyle(
-                        colorScheme == .light
-                            ? Color.black1 : Color.white1
-                    )
-            }
+            center
         }
         .padding(Spacing.md)
+        .buttonStyle(NavigationBarButtonStyle())
     }
 }
 
 #Preview {
-    NavigationBar("Test") {
-
+    NavigationBar {
+        EmptyView()
+    } center: {
+        EmptyView()
     } trailing: {
-
+        EmptyView()
     }
 }
