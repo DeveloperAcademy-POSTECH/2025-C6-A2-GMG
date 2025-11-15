@@ -90,7 +90,7 @@ final class RecordingModel:
     func resetAudioLevels() {
         self.audioLevels = []
     }
-    
+
     func updateCountdown(_ countdown: Int) {
         self.countdown = countdown
     }
@@ -98,9 +98,8 @@ final class RecordingModel:
     func updateScoreFactoryState(_ scoreFactoryState: ScoreFactoryState?) {
         self.scoreFactoryState = scoreFactoryState
     }
-    
+
     func finishScoreCreation(_ score: Score) {
-        score.audioLevels = audioLevels
         self.score = score
     }
 }
