@@ -24,6 +24,7 @@ protocol HomeModelActionProtocol: AnyObject {
     func renameScore(_ score: Score, newTitle: String)
     func updatePlayhead(_ playhead: Playhead)
     func setUpdatedAt(_ score: Score, at date: Date)
+    func reselectLast()
 }
 
 @Observable
@@ -113,5 +114,13 @@ final class HomeModel:
         score.updatedAt = date
 
         self.allScores = self.allScores
+    }
+
+    func reselectLast() {
+        if let last = sortedScores.last {
+            self.selectedScore = last
+        } else {
+            self.selectedScore = nil
+        }
     }
 }

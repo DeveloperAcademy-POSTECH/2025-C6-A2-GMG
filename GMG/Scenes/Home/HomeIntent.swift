@@ -29,14 +29,17 @@ final class HomeIntent: HomeIntentProtocol {
 
     func loadScores(_ context: ModelContext) {
         model?.fetchScores(context)
+        model?.reselectLast()
     }
 
     func setIsLatest(_ isLatest: Bool) {
         model?.setIsLatest(isLatest)
+        model?.reselectLast()
     }
 
     func deleteScore(_ score: Score, context: ModelContext) {
         model?.deleteScore(score, context: context)
+        model?.reselectLast()
     }
 
     func selectScore(_ score: Score?) {
