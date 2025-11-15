@@ -38,3 +38,10 @@ extension View {
         .toolbarVisibility(.hidden, for: .navigationBar)
     }
 }
+
+extension View {
+    func compatibleGlassEffect<S: InsettableShape>(in shape: S) -> some View {
+        self
+            .modifier(CompatibleGlassEffect(shape: shape))
+    }
+}
