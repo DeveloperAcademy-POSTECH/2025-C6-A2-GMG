@@ -12,12 +12,12 @@ enum AudioLevelMeter {
     nonisolated static func calculateLevel(from fileURL: URL, windowPerSeconds: TimeInterval = 0.1)
         throws -> [Float]
     {
-        let file = try AVAudioFile(forReading: fileURL)
+        let file: AVAudioFile = try AVAudioFile(forReading: fileURL)
 
-        let format = file.processingFormat
-        let sampleRate = format.sampleRate
+        let format: AVAudioFormat = file.processingFormat
+        let sampleRate: Double = format.sampleRate
 
-        let framesPerWindow = AVAudioFrameCount(sampleRate * windowPerSeconds)
+        let framesPerWindow: AVAudioFrameCount = AVAudioFrameCount(sampleRate * windowPerSeconds)
 
         let levels: [Float] = try calculateLevel(from: file, framesPerWindow: framesPerWindow)
 
@@ -27,7 +27,7 @@ enum AudioLevelMeter {
     nonisolated static func calculateLevel(from fileURL: URL, framesPerWindow: AVAudioFrameCount)
         throws -> [Float]
     {
-        let file = try AVAudioFile(forReading: fileURL)
+        let file: AVAudioFile = try AVAudioFile(forReading: fileURL)
 
         let levels: [Float] = try calculateLevel(from: file, framesPerWindow: framesPerWindow)
 
@@ -37,9 +37,9 @@ enum AudioLevelMeter {
     private nonisolated static func calculateLevel(
         from file: AVAudioFile, framesPerWindow: AVAudioFrameCount
     ) throws -> [Float] {
-        let format = file.processingFormat
-        let channelCount = Int(format.channelCount)
-        let totalFrames = file.length
+        let format: AVAudioFormat = file.processingFormat
+        let channelCount: Int = Int(format.channelCount)
+        let totalFrames: AVAudioFramePosition = file.length
 
         guard framesPerWindow > 0 else {
             return []
@@ -51,7 +51,7 @@ enum AudioLevelMeter {
         }
 
         var rms: [Float] = []
-        var currentFramePosition: AVAudioFramePosition = 0
+        var currentFramePosition: AVAudioFramePosition = .zero
 
         while currentFramePosition < totalFrames {
             let framesRemaining: AVAudioFrameCount = AVAudioFrameCount(
@@ -67,13 +67,13 @@ enum AudioLevelMeter {
                 var channelRMS: [Float] = []
 
                 for channel in 0..<channelCount {
-                    let pointer = channelData[channel]
-                    var rms: Float = 0
+                    let pointer: UnsafeMutablePointer<Float> = channelData[channel]
+                    var rms: Float = .zero
                     vDSP_rmsqv(pointer, vDSP_Stride(stride), &rms, vDSP_Length(frameLength))
                     channelRMS.append(rms)
                 }
 
-                let avgRMS = channelRMS.reduce(0, +) / Float(channelRMS.count)
+                let avgRMS: Float = channelRMS.reduce(0, +) / Float(channelRMS.count)
                 rms.append(avgRMS)
             } else {
                 break
