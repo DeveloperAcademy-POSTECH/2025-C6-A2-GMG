@@ -88,7 +88,7 @@ extension HomeView {
 
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.black6)
+                        .foregroundStyle(Color.white1)
                 }
 
                 Spacer()
@@ -126,14 +126,25 @@ extension HomeView {
                         playButtonAction()
                     } label: {
                         ZStack {
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 10, height: 10)
-                                .padding(.leading, isPlaying ? 0 : 2)
-                                .foregroundStyle(Color.black1)
-                                .padding(Spacing.xs)
-                                .background(Color.white2, in: Circle())
+                            if isPlaying {
+                                Image(systemName: "pause.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .padding(.leading, 0)
+                                    .foregroundStyle(Color.black1)
+                                    .padding(Spacing.xs)
+                                    .background(Color.white2, in: Circle())
+                            } else {
+                                Image("PlayButton")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 8, height: 8)
+                                    .padding(.leading, 2)
+                                    .foregroundStyle(Color.black1)
+                                    .padding(Spacing.xs)
+                                    .background(Color.white2, in: Circle())
+                            }
 
                             Circle()
                                 .stroke(Color.gray.opacity(0.25), lineWidth: 3)
