@@ -17,7 +17,7 @@ enum AudioLevelMeter {
         let foramt = file.processingFormat
         let sampleRate = foramt.sampleRate
 
-        let framesPerWindow = AVAudioFrameCount(sampleRate * 0.1)
+        let framesPerWindow = AVAudioFrameCount(sampleRate * windowPerSeconds)
 
         let levels: [Float] = try calculateLevel(from: file, framesPerWindow: framesPerWindow)
 
