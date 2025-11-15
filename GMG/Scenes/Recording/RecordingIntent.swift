@@ -224,20 +224,7 @@ final class RecordingIntent: RecordingIntentProtocol {
             else { return }
 
             do {
-                // TODO: Swift Concurrency 방법 찾아보기!
-                // DispatchQueue.global()을 사용하지 않으면 MainThread에서 실행되어 로딩 화면이 안나옴
-                let score: Score = try await withCheckedThrowingContinuation {
-                    continuation in
-                    DispatchQueue.global().async {
-                        do {
-                            let score: Score = try self.scoreFactory
-                                .createScore(audioURL: url)
-                            continuation.resume(returning: score)
-                        } catch {
-                            continuation.resume(throwing: error)
-                        }
-                    }
-                }
+                let score: Score = try await self.scoreFactory.createScore(audioURL: url)
 
                 try self.scoreRepository.insert(score)
 
