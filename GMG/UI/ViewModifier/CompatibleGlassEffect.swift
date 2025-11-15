@@ -17,6 +17,7 @@ struct CompatibleGlassEffect<S: InsettableShape>: ViewModifier {
             content
                 .background {
                     BackdropView()
+                        .padding(-4)
                         .brightness(0.1)
                         .blur(radius: 2)
                         .clipShape(shape)
