@@ -222,8 +222,8 @@ struct RecordingView: View {
         var body: some View {
             HStack(spacing: Spacing.xs) {
                 ForEach(
-                    paddedAudioLevels.enumerated(),
-                    id: \.0
+                    Array(paddedAudioLevels.enumerated()),
+                    id: \.offset
                 ) { _, audioLevel in
                     let height: CGFloat = CGFloat(80 * audioLevel + 10)
 
