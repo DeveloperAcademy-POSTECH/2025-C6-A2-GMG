@@ -394,7 +394,7 @@ extension ChordProgressView {
             }
             .padding()
             .frame(maxHeight: 96)
-            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 18))
+            .compatibleGlassEffect(in: RoundedRectangle(cornerRadius: 18))
         }
     }
 
