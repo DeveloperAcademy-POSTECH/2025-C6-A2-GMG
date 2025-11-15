@@ -440,7 +440,7 @@ extension HomeView {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 48)
                 } else {
-                    VStack(spacing: -62) {
+                    VStack(spacing: -60) {
                         ForEach(
                             Array(model.sortedScores.enumerated()),
                             id: \.element.persistentModelID

@@ -230,6 +230,17 @@
         }
       }
     },
+    "Play" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "듣기"
+          }
+        }
+      }
+    },
     "Recent Files" : {
       "extractionState" : "manual",
       "localizations" : {
