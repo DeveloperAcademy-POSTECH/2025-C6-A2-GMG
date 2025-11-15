@@ -174,7 +174,9 @@ extension HomeView {
                 maxHeight: 128
             )
             .background(
-                isLatest ? latestBackgroundColor : earliestBackgroundColor,
+                isSmall
+                    ? latestBackgroundColor
+                    : (isLatest ? latestBackgroundColor : earliestBackgroundColor),
                 in: RoundedRectangle(cornerRadius: 32)
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
