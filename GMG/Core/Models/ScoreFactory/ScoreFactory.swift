@@ -87,6 +87,8 @@ final class ScoreFactory {
             filteredChordCells = [newChordCell] + filteredChordCells[1...]
         }
 
+        let audioLevels: [Float] = try AudioLevelMeter.calculateLevel(from: workingURL)
+
         return Score(
             title: "Untitled",
             key: key,
@@ -96,7 +98,7 @@ final class ScoreFactory {
             updatedAt: Date(),
             notes: notes,
             chordCells: filteredChordCells,
-            audioLevels: []
+            audioLevels: audioLevels
         )
     }
 
@@ -117,41 +119,10 @@ final class ScoreFactory {
 
         let swiftF0Notes: [SwiftF0.Note] = NoteConverter.convert(pitchResults)
         let notes: [Note] = swiftF0Notes.map { note in
-            return convertSwiftF0NoteToNote(note)
+            return note.note
         }
 
         return notes
-    }
-
-    private func convertSwiftF0NoteToNote(_ swiftF0Note: SwiftF0.Note) -> Note {
-        let noteNames: [NoteName] = [
-            .C,
-            .Cs,
-            .D,
-            .Ds,
-            .E,
-            .F,
-            .Fs,
-            .G,
-            .Gs,
-            .A,
-            .As,
-            .B,
-        ]
-
-        let noteName: NoteName = noteNames[Int(swiftF0Note.pitch) % 12]
-        let octave: Int = Int((swiftF0Note.pitch / 12) - 1)
-        let startTime: TimeInterval = swiftF0Note.position
-        let duration: TimeInterval = swiftF0Note.duration
-
-        let note: Note = Note(
-            name: noteName,
-            octave: octave,
-            startTime: startTime,
-            duration: duration
-        )
-
-        return note
     }
 
     private func mergeChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
@@ -168,5 +139,38 @@ final class ScoreFactory {
         }
 
         return mergedChordCells
+    }
+}
+
+extension SwiftF0.Note {
+    fileprivate var note: Note {
+        let noteNames: [NoteName] = [
+            .C,
+            .Cs,
+            .D,
+            .Ds,
+            .E,
+            .F,
+            .Fs,
+            .G,
+            .Gs,
+            .A,
+            .As,
+            .B,
+        ]
+
+        let noteName: NoteName = noteNames[Int(self.pitch) % 12]
+        let octave: Int = Int((self.pitch / 12) - 1)
+        let startTime: TimeInterval = self.position
+        let duration: TimeInterval = self.duration
+
+        let note: Note = Note(
+            name: noteName,
+            octave: octave,
+            startTime: startTime,
+            duration: duration
+        )
+
+        return note
     }
 }

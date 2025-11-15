@@ -116,7 +116,6 @@ final class RecordingModel:
     }
 
     func finishScoreCreation(_ score: Score) {
-        score.audioLevels = audioLevels
         self.score = score
     }
 }
