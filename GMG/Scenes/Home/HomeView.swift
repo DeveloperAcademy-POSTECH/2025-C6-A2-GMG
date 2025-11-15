@@ -80,13 +80,13 @@ extension HomeView {
                         }
                     }
 
-                    Text("\(score.key.description) Key")
+                    Text(Self.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
 
                     Spacer()
 
-                    Text(Self.dateConverter(score.createdAt))
+                    Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.black6)
                 }
@@ -427,7 +427,7 @@ extension HomeView {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 48)
                 } else {
-                    VStack(spacing: -82) {
+                    VStack(spacing: -62) {
                         ForEach(
                             Array(model.sortedScores.enumerated()),
                             id: \.element.persistentModelID
