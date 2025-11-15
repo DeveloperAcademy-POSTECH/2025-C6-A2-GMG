@@ -15,6 +15,9 @@ struct Waveform: View {
     private let horizontalPadding: CGFloat = 11
     private let minCapsuleHeight: CGFloat = 6
     private let maxCapsuleHeight: CGFloat = 21
+    private var capsuleUnitWidth: CGFloat {
+        capsuleWidth + capsuleSpacing
+    }
 
     private var backgroundColor: Color {
         if editMode?.wrappedValue.isEditing == true {
@@ -81,9 +84,19 @@ struct Waveform: View {
             return Array(repeating: value, count: targetCount)
         }
 
+        let paddingOffsetIndex: Float
+        if capsuleUnitWidth > 0 {
+            paddingOffsetIndex = Float(horizontalPadding / capsuleUnitWidth)
+        } else {
+            paddingOffsetIndex = 0
+        }
+
+        let maxIndex = max(1, targetCount - 1)
+
         return (0..<targetCount).map { index in
-            let position = Float(index) / Float(targetCount - 1)
-            let scaled = position * Float(source.count - 1)
+            let position = (Float(index) + paddingOffsetIndex) / Float(maxIndex)
+            let normalizedPosition = min(max(position, 0), 1)
+            let scaled = normalizedPosition * Float(source.count - 1)
             let lower = Int(floor(scaled))
             let upper = Int(ceil(scaled))
 
@@ -128,7 +141,7 @@ struct Waveform: View {
                         Spacer(minLength: 0)
                     }
                 )
-                .animation(.easeInOut(duration: 0.25), value: progressWidth)
+                .animation(.easeInOut(duration: 0.01), value: progressWidth)
             }
             .frame(width: width)
 
