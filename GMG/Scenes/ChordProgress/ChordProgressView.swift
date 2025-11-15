@@ -677,7 +677,8 @@ extension ChordProgressView {
                     HStack {
                         Spacer()
 
-                        ForEach(chordCell.chordCandidates.enumerated(), id: \.0) { (_, chord) in
+                        ForEach(Array(chordCell.chordCandidates.enumerated()), id: \.offset) {
+                            (_, chord) in
                             Button {
                                 onTapAction(chord, chordCell)
                             } label: {
