@@ -74,7 +74,7 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
         audioPlayer.updateMeters()
 
         let averagePower: Float = audioPlayer.averagePower(forChannel: 0)
-        let normalizedLevel: Float = normalizeLevel(averagePower)
+        let normalizedLevel: Float = DecibelsNormalizer.normalize(averagePower)
 
         self.audioLevelPublisher.send(normalizedLevel)
     }
@@ -85,11 +85,6 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
         let playedDuration: TimeInterval = audioPlayer.currentTime
 
         self.playedDurationPublisher.send(playedDuration)
-    }
-
-    private func normalizeLevel(_ dB: Float, minDb: Float = -30) -> Float {
-        let clamped: Float = min(0, max(minDb, dB))
-        return (clamped - minDb) / (-minDb)
     }
 
     // MARK: - AVAudioPlayerDelgate Implement

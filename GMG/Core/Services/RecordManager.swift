@@ -115,13 +115,8 @@ final class RecordManager {
         audioRecorder.updateMeters()
 
         let averagePower: Float = audioRecorder.averagePower(forChannel: 0)
-        let normalizedLevel: Float = normalizeLevel(averagePower)
+        let normalizedLevel: Float = DecibelsNormalizer.normalize(averagePower)
 
         self.audioLevelPublisher.send(normalizedLevel)
-    }
-
-    private func normalizeLevel(_ dB: Float, minDb: Float = -30) -> Float {
-        let clamped: Float = min(0, max(minDb, dB))
-        return (clamped - minDb) / (-minDb)
     }
 }
