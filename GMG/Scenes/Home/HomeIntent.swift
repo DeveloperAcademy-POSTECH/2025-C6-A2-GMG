@@ -10,10 +10,10 @@ protocol HomeIntentProtocol {
     func deleteScore(_ score: Score, context: ModelContext)
     func selectScore(_ score: Score?)
     func renameScore(_ score: Score, newTitle: String)
-    func onAppear(_ score: Score)
     func onTapPlayButton(score: Score, selectedScore: Score?)
     func onTapStopButton()
     func onTapScore(_ score: Score, context: ModelContext)
+    func selectLastScore(_ scores: [Score])
 }
 
 final class HomeIntent: HomeIntentProtocol {
@@ -29,21 +29,22 @@ final class HomeIntent: HomeIntentProtocol {
 
     func loadScores(_ context: ModelContext) {
         model?.fetchScores(context)
-        model?.reselectLast()
     }
 
     func setIsLatest(_ isLatest: Bool) {
         model?.setIsLatest(isLatest)
-        model?.reselectLast()
     }
 
     func deleteScore(_ score: Score, context: ModelContext) {
         model?.deleteScore(score, context: context)
-        model?.reselectLast()
     }
 
     func selectScore(_ score: Score?) {
         model?.setSelectedScore(score)
+
+        guard let score else { return }
+
+        setupPlayer(for: score)
     }
 
     func renameScore(_ score: Score, newTitle: String) {
@@ -70,10 +71,6 @@ final class HomeIntent: HomeIntentProtocol {
         }
     }
 
-    func onAppear(_ score: Score) {
-        setupPlayer(for: score)
-    }
-
     func onTapPlayButton(score: Score, selectedScore: Score?) {
         if selectedScore?.persistentModelID != score.persistentModelID {
             model?.setSelectedScore(score)
@@ -93,5 +90,13 @@ final class HomeIntent: HomeIntentProtocol {
         model?.setSelectedScore(score)
 
         model?.fetchScores(context)
+    }
+
+    func selectLastScore(_ scores: [Score]) {
+        guard let last = scores.last else {
+            model?.setSelectedScore(nil)
+            return
+        }
+        selectScore(last)  // setupPlayer 포함
     }
 }
