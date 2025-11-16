@@ -13,8 +13,7 @@ protocol ExportModelStateProtocol {
 }
 
 protocol ExportModelActionProtocol: AnyObject {
-    func prepareSheetExport()
-    func prepareAudioExport()
+    func updateShareItems(_ items: [Any])
     func updateSharing(_ isSharing: Bool)
 }
 
@@ -50,34 +49,12 @@ final class ExportModel:
         self.shareItems = []
     }
 
-    func prepareSheetExport() {
-        if let url = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "png"
-        ) {
-            print("image success")
-            self.shareItems = [url]
-            self.isSharing = true
-        } else {
-            print("err: image not found")
-        }
-    }
-
-    func prepareAudioExport() {
-        if let url = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "m4a"
-        ) {
-            print("audio success")
-            self.shareItems = [url]
-            self.isSharing = true
-        } else {
-            print("err: audio not found")
-        }
-    }
-
     func updateSharing(_ isSharing: Bool) {
         self.isSharing = isSharing
+    }
+
+    func updateShareItems(_ items: [Any]) {
+        self.shareItems = items
     }
 }
 
