@@ -149,7 +149,7 @@ extension ChordProgressView {
 
         var body: some View {
             ZStack(alignment: .center) {
-                TextField("Untitled", text: $title)
+                TextField(.enterTitle, text: $title)
                     .multilineTextAlignment(.center)
                     .font(Typography.WantedSansStd.R6)
                     .foregroundStyle(
@@ -291,14 +291,14 @@ extension ChordProgressView {
         var body: some View {
             HStack(spacing: .zero) {
                 ToggleButton(
-                    title: "Sheet",
+                    title: String(localized: .sheet),
                     isSelected: !isEditMode,
                     namespace: namespace
                 ) {
                     isEditMode = false
                 }
                 ToggleButton(
-                    title: "Edit",
+                    title: String(localized: .edit),
                     isSelected: isEditMode,
                     namespace: namespace
                 ) {
