@@ -40,9 +40,9 @@ final class HomeIntent: HomeIntentProtocol {
     }
 
     func selectScore(_ score: Score?) {
-        model?.setSelectedScore(score)
-
         guard let score else { return }
+
+        model?.setSelectedScore(score)
 
         setupPlayer(for: score)
     }
