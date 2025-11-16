@@ -64,7 +64,7 @@ final class ScoreFactory {
 
         scoreFactoryStatePublisher.send(.sheetMusicExtraction)
 
-        let mergedChordCells: [ChordCell] = mergeChordCells(chordCells)
+        let mergedChordCells: [ChordCell] = mergeConsecutiveChordCells(chordCells)
 
         let file: AVAudioFile = try AVAudioFile(forReading: workingURL)
         let totalDuration: TimeInterval =
@@ -125,7 +125,7 @@ final class ScoreFactory {
         return notes
     }
 
-    private func mergeChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
+    private func mergeConsecutiveChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
         var mergedChordCells: [ChordCell] = []
 
         for chordCell in chordCells {
