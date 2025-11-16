@@ -61,6 +61,8 @@ extension HomeView {
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
+        let latestPalette: [Color]
+        let earliestPalette: [Color]
 
         var body: some View {
             HStack {
@@ -174,9 +176,7 @@ extension HomeView {
                 maxHeight: 128
             )
             .background(
-                isSmall
-                    ? latestBackgroundColor
-                    : (isLatest ? latestBackgroundColor : earliestBackgroundColor),
+                backgroundColor,
                 in: RoundedRectangle(cornerRadius: 32)
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
@@ -211,13 +211,14 @@ extension HomeView {
         }
 
         // MARK: - Color Helpers
-        private var latestBackgroundColor: Color {
-            let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
-            return palette[index % palette.count]
-        }
-        private var earliestBackgroundColor: Color {
-            let palette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
-            return palette[index % palette.count]
+        private var backgroundColor: Color {
+            if isSmall {
+                return latestPalette[index % latestPalette.count]
+            } else {
+                return isLatest
+                    ? latestPalette[index % latestPalette.count]
+                    : earliestPalette[index % earliestPalette.count]
+            }
         }
 
         // MARK: - data Helpers
@@ -356,7 +357,9 @@ extension HomeView {
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score, context: context)
-                                }
+                                },
+                                latestPalette: latestPalette,
+                                earliestPalette: earliestPalette
                             )
                         }
                     }
@@ -500,7 +503,9 @@ extension HomeView {
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score, context: context)
                                     intent.selectLastScore(model.sortedScores)
-                                }
+                                },
+                                latestPalette: latestPalette,
+                                earliestPalette: earliestPalette
                             )
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
@@ -513,6 +518,8 @@ extension HomeView {
         }
     }
 
+    static let latestPalette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
+    static let earliestPalette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
 }
 
 #Preview(traits: .routerModifier) {
