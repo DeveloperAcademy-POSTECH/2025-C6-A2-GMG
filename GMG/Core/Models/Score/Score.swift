@@ -7,11 +7,7 @@ class Score {
     private(set) var id: UUID
     private(set) var title: String
     private(set) var key: Key
-    private(set) var audioFileName: String
-    var audioUrl: URL {
-        return Self.recordingFolder
-            .appending(component: audioFileName)
-    }
+    private(set) var audioURL: URL
     private(set) var totalDuration: TimeInterval
     private(set) var createdAt: Date
     private(set) var updatedAt: Date
@@ -23,7 +19,7 @@ class Score {
         id: UUID = UUID(),
         title: String,
         key: Key,
-        audioFileName: String,
+        audioURL: URL,
         totalDuration: TimeInterval,
         createdAt: Date,
         updatedAt: Date,
@@ -34,7 +30,7 @@ class Score {
         self.id = id
         self.title = title
         self.key = key
-        self.audioFileName = audioFileName
+        self.audioURL = audioURL
         self.totalDuration = totalDuration
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -107,7 +103,7 @@ extension Score: Hashable {
         lhs.id == rhs.id
             && lhs.title == rhs.title
             && lhs.key == rhs.key
-            && lhs.audioFileName == rhs.audioFileName
+            && lhs.audioURL == rhs.audioURL
             && lhs.totalDuration == rhs.totalDuration
             && lhs.createdAt == rhs.createdAt
             && lhs.updatedAt == rhs.updatedAt
@@ -120,7 +116,7 @@ extension Score: Hashable {
         hasher.combine(id)
         hasher.combine(title)
         hasher.combine(key)
-        hasher.combine(audioFileName)
+        hasher.combine(audioURL)
         hasher.combine(totalDuration)
         hasher.combine(createdAt)
         hasher.combine(updatedAt)
@@ -134,7 +130,7 @@ extension Score {
         Score(
             title: "Untitled",
             key: Key(root: .C),
-            audioFileName: "Untitled.m4a",
+            audioURL: Bundle.main.url(forResource: "Sample", withExtension: "m4a")!,
             totalDuration: 31.0,
             createdAt: Date(),
             updatedAt: Date(),
