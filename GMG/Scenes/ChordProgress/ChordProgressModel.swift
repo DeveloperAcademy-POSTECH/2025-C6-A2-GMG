@@ -7,6 +7,7 @@ protocol ChordProgressModelStateProtocol {
     var score: Score { get }
     var isEditMode: Bool { get }
     var playhead: Playhead { get }
+    var isMuted: Bool { get }
     var currentChordCell: ChordCell? { get }
     var selectedChordCell: ChordCell? { get }
     var canUndo: Bool { get }
@@ -16,8 +17,10 @@ protocol ChordProgressModelStateProtocol {
 protocol ChordProgressModelActionProtocol: AnyObject {
     func setEditMode(_ isEditMode: Bool)
     func updatePlayhead(_ playhead: Playhead)
+    func setMuted(_ isMuted: Bool)
     func selectChordCell(_ chordCell: ChordCell?)
     func replaceChord(with candidate: Chord, for cell: ChordCell)
+    func updateTitle(_ title: String)
     func setUndoManager(_ undoManager: UndoManager?)
     func performUndo()
     func performRedo()
@@ -31,6 +34,7 @@ final class ChordProgressModel:
     private(set) var score: Score
     private(set) var isEditMode: Bool
     private(set) var playhead: Playhead
+    private(set) var isMuted: Bool
     private(set) var currentChordCell: ChordCell?
     private(set) var selectedChordCell: ChordCell?
     private(set) var undoManager: UndoManager?
@@ -39,15 +43,16 @@ final class ChordProgressModel:
         self.score = score
         self.isEditMode = false
         self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
+        self.isMuted = false
         self.currentChordCell = nil
         self.selectedChordCell = nil
         self.undoManager = nil
     }
-    
+
     var canUndo: Bool {
         undoManager?.canUndo ?? false
     }
-    
+
     var canRedo: Bool {
         undoManager?.canRedo ?? false
     }
@@ -70,22 +75,26 @@ final class ChordProgressModel:
         }
     }
 
+    func setMuted(_ isMuted: Bool) {
+        self.isMuted = isMuted
+    }
+
     func selectChordCell(_ chordCell: ChordCell?) {
         self.selectedChordCell = chordCell
     }
-    
+
     func replaceChord(with selectedCandidate: Chord, for cell: ChordCell) {
         guard let cellIndex: Int = score.retrieveCellIndexBy(time: cell.startTime),
             let originalCell: ChordCell = score.retrieveChordCellBy(cellIndex: cellIndex)
         else {
             return
         }
-        
+
         let previousChord: Chord? = originalCell.chord
         if previousChord == selectedCandidate {
             return
         }
-        
+
         registerUndoRedoHandlers(
             cellIndex: cellIndex,
             previousChord: previousChord,
@@ -96,23 +105,27 @@ final class ChordProgressModel:
         updateSelectedCell(at: cellIndex)
     }
     
+    func updateTitle(_ title: String) {
+        score.updateTitle(title)
+    }
+    
     func setUndoManager(_ undoManager: UndoManager?) {
         self.undoManager = undoManager
     }
-    
+
     func performUndo() {
         undoManager?.undo()
     }
-    
+
     func performRedo() {
         undoManager?.redo()
     }
-    
+
     private func updateSelectedCell(at index: Int) {
         guard let updatedCell = score.retrieveChordCellBy(cellIndex: index) else {
             return
         }
-        
+
         selectedChordCell = updatedCell
     }
 

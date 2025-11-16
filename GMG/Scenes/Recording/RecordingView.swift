@@ -31,7 +31,7 @@ struct RecordingView: View {
 
                 Spacer()
             }
-            .navigationBar(leading: {}, trailing: {})
+            .navigationBar(leading: {}, center: {}, trailing: {})
 
             WaveForm(audioLevels: model.audioLevels)
 
@@ -44,7 +44,7 @@ struct RecordingView: View {
                     isPlaying: model.isPlaying,
                     recordAction: intent.onTapRecordButton,
                     stopRecordAction: intent.onTapStopRecordButton,
-                    resetAction: intent.onTapResetButton,
+                    resetAction: intent.onTapShowResetConfirmationAlertButton,
                     playAction: {
                         guard let url = model.recordingURL else { return }
 
@@ -77,6 +77,31 @@ struct RecordingView: View {
                 }
             }
             .animation(.default, value: model.scoreFactoryState)
+        }
+        .task {
+            await intent.onAppear()
+        }
+        .alert(
+            .requestMicrophoneAccessPermission,
+            isPresented: .constant(model.isRecordPermissionAlertPresented)
+        ) {
+            Button(.openSettings, role: .confirm) {
+                intent.onTapOpenSettingsButton()
+            }
+            .keyboardShortcut(.defaultAction)
+            Button(.cancel, role: .cancel) {
+                intent.onTapRecordPermissionAlertCancelButton()
+            }
+        }
+        .alert(
+            .resetConfirmationAlert, isPresented: .constant(model.isResetConfirmationAlertPresented)
+        ) {
+            Button(.reset, role: .destructive) {
+                intent.onTapResetButton()
+            }
+            Button(.cancel, role: .cancel) {
+                intent.onTapResetConfirmationAlertCancelButton()
+            }
         }
     }
 
@@ -197,8 +222,8 @@ struct RecordingView: View {
         var body: some View {
             HStack(spacing: Spacing.xs) {
                 ForEach(
-                    paddedAudioLevels.enumerated(),
-                    id: \.0
+                    Array(paddedAudioLevels.enumerated()),
+                    id: \.offset
                 ) { _, audioLevel in
                     let height: CGFloat = CGFloat(80 * audioLevel + 10)
 
@@ -312,7 +337,7 @@ struct RecordingView: View {
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: 140)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18))
+            .compatibleGlassEffect(in: RoundedRectangle(cornerRadius: 18))
             .animation(.default, value: recordingUrl)
         }
     }
