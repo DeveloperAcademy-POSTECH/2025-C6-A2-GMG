@@ -33,6 +33,7 @@ struct HomeView: View {
                 .scrollIndicators(.hidden)
                 .task {
                     intent.loadScores(context)
+                    intent.selectLastScore(model.sortedScores)
                 }
             }
         }
@@ -125,45 +126,39 @@ extension HomeView {
                     Button {
                         playButtonAction()
                     } label: {
-                        ZStack {
-                            if isPlaying {
-                                Image(systemName: "pause.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 10, height: 10)
-                                    .padding(.leading, 0)
-                                    .foregroundStyle(Color.black1)
-                                    .padding(Spacing.xs)
-                                    .background(Color.white2, in: Circle())
-                            } else {
-                                Image("PlayButton")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 8, height: 8)
-                                    .padding(.leading, 2)
-                                    .foregroundStyle(Color.black1)
-                                    .padding(Spacing.xs)
-                                    .background(Color.white2, in: Circle())
+                        Image(isPlaying ? .pause : .play)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 12, height: 12)
+                            .padding(.leading, isPlaying ? 0 : 2)
+                            .foregroundStyle(Color.black1)
+                            .padding(Spacing.xs)
+                            .background {
+                                let lineWidth: CGFloat = 3
+                                let isProgressPresented: Bool =
+                                    isSelected && (isPlaying || progress > 0)
+                                Circle()
+                                    .inset(by: lineWidth / 2)
+                                    .fill(Color.white2)
+                                    .stroke(
+                                        isProgressPresented ? Color.bg1 : Color.white2,
+                                        lineWidth: lineWidth
+                                    )
+                                    .drawingGroup()
+                                Circle()
+                                    .inset(by: lineWidth / 2)
+                                    .trim(from: 0, to: progress)
+                                    .stroke(
+                                        Color.bg2,
+                                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                                    )
+                                    .rotationEffect(.degrees(-90))
+                                    .opacity(isProgressPresented ? 1 : 0)
                             }
-
-                            Circle()
-                                .stroke(Color.gray.opacity(0.25), lineWidth: 3)
-                                .frame(width: 24, height: 24)
-                                .opacity(isSelected && (isPlaying || progress > 0) ? 1 : 0)
-
-                            Circle()
-                                .trim(from: 0, to: progress)
-                                .stroke(
-                                    Color.bg2,
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                                )
-                                .rotationEffect(.degrees(-90))
-                                .frame(width: 24, height: 24)
-                                .opacity(isSelected && (isPlaying || progress > 0) ? 1 : 0)
-                        }
-                        .opacity(isSelected ? 1 : 0)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.bouncy)
+                    .opacity(isSelected ? 1 : 0)
                 }
             }
             .padding(Spacing.lg)
@@ -407,7 +402,12 @@ extension HomeView {
                             model.isLatest ? Color.black5 : Color.black3
                         )
                         .padding(.trailing, 12)
-                        .onTapGesture { if model.isLatest == false { intent.setIsLatest(true) } }
+                        .onTapGesture {
+                            if model.isLatest == false {
+                                intent.setIsLatest(true)
+                                intent.selectLastScore(model.sortedScores)
+                            }
+                        }
 
                     Text("Earliest")
                         .font(Typography.WantedSansStd.R5)
@@ -415,7 +415,12 @@ extension HomeView {
                             model.isLatest ? Color.black3 : Color.black5
                         )
                         .padding(.trailing, 12)
-                        .onTapGesture { if model.isLatest == true { intent.setIsLatest(false) } }
+                        .onTapGesture {
+                            if model.isLatest == true {
+                                intent.setIsLatest(false)
+                                intent.selectLastScore(model.sortedScores)
+                            }
+                        }
 
                     Spacer()
                 }
@@ -469,7 +474,6 @@ extension HomeView {
                                         )
                                     } else {
                                         intent.selectScore(score)
-                                        intent.onAppear(score)
                                     }
                                 },
                                 playButtonAction: {
@@ -488,6 +492,7 @@ extension HomeView {
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score, context: context)
+                                    intent.selectLastScore(model.sortedScores)
                                 }
                             )
                             .padding(.bottom, isSelected ? 60.0 : .zero)
