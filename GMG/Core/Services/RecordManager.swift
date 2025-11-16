@@ -98,7 +98,6 @@ final class RecordManager {
         let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
 
         try audioSession.setActive(false)
-
     }
 
     private func updateRecordedDuration() {

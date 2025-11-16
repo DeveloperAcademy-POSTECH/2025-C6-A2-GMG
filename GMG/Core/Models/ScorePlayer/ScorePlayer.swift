@@ -30,6 +30,8 @@ final class ScorePlayer {
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
     private var playheadPublisherTimer: AnyCancellable?
 
+    private var routeChangeObserver: NSObjectProtocol?
+
     init(score: Score) {
         self.score = score
 
@@ -56,10 +58,14 @@ final class ScorePlayer {
             )
         )
         self.playheadPublisherTimer = nil
+
+        self.routeChangeObserver = nil
     }
 
     /// onAppear 시 실행될 메서드
     func prepareToPlay() throws {
+        try activateAudioSession()
+
         engine.attach(sampler)
         engine.connect(sampler, to: engine.mainMixerNode, format: nil)
 
@@ -100,12 +106,29 @@ final class ScorePlayer {
                 )
             )
         }
+
+        routeChangeObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            try? self?.activateAudioSession()
+
+            try? self?.engine.start()
+        }
     }
 
     /// onDisappear 시 실행될 메서드
     func cleanupAfterPlay() {
+        try? deactivateAudioSession()
+
         playheadPublisherTimer?.cancel()
         playheadPublisherTimer = nil
+
+        if let observer = routeChangeObserver {
+            NotificationCenter.default.removeObserver(observer)
+            routeChangeObserver = nil
+        }
 
         engine.stop()
     }
@@ -294,6 +317,23 @@ final class ScorePlayer {
             at: nil,
             completionHandler: nil
         )
+    }
+
+    private func activateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setCategory(
+            .playback,
+            mode: .default,
+            options: []
+        )
+        try audioSession.setActive(true)
+    }
+
+    private func deactivateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setActive(false)
     }
 
     private func currentPlaybackTime() -> TimeInterval {
