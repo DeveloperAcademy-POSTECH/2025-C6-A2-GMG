@@ -43,9 +43,9 @@ final class ScoreFactory {
     }
 
     func createScore(
-        audioUrl: URL
+        audioURL: URL
     ) throws -> Score {
-        let audioFileName: String = audioUrl.lastPathComponent
+        let audioFileName: String = audioURL.lastPathComponent
 
         if FileManager.default.fileExists(atPath: Score.recordingFolder.path()) == false {
             try FileManager.default.createDirectory(
@@ -54,14 +54,14 @@ final class ScoreFactory {
             )
         }
 
-        let workingURL: URL = Score.recordingFolder
+        let copiedAudioURL: URL = Score.recordingFolder
             .appending(component: audioFileName)
 
-        try FileManager.default.copyItem(at: audioUrl, to: workingURL)
+        try FileManager.default.copyItem(at: audioURL, to: copiedAudioURL)
 
         scoreFactoryStatePublisher.send(.hummingAnalysis)
 
-        let notes: [Note] = try self.convertAudioToNotes(audioUrl: workingURL)
+        let notes: [Note] = try self.convertAudioToNotes(audioURL: copiedAudioURL)
 
         scoreFactoryStatePublisher.send(.chordGeneration)
 
@@ -76,7 +76,7 @@ final class ScoreFactory {
 
         let mergedChordCells: [ChordCell] = mergeConsecutiveChordCells(chordCells)
 
-        let file: AVAudioFile = try AVAudioFile(forReading: workingURL)
+        let file: AVAudioFile = try AVAudioFile(forReading: copiedAudioURL)
         let totalDuration: TimeInterval =
             TimeInterval(file.length) / file.fileFormat.sampleRate
 
@@ -102,7 +102,7 @@ final class ScoreFactory {
         return Score(
             title: "Untitled",
             key: key,
-            audioFileName: audioFileName,
+            audioURL: copiedAudioURL,
             totalDuration: totalDuration,
             createdAt: Date(),
             updatedAt: Date(),
@@ -112,19 +112,19 @@ final class ScoreFactory {
         )
     }
 
-    private func convertAudioToNotes(audioUrl: URL) throws -> [Note] {
+    private func convertAudioToNotes(audioURL: URL) throws -> [Note] {
         guard
-            let modelUrl: URL = Bundle.main.url(
+            let modelURL: URL = Bundle.main.url(
                 forResource: "SwiftF0",
                 withExtension: "onnx"
             )
         else { throw ScoreFactoryError.pitchDetectModelNotFound }
 
         let pitchDetector: SwiftF0Detector = try SwiftF0Detector(
-            modelUrl: modelUrl
+            modelUrl: modelURL
         )
         let pitchResults: [PitchResult] = try pitchDetector.detect(
-            url: audioUrl
+            url: audioURL
         )
 
         let swiftF0Notes: [SwiftF0.Note] = NoteConverter.convert(pitchResults)

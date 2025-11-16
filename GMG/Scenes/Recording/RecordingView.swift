@@ -40,7 +40,7 @@ struct RecordingView: View {
                 Spacer()
 
                 Controller(
-                    recordingUrl: model.recordingURL,
+                    recordingURL: model.recordingURL,
                     isRecording: model.isRecording,
                     isPlaying: model.isPlaying,
                     recordAction: intent.onTapRecordButton,
@@ -239,7 +239,7 @@ struct RecordingView: View {
     }
 
     struct Controller: View {
-        let recordingUrl: URL?
+        let recordingURL: URL?
         let isRecording: Bool
         let isPlaying: Bool
         let recordAction: () -> Void
@@ -254,7 +254,7 @@ struct RecordingView: View {
                 return String(localized: .stop)
             } else if isPlaying {
                 return String(localized: .stop)
-            } else if recordingUrl != nil {
+            } else if recordingURL != nil {
                 return String(localized: .replay)
             }
             return String(localized: .record)
@@ -265,7 +265,7 @@ struct RecordingView: View {
                 return .stop
             } else if isPlaying {
                 return .stop
-            } else if recordingUrl != nil {
+            } else if recordingURL != nil {
                 return .play
             }
             return .record
@@ -276,7 +276,7 @@ struct RecordingView: View {
                 return stopRecordAction
             } else if isPlaying {
                 return stopPlayAction
-            } else if recordingUrl != nil {
+            } else if recordingURL != nil {
                 return playAction
             }
             return recordAction
@@ -285,7 +285,7 @@ struct RecordingView: View {
         var body: some View {
             Grid {
                 GridRow {
-                    if recordingUrl != nil {
+                    if recordingURL != nil {
                         ControllerButton {
                             resetAction()
                         } label: {
@@ -315,7 +315,7 @@ struct RecordingView: View {
                     }
                     .gridCellColumns(2)
 
-                    if recordingUrl != nil {
+                    if recordingURL != nil {
                         ControllerButton {
                             nextAction()
                         } label: {
@@ -337,7 +337,7 @@ struct RecordingView: View {
             .padding()
             .frame(maxWidth: .infinity, maxHeight: 140)
             .compatibleGlassEffect(in: RoundedRectangle(cornerRadius: 18))
-            .animation(.default, value: recordingUrl)
+            .animation(.default, value: recordingURL)
         }
     }
 }
