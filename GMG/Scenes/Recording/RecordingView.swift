@@ -128,7 +128,7 @@ struct RecordingView: View {
                     Button {
                         skipAction()
                     } label: {
-                        Text("Skip")
+                        Text(.skip)
                             .font(Typography.WantedSansStd.R6)
                             .underline()
                             .foregroundStyle(Color.white1)
@@ -251,13 +251,13 @@ struct RecordingView: View {
 
         private var primaryButtonTitle: String {
             if isRecording {
-                return "Stop"
+                return String(localized: .stop)
             } else if isPlaying {
-                return "Stop"
+                return String(localized: .stop)
             } else if recordingUrl != nil {
-                return "Play"
+                return String(localized: .replay)
             }
-            return "Record"
+            return String(localized: .record)
         }
 
         private var primaryButtonImage: ImageResource {
@@ -292,7 +292,7 @@ struct RecordingView: View {
                             VStack(spacing: Spacing.xs) {
                                 Image(.reset)
                                     .renderingMode(.template)
-                                Text("Reset")
+                                Text(.reset)
                                     .font(Typography.WantedSansStd.M2)
                             }
                         }
@@ -322,7 +322,7 @@ struct RecordingView: View {
                             VStack(spacing: Spacing.xs) {
                                 Image(.next)
                                     .renderingMode(.template)
-                                Text("Next")
+                                Text(.next)
                                     .font(Typography.WantedSansStd.M2)
                             }
                         }
