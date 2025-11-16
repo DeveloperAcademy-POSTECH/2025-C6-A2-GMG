@@ -174,7 +174,7 @@ extension Waveform {
 
         var body: some View {
             HStack(alignment: .center, spacing: capsuleSpacing) {
-                ForEach(amplitudes.enumerated(), id: \.offset) { (index, amplitude) in
+                ForEach(Array(amplitudes.enumerated()), id: \.offset) { (index, amplitude) in
                     Capsule()
                         .fill(color)
                         .frame(
