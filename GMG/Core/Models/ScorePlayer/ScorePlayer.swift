@@ -25,6 +25,8 @@ final class ScorePlayer {
     private var sampleRate: Double
     private var totalFrames: AVAudioFramePosition
 
+    private var chordPlayTask: Task<Void, Never>?
+
     let playerMutedPublisher: CurrentValueSubject<Bool, Never>
 
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
@@ -46,6 +48,8 @@ final class ScorePlayer {
 
         self.sampleRate = 48_000
         self.totalFrames = .zero
+
+        self.chordPlayTask = nil
 
         self.playerMutedPublisher = CurrentValueSubject<Bool, Never>(false)
 
@@ -163,15 +167,41 @@ final class ScorePlayer {
     }
 
     func play(chord: Chord) {
-        let tonicChord: Tonic.Chord = chord.tonicChord
-        let midiNotes: [Int8] = tonicChord.midiNoteNumbers
+        chordPlayTask?.cancel()
 
-        for midiNote in midiNotes {
-            sampler.startNote(
-                UInt8(midiNote),
-                withVelocity: 100,
-                onChannel: .zero
-            )
+        chordPlayTask = Task {
+            let tonicChord: Tonic.Chord = chord.tonicChord
+            let midiNotes: [Int8] = tonicChord.midiNoteNumbers
+
+            midiNotes.forEach { midiNote in
+                sampler.startNote(
+                    UInt8(midiNote),
+                    withVelocity: 100,
+                    onChannel: .zero
+                )
+            }
+
+            await withTaskCancellationHandler {
+                try? await Task.sleep(for: .seconds(1))
+            } onCancel: {
+                Task { @MainActor in
+                    midiNotes.forEach { midiNote in
+                        sampler.stopNote(
+                            UInt8(midiNote),
+                            onChannel: .zero
+                        )
+                    }
+                }
+            }
+
+            guard !Task.isCancelled else { return }
+
+            midiNotes.forEach { midiNote in
+                sampler.stopNote(
+                    UInt8(midiNote),
+                    onChannel: .zero
+                )
+            }
         }
     }
 
@@ -263,14 +293,14 @@ final class ScorePlayer {
     private func loadSoundBank() throws {
         guard
             let url: URL = Bundle.main.url(
-                forResource: "8MBGMSFX",
+                forResource: "8MBGMSFX_EP1_Loop",
                 withExtension: "sf2"
             )
         else { throw ScorePlayerError.soundBankNotFound }
 
         try sampler.loadSoundBankInstrument(
             at: url,
-            program: .zero,
+            program: 4,
             bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
             bankLSB: UInt8(kAUSampler_DefaultBankLSB)
         )
