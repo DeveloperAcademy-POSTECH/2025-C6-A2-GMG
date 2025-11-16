@@ -15,4 +15,5 @@ extension ChordCell {
 }
 
 extension ChordCell: Codable {}
+
 extension ChordCell: Hashable {}

@@ -4,17 +4,18 @@ import SwiftData
 import SwiftUI
 
 struct HomeView: View {
-    @Environment(\.modelContext) private var context
-    @Environment(Router.self) private var router: Router
-
     @State private var model: HomeModelStateProtocol
     @State private var intent: HomeIntentProtocol
+    private weak var router: Router?
 
-    init() {
-        let model: HomeModel = HomeModel()
-
+    init(
+        model: HomeModelStateProtocol,
+        intent: HomeIntentProtocol,
+        router: Router? = nil
+    ) {
         self.model = model
-        self.intent = HomeIntent(model: model)
+        self.intent = intent
+        self.router = router
     }
 
     var body: some View {
@@ -25,14 +26,14 @@ struct HomeView: View {
                     .safeAreaPadding()
                 ScrollView {
                     LazyVStack(spacing: Spacing.xl) {
-                        RecentFileSection(model: model, intent: intent)
-                        AllFilesSection(model: model, intent: intent)
+                        RecentFileSection(model: model, intent: intent, router: router)
+                        AllFilesSection(model: model, intent: intent, router: router)
                     }
                     .safeAreaPadding()
                 }
                 .scrollIndicators(.hidden)
                 .task {
-                    intent.loadScores(context)
+                    intent.onAppear()
                 }
             }
         }
@@ -278,11 +279,9 @@ extension HomeView {
 
     //MARK: - recentFileSection
     struct RecentFileSection: View {
-        @Environment(\.modelContext) private var context
-        @Environment(Router.self) private var router: Router
-
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
+        let router: Router?
 
         var body: some View {
             VStack(spacing: Spacing.md) {
@@ -297,14 +296,14 @@ extension HomeView {
                     LazyHStack(spacing: Spacing.md) {
                         AddScoreButton(
                             action: {
-                                router.push(.recording)
+                                router?.push(.recording)
                             },
                             isExpanded: model.isScoresEmpty
                         )
 
                         ForEach(
                             Array(model.recentScores.prefix(3).enumerated()),
-                            id: \.element.persistentModelID
+                            id: \.element.id
                         ) { (index, score) in
                             let isSelected = model.selectedScore == score
                             let isPlayingForThisScore = isSelected && model.playhead.isPlaying
@@ -321,8 +320,8 @@ extension HomeView {
                                 isPlaying: isPlayingForThisScore,
                                 progress: progressForThisScore,
                                 tapAction: {
-                                    intent.onTapScore(score, context: context)
-                                    router.push(
+                                    intent.onTapScore(score)
+                                    router?.push(
                                         .chordProgress(score: score)
                                     )
                                 },
@@ -338,10 +337,10 @@ extension HomeView {
                                     intent.renameScore(score, newTitle: newTitle)
                                 },
                                 exportScoreAction: { score in
-                                    router.push(.export)
+                                    router?.push(.export)
                                 },
                                 deleteScoreAction: { score in
-                                    intent.deleteScore(score, context: context)
+                                    intent.deleteScore(score)
                                 }
                             )
                         }
@@ -374,11 +373,9 @@ extension HomeView {
 
     //MARK: - AllFilesSection
     struct AllFilesSection: View {
-        @Environment(\.modelContext) private var context
-        @Environment(Router.self) private var router: Router
-
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
+        let router: Router?
 
         var body: some View {
             VStack(spacing: Spacing.md) {
@@ -430,10 +427,10 @@ extension HomeView {
                     VStack(spacing: -82) {
                         ForEach(
                             Array(model.sortedScores.enumerated()),
-                            id: \.element.persistentModelID
+                            id: \.element.id
                         ) { (index, score) in
                             let isSelected: Bool =
-                                model.selectedScore == score
+                                model.selectedScore?.id == score.id
                             let isPlayingForThisScore = isSelected && model.playhead.isPlaying
                             let progressForThisScore =
                                 (isSelected && score.totalDuration > 0)
@@ -450,13 +447,12 @@ extension HomeView {
                                 progress: progressForThisScore,
                                 tapAction: {
                                     if isSelected {
-                                        intent.onTapScore(score, context: context)
-                                        router.push(
+                                        intent.onTapScore(score)
+                                        router?.push(
                                             .chordProgress(score: score)
                                         )
                                     } else {
                                         intent.selectScore(score)
-                                        intent.onAppear(score)
                                     }
                                 },
                                 playButtonAction: {
@@ -471,10 +467,10 @@ extension HomeView {
                                     intent.renameScore(score, newTitle: newTitle)
                                 },
                                 exportScoreAction: { score in
-                                    router.push(.export)
+                                    router?.push(.export)
                                 },
                                 deleteScoreAction: { score in
-                                    intent.deleteScore(score, context: context)
+                                    intent.deleteScore(score)
                                 }
                             )
                             .padding(.bottom, isSelected ? 60.0 : .zero)
@@ -490,6 +486,8 @@ extension HomeView {
 
 }
 
-#Preview(traits: .routerModifier) {
-    HomeView()
+#Preview {
+    PreviewContainer { router in
+        router.view(.home)
+    }
 }

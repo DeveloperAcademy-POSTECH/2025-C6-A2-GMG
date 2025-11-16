@@ -23,6 +23,8 @@ protocol RecordingIntentProtocol {
 final class RecordingIntent: RecordingIntentProtocol {
     private weak var model: RecordingModelActionProtocol?
 
+    private let scoreRepository: ScoreRepository
+
     private let recordManager: RecordManager
     private let playbackManager: PlaybackManager
 
@@ -33,8 +35,13 @@ final class RecordingIntent: RecordingIntentProtocol {
     private var countdownTask: Task<Void, Never>?
     private var scoreCreationTask: Task<Void, Never>?
 
-    init(model: RecordingModelActionProtocol) {
+    init(
+        model: RecordingModelActionProtocol,
+        scoreRepository: ScoreRepository
+    ) {
         self.model = model
+
+        self.scoreRepository = scoreRepository
 
         self.recordManager = RecordManager()
         self.playbackManager = PlaybackManager()
@@ -231,6 +238,8 @@ final class RecordingIntent: RecordingIntentProtocol {
                         }
                     }
                 }
+
+                try self.scoreRepository.insert(score)
 
                 try? await Task.sleep(for: .seconds(0.5))
 
