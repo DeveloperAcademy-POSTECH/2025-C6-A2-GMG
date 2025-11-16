@@ -29,7 +29,7 @@ struct LoadingView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     ForEach(ScoreFactoryState.allCases, id: \.self) { state in
-                        LoadingStateRow(text: state.description)
+                        LoadingStateRow(text: String(localized: state.localizedStringResource))
                             .disabled(scoreFactoryState.rawValue < state.rawValue)
                     }
                 }

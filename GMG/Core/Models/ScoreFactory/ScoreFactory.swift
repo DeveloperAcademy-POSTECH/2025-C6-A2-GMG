@@ -10,7 +10,9 @@ enum ScoreFactoryError: Error {
     case failedToChordInference
 }
 
-enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible {
+enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible,
+    CustomLocalizedStringResourceConvertible
+{
     case hummingAnalysis
     case chordGeneration
     case sheetMusicExtraction
@@ -20,6 +22,14 @@ enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible {
         case .hummingAnalysis: return "Humming analysis in progress."
         case .chordGeneration: return "AI is generating chords."
         case .sheetMusicExtraction: return "Sheet music extraction in progress."
+        }
+    }
+
+    var localizedStringResource: LocalizedStringResource {
+        switch self {
+        case .hummingAnalysis: return .scoreFactoryState1
+        case .chordGeneration: return .scoreFactoryState2
+        case .sheetMusicExtraction: return .scoreFactoryState3
         }
     }
 }

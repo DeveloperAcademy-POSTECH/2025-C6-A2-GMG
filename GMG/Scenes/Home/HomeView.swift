@@ -65,7 +65,7 @@ extension HomeView {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
                     TextField(
-                        "Enter Score Title",
+                        .enterTitle,
                         text: isEditable ? $tempTitle : .constant(score.title)
                     )
                     .font(Typography.WantedSansStd.R4)
@@ -97,15 +97,15 @@ extension HomeView {
                 VStack(alignment: .trailing, spacing: .zero) {
 
                     Menu {
-                        Button("Rename", systemImage: "pencil") {
+                        Button(.rename, systemImage: "pencil") {
                             startRename()
                         }
 
-                        Button("Export", systemImage: "square.and.arrow.up") {
+                        Button(.export, systemImage: "square.and.arrow.up") {
                             exportScoreAction(score)
                         }
 
-                        Button("Delete", systemImage: "trash", role: .destructive) {
+                        Button(.delete, systemImage: "trash", role: .destructive) {
                             deleteScoreAction(score)
                         }
                     } label: {
@@ -266,7 +266,7 @@ extension HomeView {
         }
 
         private var unitString: AttributedString {
-            var string: AttributedString = AttributedString("songs")
+            var string: AttributedString = AttributedString(String(localized: .songs))
             string.font = Typography.WantedSansStd.R7.font
             return string
         }
@@ -286,7 +286,7 @@ extension HomeView {
         var body: some View {
             VStack(spacing: Spacing.md) {
                 HStack {
-                    Text("Recent Files")
+                    Text(.recentFiles)
                         .font(Typography.WantedSansStd.R7)
                         .foregroundStyle(Color.black1)
                     Spacer()
@@ -380,12 +380,12 @@ extension HomeView {
         var body: some View {
             VStack(spacing: Spacing.md) {
                 HStack(alignment: .lastTextBaseline, spacing: 0) {
-                    Text("All Files")
+                    Text(.allFiles)
                         .font(Typography.WantedSansStd.R7)
                         .foregroundStyle(Color.black1)
                         .padding(.trailing, 20)
 
-                    Text("Latest")
+                    Text(.latest)
                         .font(Typography.WantedSansStd.R5)
                         .foregroundStyle(
                             model.isLatest ? Color.black5 : Color.black3
@@ -393,7 +393,7 @@ extension HomeView {
                         .padding(.trailing, 12)
                         .onTapGesture { if model.isLatest == false { intent.setIsLatest(true) } }
 
-                    Text("Earliest")
+                    Text(.earliest)
                         .font(Typography.WantedSansStd.R5)
                         .foregroundStyle(
                             model.isLatest ? Color.black3 : Color.black5
