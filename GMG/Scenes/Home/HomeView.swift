@@ -71,7 +71,7 @@ extension HomeView {
                         "Enter Score Title",
                         text: isEditable ? $tempTitle : .constant(score.title)
                     )
-                    .font(Typography.WantedSansStd.R4)
+                    .font(isSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5)
                     .foregroundStyle(Color.white1)
                     .autocorrectionDisabled()
                     .focused($isTitleFocused)
