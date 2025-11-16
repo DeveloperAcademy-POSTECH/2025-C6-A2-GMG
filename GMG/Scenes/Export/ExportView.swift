@@ -32,7 +32,7 @@ struct ExportView: View {
                 )
                 Spacer()
             }
-            .navigationBar(leading: {}, trailing: {})
+            .navigationBar(leading: {}, center: {}, trailing: {})
         }
         .sheet(
             isPresented: Binding(

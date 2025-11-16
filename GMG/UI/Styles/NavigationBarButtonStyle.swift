@@ -5,7 +5,7 @@ import SwiftUI
 struct NavigationBarButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .frame(width: 24, height: 24)
+            .frame(minWidth: 44, minHeight: 44)
             .scaleEffect(configuration.isPressed ? 1.1 : 1.0)
     }
 }

@@ -20,18 +20,20 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
-
-            ScrollView {
-                LazyVStack(spacing: Spacing.xl) {
-                    HeaderSection(count: model.songCount)
-                    RecentFileSection(model: model, intent: intent)
-                    AllFilesSection(model: model, intent: intent)
+            VStack {
+                HeaderSection(count: model.songCount)
+                    .safeAreaPadding()
+                ScrollView {
+                    LazyVStack(spacing: Spacing.xl) {
+                        RecentFileSection(model: model, intent: intent)
+                        AllFilesSection(model: model, intent: intent)
+                    }
+                    .safeAreaPadding()
                 }
-                .safeAreaPadding()
-            }
-            .scrollIndicators(.hidden)
-            .task {
-                intent.loadScores(context)
+                .scrollIndicators(.hidden)
+                .task {
+                    intent.loadScores(context)
+                }
             }
         }
     }
@@ -48,7 +50,12 @@ extension HomeView {
         let score: Score
         let index: Int
         let isSmall: Bool
+        let isLatest: Bool
+        let isSelected: Bool
+        let isPlaying: Bool
+        let progress: Double
         let tapAction: () -> Void
+        let playButtonAction: () -> Void
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
@@ -97,34 +104,53 @@ extension HomeView {
                             exportScoreAction(score)
                         }
 
-                        Button("Delete", systemImage: "trash") {
+                        Button("Delete", systemImage: "trash", role: .destructive) {
                             deleteScoreAction(score)
                         }
                     } label: {
                         Image(systemName: "ellipsis")
                             .foregroundStyle(Color.white1)
+                            .frame(width: 30, height: 30, alignment: .top)
+                            .contentShape(Rectangle())
                     }
                     .menuIndicator(.hidden)
-
-                    Spacer()
 
                     Text(Self.formatDuration(score.totalDuration))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
                         .padding(.bottom, 9.5)
                         .padding(.trailing, 1)
+                        .padding(.top, -6)
 
                     Button {
-                        // TODO: 오디오 재생 기능
+                        playButtonAction()
                     } label: {
-                        Image(systemName: "play.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .padding(.leading, 2)
-                            .foregroundStyle(Color.black1)
-                            .padding(Spacing.xs)
-                            .background(Color.white2, in: Circle())
+                        ZStack {
+                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 10, height: 10)
+                                .padding(.leading, isPlaying ? 0 : 2)
+                                .foregroundStyle(Color.black1)
+                                .padding(Spacing.xs)
+                                .background(Color.white2, in: Circle())
+
+                            Circle()
+                                .stroke(Color.gray.opacity(0.25), lineWidth: 3)
+                                .frame(width: 24, height: 24)
+                                .opacity(isSelected && (isPlaying || progress > 0) ? 1 : 0)
+
+                            Circle()
+                                .trim(from: 0, to: progress)
+                                .stroke(
+                                    Color.bg2,
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                                )
+                                .rotationEffect(.degrees(-90))
+                                .frame(width: 24, height: 24)
+                                .opacity(isSelected && (isPlaying || progress > 0) ? 1 : 0)
+                        }
+                        .opacity(isSelected ? 1 : 0)
                     }
                     .buttonStyle(.plain)
                 }
@@ -137,7 +163,7 @@ extension HomeView {
                 maxHeight: 128
             )
             .background(
-                backgroundColor,
+                isLatest ? latestBackgroundColor : earliestBackgroundColor,
                 in: RoundedRectangle(cornerRadius: 32)
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
@@ -172,8 +198,12 @@ extension HomeView {
         }
 
         // MARK: - Color Helpers
-        private var backgroundColor: Color {
+        private var latestBackgroundColor: Color {
             let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
+            return palette[index % palette.count]
+        }
+        private var earliestBackgroundColor: Color {
+            let palette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
             return palette[index % palette.count]
         }
 
@@ -276,21 +306,44 @@ extension HomeView {
                             Array(model.recentScores.prefix(3).enumerated()),
                             id: \.element.persistentModelID
                         ) { (index, score) in
+                            let isSelected = model.selectedScore == score
+                            let isPlayingForThisScore = isSelected && model.playhead.isPlaying
+                            let progressForThisScore =
+                                (isSelected && score.totalDuration > 0)
+                                ? model.playhead.elapsedTime / score.totalDuration
+                                : 0
                             ScoreCard(
                                 score: score,
                                 index: index,
-                                isSmall: true
-                            ) {
-                                router.push(
-                                    .chordProgress(score: score)
-                                )
-                            } renameScoreAction: { newTitle in
-                                intent.renameScore(score, newTitle: newTitle)
-                            } exportScoreAction: { score in
-                                router.push(.export(score: model.selectedScore!))
-                            } deleteScoreAction: { score in
-                                intent.deleteScore(score, context: context)
-                            }
+                                isSmall: true,
+                                isLatest: model.isLatest,
+                                isSelected: true,
+                                isPlaying: isPlayingForThisScore,
+                                progress: progressForThisScore,
+                                tapAction: {
+                                    intent.onTapScore(score, context: context)
+                                    router.push(
+                                        .chordProgress(score: score)
+                                    )
+                                },
+                                playButtonAction: {
+                                    if isSelected && model.playhead.isPlaying {
+                                        intent.onTapStopButton()
+                                    } else {
+                                        intent.onTapPlayButton(
+                                            score: score, selectedScore: model.selectedScore)
+                                    }
+                                },
+                                renameScoreAction: { newTitle in
+                                    intent.renameScore(score, newTitle: newTitle)
+                                },
+                                exportScoreAction: { score in
+                                    router.push(.export)
+                                },
+                                deleteScoreAction: { score in
+                                    intent.deleteScore(score, context: context)
+                                }
+                            )
                         }
                     }
                 }
@@ -319,6 +372,7 @@ extension HomeView {
         }
     }
 
+    //MARK: - AllFilesSection
     struct AllFilesSection: View {
         @Environment(\.modelContext) private var context
         @Environment(Router.self) private var router: Router
@@ -380,29 +434,53 @@ extension HomeView {
                         ) { (index, score) in
                             let isSelected: Bool =
                                 model.selectedScore == score
+                            let isPlayingForThisScore = isSelected && model.playhead.isPlaying
+                            let progressForThisScore =
+                                (isSelected && score.totalDuration > 0)
+                                ? model.playhead.elapsedTime / score.totalDuration
+                                : 0
 
                             ScoreCard(
                                 score: score,
                                 index: index,
-                                isSmall: false
-                            ) {
-                                if isSelected {
-                                    router.push(
-                                        .chordProgress(score: score)
-                                    )
-                                } else {
-                                    intent.selectScore(score)
+                                isSmall: false,
+                                isLatest: model.isLatest,
+                                isSelected: isSelected,
+                                isPlaying: isPlayingForThisScore,
+                                progress: progressForThisScore,
+                                tapAction: {
+                                    if isSelected {
+                                        intent.onTapScore(score, context: context)
+                                        router.push(
+                                            .chordProgress(score: score)
+                                        )
+                                    } else {
+                                        intent.selectScore(score)
+                                        intent.onAppear(score)
+                                    }
+                                },
+                                playButtonAction: {
+                                    if isSelected && model.playhead.isPlaying {
+                                        intent.onTapStopButton()
+                                    } else {
+                                        intent.onTapPlayButton(
+                                            score: score, selectedScore: model.selectedScore)
+                                    }
+                                },
+                                renameScoreAction: { newTitle in
+                                    intent.renameScore(score, newTitle: newTitle)
+                                },
+                                exportScoreAction: { score in
+                                    router.push(.export)
+                                },
+                                deleteScoreAction: { score in
+                                    intent.deleteScore(score, context: context)
                                 }
-                            } renameScoreAction: { newTitle in
-                                intent.renameScore(score, newTitle: newTitle)
-                            } exportScoreAction: { score in
-                                router.push(.export(score: model.selectedScore!))
-                            } deleteScoreAction: { score in
-                                intent.deleteScore(score, context: context)
-                            }
+                            )
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
                     }
+                    .animation(.smooth, value: model.sortedScores)
                     .animation(.default, value: model.selectedScore)
                 }
             }
