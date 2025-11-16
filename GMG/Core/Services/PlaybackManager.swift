@@ -26,6 +26,8 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
     }
 
     func play(_ url: URL) throws {
+        try activateAudioSession()
+
         do {
             let audioPlayer: AVAudioPlayer = try AVAudioPlayer(contentsOf: url)
 
@@ -57,6 +59,8 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
     }
 
     func stop() {
+        try? deactivateAudioSession()
+
         guard let audioPlayer else { return }
 
         audioPlayer.stop()
@@ -66,6 +70,23 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
 
         self.isPlayingPublisher.send(audioPlayer.isPlaying)
         self.playedDurationPublisher.send(audioPlayer.duration)
+    }
+
+    private func activateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setCategory(
+            .playback,
+            mode: .default,
+            options: []
+        )
+        try audioSession.setActive(true)
+    }
+
+    private func deactivateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setActive(false)
     }
 
     private func updateMeter() {
