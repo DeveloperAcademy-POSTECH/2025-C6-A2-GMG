@@ -104,11 +104,11 @@ final class ChordProgressModel:
         score.updateChordCellBy(cellIndex: cellIndex, chord: selectedCandidate)
         updateSelectedCell(at: cellIndex)
     }
-    
+
     func updateTitle(_ title: String) {
         score.updateTitle(title)
     }
-    
+
     func setUndoManager(_ undoManager: UndoManager?) {
         self.undoManager = undoManager
     }
@@ -137,6 +137,7 @@ final class ChordProgressModel:
         guard let undoManager else { return }
 
         undoManager.registerUndo(withTarget: self) { target in
+            // TODO: UndoManager를 ChordProgressIntent로 이동
             target.score.updateChordCellBy(cellIndex: cellIndex, chord: previousChord)
             target.updateSelectedCell(at: cellIndex)
             target.registerUndoRedoHandlers(

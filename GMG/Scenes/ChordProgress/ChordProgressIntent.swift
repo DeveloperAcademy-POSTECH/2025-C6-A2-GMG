@@ -27,14 +27,21 @@ protocol ChordProgressIntentProtocol {
 final class ChordProgressIntent: ChordProgressIntentProtocol {
     private weak var model: ChordProgressModelActionProtocol?
 
+    private let scoreRepository: ScoreRepository
+
     private var scorePlayer: ScorePlayer?
 
     private var cancellables: Set<AnyCancellable>
 
     private var creatingScoreTask: Task<Void, Never>?
 
-    init(model: ChordProgressModelActionProtocol) {
+    init(
+        model: ChordProgressModelActionProtocol,
+        scoreRepository: ScoreRepository
+    ) {
         self.model = model
+
+        self.scoreRepository = scoreRepository
 
         self.scorePlayer = nil
 

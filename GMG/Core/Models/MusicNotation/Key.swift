@@ -11,3 +11,5 @@ extension Key: CustomStringConvertible {
 }
 
 extension Key: Codable {}
+
+extension Key: Hashable {}

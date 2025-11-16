@@ -47,3 +47,5 @@ extension NoteName: CustomStringConvertible {
 }
 
 extension NoteName: Codable {}
+
+extension NoteName: Hashable {}
