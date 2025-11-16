@@ -4,17 +4,18 @@ import SwiftData
 import SwiftUI
 
 struct RecordingView: View {
-    @Environment(\.modelContext) private var context
-    @Environment(Router.self) private var router: Router
-
     @State private var model: RecordingModelStateProtocol
     @State private var intent: RecordingIntentProtocol
+    private weak var router: Router?
 
-    init() {
-        let model: RecordingModel = RecordingModel()
-
+    init(
+        model: RecordingModelStateProtocol,
+        intent: RecordingIntentProtocol,
+        router: Router? = nil
+    ) {
         self.model = model
-        self.intent = RecordingIntent(model: model)
+        self.intent = intent
+        self.router = router
     }
 
     var body: some View {
@@ -57,11 +58,9 @@ struct RecordingView: View {
                         intent.onTapNextButton(url) {
                             guard let score = model.score else { return }
 
-                            context.insert(score)
+                            router?.popToRoot()
 
-                            router.popToRoot()
-
-                            router.push(.chordProgress(score: score))
+                            router?.push(.chordProgress(score: score))
                         }
                     },
                 )
@@ -343,6 +342,8 @@ struct RecordingView: View {
     }
 }
 
-#Preview(traits: .routerModifier) {
-    RecordingView()
+#Preview {
+    PreviewContainer { router in
+        router.view(.recording)
+    }
 }

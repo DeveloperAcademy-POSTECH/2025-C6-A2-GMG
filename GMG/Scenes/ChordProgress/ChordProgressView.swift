@@ -3,17 +3,20 @@
 import SwiftUI
 
 struct ChordProgressView: View {
-    @Environment(Router.self) private var router: Router
     @Environment(\.undoManager) private var undoManager
 
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
+    private weak var router: Router?
 
-    init(score: Score) {
-        let model: ChordProgressModel = ChordProgressModel(score: score)
-
+    init(
+        model: ChordProgressModelStateProtocol,
+        intent: ChordProgressIntentProtocol,
+        router: Router?
+    ) {
         self.model = model
-        self.intent = ChordProgressIntent(model: model)
+        self.intent = intent
+        self.router = router
     }
 
     var body: some View {
@@ -73,7 +76,7 @@ struct ChordProgressView: View {
                 },
                 trailing: {
                     Button {
-                        router.push(.export)
+                        router?.push(.export)
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
@@ -846,8 +849,8 @@ extension ChordProgressView {
     }
 }
 
-#Preview(traits: .routerModifier) {
-    NavigationStack {
-        ChordProgressView(score: .mock)
+#Preview {
+    PreviewContainer { router in
+        router.view(.chordProgress(score: .mock))
     }
 }

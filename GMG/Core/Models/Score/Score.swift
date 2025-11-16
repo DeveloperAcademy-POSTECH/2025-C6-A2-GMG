@@ -1,27 +1,26 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
-import SwiftData
 internal import UniformTypeIdentifiers
 
-@Model
 class Score {
-    var id: UUID = UUID()
-    var title: String
-    var key: Key
-    var audioFileName: String
+    private(set) var id: UUID
+    private(set) var title: String
+    private(set) var key: Key
+    private(set) var audioFileName: String
     var audioUrl: URL {
         return Self.recordingFolder
             .appending(component: audioFileName)
     }
-    var totalDuration: TimeInterval
-    var createdAt: Date
-    var updatedAt: Date
-    var notes: [Note]
-    var chordCells: [ChordCell]
-    var audioLevels: [Float]  // 0.1s초 간격으로 audio의 amplitude 값이 저장
+    private(set) var totalDuration: TimeInterval
+    private(set) var createdAt: Date
+    private(set) var updatedAt: Date
+    private(set) var notes: [Note]
+    private(set) var chordCells: [ChordCell]
+    private(set) var audioLevels: [Float]  // 0.1s초 간격으로 audio의 amplitude 값이 저장
 
     init(
+        id: UUID = UUID(),
         title: String,
         key: Key,
         audioFileName: String,
@@ -32,6 +31,7 @@ class Score {
         chordCells: [ChordCell],  // 정렬되어 있어야 함
         audioLevels: [Float]
     ) {
+        self.id = id
         self.title = title
         self.key = key
         self.audioFileName = audioFileName
@@ -91,6 +91,41 @@ class Score {
 
     func updateTitle(_ title: String) {
         self.title = title
+    }
+
+    func updateAudioLevels(_ audioLevels: [Float]) {
+        self.audioLevels = audioLevels
+    }
+
+    func setUpdatedAt(_ updatedAt: Date) {
+        self.updatedAt = updatedAt
+    }
+}
+
+extension Score: Hashable {
+    static func == (lhs: Score, rhs: Score) -> Bool {
+        lhs.id == rhs.id
+            && lhs.title == rhs.title
+            && lhs.key == rhs.key
+            && lhs.audioFileName == rhs.audioFileName
+            && lhs.totalDuration == rhs.totalDuration
+            && lhs.createdAt == rhs.createdAt
+            && lhs.updatedAt == rhs.updatedAt
+            && lhs.notes == rhs.notes
+            && lhs.chordCells == rhs.chordCells
+            && lhs.audioLevels == rhs.audioLevels
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(key)
+        hasher.combine(audioFileName)
+        hasher.combine(totalDuration)
+        hasher.combine(createdAt)
+        hasher.combine(updatedAt)
+        hasher.combine(notes)
+        hasher.combine(chordCells)
     }
 }
 
