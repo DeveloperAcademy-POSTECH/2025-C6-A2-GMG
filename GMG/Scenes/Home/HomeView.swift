@@ -92,7 +92,7 @@ extension HomeView {
 
                     Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(Color.black6)
                 }
 
                 Spacer()
@@ -437,13 +437,13 @@ extension HomeView {
                 if model.songCount == 0 {
                     VStack(alignment: .leading, spacing: Spacing.xs) {
                         Text("An experience")
-                            .foregroundStyle(Color.white3.opacity(0.6))
+                            .foregroundStyle(Color.white3.opacity(0.55))
                         Text("where humming")
-                            .foregroundStyle(Color.black8.opacity(0.4))
+                            .foregroundStyle(Color.black8.opacity(0.3))
                         Text("becomes the")
-                            .foregroundStyle(Color.black4.opacity(0.4))
+                            .foregroundStyle(Color.black4.opacity(0.3))
                         Text("start of a song")
-                            .foregroundStyle(Color.black4.opacity(0.55))
+                            .foregroundStyle(Color.black4.opacity(0.35))
                     }
                     .font(
                         .custom(
