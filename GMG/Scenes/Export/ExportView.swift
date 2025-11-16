@@ -1,7 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import SwiftUI
-import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
@@ -26,20 +25,15 @@ struct ExportView: View {
                 Image(model.imageName)
                     .padding(.bottom, 69.5)
                 ExportButton(
-                    exportSheet: { intent.onTapExportSheet() },
-                    exportAudio: { intent.onTapExportAudio() }
+                    sheetURL: model.sheetURL,
+                    audioURL: model.audioURL
                 )
                 Spacer()
             }
             .navigationBar(leading: {}, center: {}, trailing: {})
         }
-        .sheet(
-            isPresented: Binding(
-                get: { model.isSharing },
-                set: { intent.onChangeSharing($0) }
-            )
-        ) {
-            ActivityView(activityItems: model.shareItems)
+        .onAppear {
+            intent.onAppear()
         }
     }
 }
@@ -100,59 +94,48 @@ extension ExportView {
     }
 
     struct ExportButton: View {
-        let exportSheet: () -> Void
-        let exportAudio: () -> Void
+        let sheetURL: URL?
+        let audioURL: URL?
 
         var body: some View {
             HStack(spacing: 19) {
-                Button(action: exportSheet) {
-                    HStack(spacing: 4) {
-                        Text("sheet")
-                            .font(Typography.WantedSansStd.M2)
-                            .foregroundStyle(Color.white1)
-                        Image("Export")
+
+                if let sheetURL {
+                    ShareLink(item: sheetURL) {
+                        HStack(spacing: 4) {
+                            Text("sheet")
+                                .font(Typography.WantedSansStd.M2)
+                                .foregroundStyle(Color.white1)
+                            Image("Export")
+                        }
+                        .padding(.vertical, 20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .foregroundStyle(Color.black1)
+                        )
                     }
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18)
-                            .foregroundStyle(Color.black1)
-                    )
                 }
 
-                Button(action: exportAudio) {
-                    HStack(spacing: 4) {
-                        Text("Audio")
-                            .font(Typography.WantedSansStd.M2)
-                            .foregroundStyle(Color.white1)
-                        Image("Export")
+                if let audioURL {
+                    ShareLink(item: audioURL) {
+                        HStack(spacing: 4) {
+                            Text("Audio")
+                                .font(Typography.WantedSansStd.M2)
+                                .foregroundStyle(Color.white1)
+                            Image("Export")
+                        }
+                        .padding(.vertical, 20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .foregroundStyle(Color.black1)
+                        )
                     }
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18)
-                            .foregroundStyle(Color.black1)
-                    )
                 }
             }
             .padding(.horizontal, 16)
         }
-    }
-
-    struct ActivityView: UIViewControllerRepresentable {
-        let activityItems: [Any]
-
-        func makeUIViewController(context: Context) -> UIActivityViewController {
-            UIActivityViewController(
-                activityItems: activityItems,
-                applicationActivities: nil
-            )
-        }
-
-        func updateUIViewController(
-            _ controller: UIActivityViewController,
-            context: Context
-        ) {}
     }
 }
 

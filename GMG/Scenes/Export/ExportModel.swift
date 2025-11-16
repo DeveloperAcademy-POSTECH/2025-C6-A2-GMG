@@ -3,18 +3,19 @@
 import Foundation
 
 protocol ExportModelStateProtocol {
-    var isSharing: Bool { get }
-    var shareItems: [Any] { get }
 
     var title: String { get }
     var keyDescription: String { get }
     var dateString: String { get }
     var imageName: String { get }
+
+    var sheetURL: URL? { get }
+    var audioURL: URL? { get }
 }
 
 protocol ExportModelActionProtocol: AnyObject {
-    func updateShareItems(_ items: [Any])
-    func updateSharing(_ isSharing: Bool)
+    func updateSheetURL(_ url: URL?)
+    func updateAudioURL(_ url: URL?)
 }
 
 @Observable
@@ -22,10 +23,11 @@ final class ExportModel:
     ExportModelStateProtocol,
     ExportModelActionProtocol
 {
-    private(set) var isSharing: Bool
-    private(set) var shareItems: [Any]
 
     private let score: Score
+
+    private(set) var sheetURL: URL?
+    private(set) var audioURL: URL?
 
     var title: String {
         score.title
@@ -45,16 +47,16 @@ final class ExportModel:
 
     init(score: Score) {
         self.score = score
-        self.isSharing = false
-        self.shareItems = []
+        self.sheetURL = nil
+        self.audioURL = nil
     }
 
-    func updateSharing(_ isSharing: Bool) {
-        self.isSharing = isSharing
+    func updateSheetURL(_ url: URL?) {
+        self.sheetURL = url
     }
 
-    func updateShareItems(_ items: [Any]) {
-        self.shareItems = items
+    func updateAudioURL(_ url: URL?) {
+        self.audioURL = url
     }
 }
 

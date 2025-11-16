@@ -3,9 +3,7 @@
 import Foundation
 
 protocol ExportIntentProtocol {
-    func onTapExportSheet()
-    func onTapExportAudio()
-    func onChangeSharing(_ isSharing: Bool)
+    func onAppear()
 }
 
 final class ExportIntent: ExportIntentProtocol {
@@ -15,21 +13,22 @@ final class ExportIntent: ExportIntentProtocol {
         self.model = model
     }
 
-    func onTapExportSheet() {
-        guard let url = Bundle.main.url(forResource: "Sample", withExtension: "png") else { return }
-
-        model.updateShareItems([url])
-        model.updateSharing(true)
+    func onAppear() {
+        prepareExportURLs()
     }
 
-    func onTapExportAudio() {
-        guard let url = Bundle.main.url(forResource: "Sample", withExtension: "m4a") else { return }
+    private func prepareExportURLs() {
+        let sheetURL = Bundle.main.url(
+            forResource: "Sample",
+            withExtension: "png"
+        )
 
-        model.updateShareItems([url])
-        model.updateSharing(true)
-    }
+        let audioURL = Bundle.main.url(
+            forResource: "Sample",
+            withExtension: "m4a"
+        )
 
-    func onChangeSharing(_ isSharing: Bool) {
-        model.updateSharing(isSharing)
+        model.updateSheetURL(sheetURL)
+        model.updateAudioURL(audioURL)
     }
 }
