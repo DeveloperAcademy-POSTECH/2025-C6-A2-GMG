@@ -16,11 +16,17 @@ final class ExportIntent: ExportIntentProtocol {
     }
 
     func onTapExportSheet() {
-        model.prepareSheetExport()
+        guard let url = Bundle.main.url(forResource: "Sample", withExtension: "png") else { return }
+
+        model.updateShareItems([url])
+        model.updateSharing(true)
     }
 
     func onTapExportAudio() {
-        model.prepareAudioExport()
+        guard let url = Bundle.main.url(forResource: "Sample", withExtension: "m4a") else { return }
+
+        model.updateShareItems([url])
+        model.updateSharing(true)
     }
 
     func onChangeSharing(_ isSharing: Bool) {

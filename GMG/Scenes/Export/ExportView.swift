@@ -9,16 +9,15 @@ struct ExportView: View {
     @State private var intent: any ExportIntentProtocol
 
     init(score: Score) {
-        let model = ExportModel(score: score)
-        self._model = State(initialValue: model)
-        self._intent = State(initialValue: ExportIntent(model: model))
+        let model: ExportModel = ExportModel(score: score)
+        self.model = model
+        self.intent = ExportIntent(model: model)
     }
 
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
             VStack(spacing: 0) {
-                // Header() 필요하면 살리기
                 Title(title: model.title)
                 KeyDate(
                     keyDescription: model.keyDescription,
