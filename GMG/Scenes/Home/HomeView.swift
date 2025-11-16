@@ -57,6 +57,7 @@ extension HomeView {
         let progress: Double
         let tapAction: () -> Void
         let playButtonAction: () -> Void
+        let stopButtonAction: () -> Void
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
@@ -124,7 +125,11 @@ extension HomeView {
                         .padding(.top, -6)
 
                     Button {
-                        playButtonAction()
+                        if isPlaying {
+                            stopButtonAction()
+                        } else {
+                            playButtonAction()
+                        }
                     } label: {
                         Image(isPlaying ? .pause : .play)
                             .renderingMode(.template)
@@ -335,12 +340,13 @@ extension HomeView {
                                     )
                                 },
                                 playButtonAction: {
-                                    if isSelected && model.playhead.isPlaying {
-                                        intent.onTapStopButton()
-                                    } else {
-                                        intent.onTapPlayButton(
-                                            score: score, selectedScore: model.selectedScore)
-                                    }
+                                    intent.onTapPlayButton(
+                                        score: score,
+                                        selectedScore: model.selectedScore
+                                    )
+                                },
+                                stopButtonAction: {
+                                    intent.onTapStopButton()
                                 },
                                 renameScoreAction: { newTitle in
                                     intent.renameScore(score, newTitle: newTitle)
@@ -477,12 +483,13 @@ extension HomeView {
                                     }
                                 },
                                 playButtonAction: {
-                                    if isSelected && model.playhead.isPlaying {
-                                        intent.onTapStopButton()
-                                    } else {
-                                        intent.onTapPlayButton(
-                                            score: score, selectedScore: model.selectedScore)
-                                    }
+                                    intent.onTapPlayButton(
+                                        score: score,
+                                        selectedScore: model.selectedScore
+                                    )
+                                },
+                                stopButtonAction: {
+                                    intent.onTapStopButton()
                                 },
                                 renameScoreAction: { newTitle in
                                     intent.renameScore(score, newTitle: newTitle)
