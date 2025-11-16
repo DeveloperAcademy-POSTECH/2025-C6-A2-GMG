@@ -231,7 +231,7 @@ final class RecordingIntent: RecordingIntentProtocol {
                     DispatchQueue.global().async {
                         do {
                             let score: Score = try self.scoreFactory
-                                .createScore(audioUrl: url)
+                                .createScore(audioURL: url)
                             continuation.resume(returning: score)
                         } catch {
                             continuation.resume(throwing: error)
