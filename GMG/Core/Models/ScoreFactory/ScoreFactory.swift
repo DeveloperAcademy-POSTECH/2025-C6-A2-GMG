@@ -10,7 +10,9 @@ enum ScoreFactoryError: Error {
     case failedToChordInference
 }
 
-enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible {
+enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible,
+    CustomLocalizedStringResourceConvertible
+{
     case hummingAnalysis
     case chordGeneration
     case sheetMusicExtraction
@@ -20,6 +22,14 @@ enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible {
         case .hummingAnalysis: return "Humming analysis in progress."
         case .chordGeneration: return "AI is generating chords."
         case .sheetMusicExtraction: return "Sheet music extraction in progress."
+        }
+    }
+
+    var localizedStringResource: LocalizedStringResource {
+        switch self {
+        case .hummingAnalysis: return .scoreFactoryState1
+        case .chordGeneration: return .scoreFactoryState2
+        case .sheetMusicExtraction: return .scoreFactoryState3
         }
     }
 }
@@ -33,9 +43,9 @@ final class ScoreFactory {
     }
 
     func createScore(
-        audioUrl: URL
+        audioURL: URL
     ) throws -> Score {
-        let audioFileName: String = audioUrl.lastPathComponent
+        let audioFileName: String = audioURL.lastPathComponent
 
         if FileManager.default.fileExists(atPath: Score.recordingFolder.path()) == false {
             try FileManager.default.createDirectory(
@@ -44,14 +54,14 @@ final class ScoreFactory {
             )
         }
 
-        let workingURL: URL = Score.recordingFolder
+        let copiedAudioURL: URL = Score.recordingFolder
             .appending(component: audioFileName)
 
-        try FileManager.default.copyItem(at: audioUrl, to: workingURL)
+        try FileManager.default.copyItem(at: audioURL, to: copiedAudioURL)
 
         scoreFactoryStatePublisher.send(.hummingAnalysis)
 
-        let notes: [Note] = try self.convertAudioToNotes(audioUrl: workingURL)
+        let notes: [Note] = try self.convertAudioToNotes(audioURL: copiedAudioURL)
 
         scoreFactoryStatePublisher.send(.chordGeneration)
 
@@ -64,9 +74,9 @@ final class ScoreFactory {
 
         scoreFactoryStatePublisher.send(.sheetMusicExtraction)
 
-        let mergedChordCells: [ChordCell] = mergeChordCells(chordCells)
+        let mergedChordCells: [ChordCell] = mergeConsecutiveChordCells(chordCells)
 
-        let file: AVAudioFile = try AVAudioFile(forReading: workingURL)
+        let file: AVAudioFile = try AVAudioFile(forReading: copiedAudioURL)
         let totalDuration: TimeInterval =
             TimeInterval(file.length) / file.fileFormat.sampleRate
 
@@ -87,43 +97,63 @@ final class ScoreFactory {
             filteredChordCells = [newChordCell] + filteredChordCells[1...]
         }
 
+        let audioLevels: [Float] = try AudioLevelMeter.calculateLevel(from: copiedAudioURL)
+
         return Score(
             title: "Untitled",
             key: key,
-            audioFileName: audioFileName,
+            audioURL: copiedAudioURL,
             totalDuration: totalDuration,
             createdAt: Date(),
             updatedAt: Date(),
             notes: notes,
             chordCells: filteredChordCells,
-            audioLevels: []
+            audioLevels: audioLevels
         )
     }
 
-    private func convertAudioToNotes(audioUrl: URL) throws -> [Note] {
+    private func convertAudioToNotes(audioURL: URL) throws -> [Note] {
         guard
-            let modelUrl: URL = Bundle.main.url(
+            let modelURL: URL = Bundle.main.url(
                 forResource: "SwiftF0",
                 withExtension: "onnx"
             )
         else { throw ScoreFactoryError.pitchDetectModelNotFound }
 
         let pitchDetector: SwiftF0Detector = try SwiftF0Detector(
-            modelUrl: modelUrl
+            modelUrl: modelURL
         )
         let pitchResults: [PitchResult] = try pitchDetector.detect(
-            url: audioUrl
+            url: audioURL
         )
 
         let swiftF0Notes: [SwiftF0.Note] = NoteConverter.convert(pitchResults)
         let notes: [Note] = swiftF0Notes.map { note in
-            return convertSwiftF0NoteToNote(note)
+            return note.note
         }
 
         return notes
     }
 
-    private func convertSwiftF0NoteToNote(_ swiftF0Note: SwiftF0.Note) -> Note {
+    private func mergeConsecutiveChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
+        var mergedChordCells: [ChordCell] = []
+
+        for chordCell in chordCells {
+            if let lastMergedChordCell = mergedChordCells.last,
+                lastMergedChordCell.chord == chordCell.chord
+            {
+                continue
+            } else {
+                mergedChordCells.append(chordCell)
+            }
+        }
+
+        return mergedChordCells
+    }
+}
+
+extension SwiftF0.Note {
+    fileprivate var note: Note {
         let noteNames: [NoteName] = [
             .C,
             .Cs,
@@ -139,10 +169,10 @@ final class ScoreFactory {
             .B,
         ]
 
-        let noteName: NoteName = noteNames[Int(swiftF0Note.pitch) % 12]
-        let octave: Int = Int((swiftF0Note.pitch / 12) - 1)
-        let startTime: TimeInterval = swiftF0Note.position
-        let duration: TimeInterval = swiftF0Note.duration
+        let noteName: NoteName = noteNames[Int(self.pitch) % 12]
+        let octave: Int = Int((self.pitch / 12) - 1)
+        let startTime: TimeInterval = self.position
+        let duration: TimeInterval = self.duration
 
         let note: Note = Note(
             name: noteName,
@@ -152,21 +182,5 @@ final class ScoreFactory {
         )
 
         return note
-    }
-
-    private func mergeChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
-        var mergedChordCells: [ChordCell] = []
-
-        for chordCell in chordCells {
-            if let lastMergedChordCell = mergedChordCells.last,
-                lastMergedChordCell.chord == chordCell.chord
-            {
-                continue
-            } else {
-                mergedChordCells.append(chordCell)
-            }
-        }
-
-        return mergedChordCells
     }
 }

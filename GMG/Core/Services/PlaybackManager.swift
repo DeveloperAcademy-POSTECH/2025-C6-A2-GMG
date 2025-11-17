@@ -26,6 +26,8 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
     }
 
     func play(_ url: URL) throws {
+        try activateAudioSession()
+
         do {
             let audioPlayer: AVAudioPlayer = try AVAudioPlayer(contentsOf: url)
 
@@ -57,6 +59,8 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
     }
 
     func stop() {
+        try? deactivateAudioSession()
+
         guard let audioPlayer else { return }
 
         audioPlayer.stop()
@@ -68,13 +72,30 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
         self.playedDurationPublisher.send(audioPlayer.duration)
     }
 
+    private func activateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setCategory(
+            .playback,
+            mode: .default,
+            options: []
+        )
+        try audioSession.setActive(true)
+    }
+
+    private func deactivateAudioSession() throws {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+
+        try audioSession.setActive(false)
+    }
+
     private func updateMeter() {
         guard let audioPlayer else { return }
 
         audioPlayer.updateMeters()
 
         let averagePower: Float = audioPlayer.averagePower(forChannel: 0)
-        let normalizedLevel: Float = normalizeLevel(averagePower)
+        let normalizedLevel: Float = DecibelsNormalizer.normalize(averagePower)
 
         self.audioLevelPublisher.send(normalizedLevel)
     }
@@ -85,11 +106,6 @@ final class PlaybackManager: NSObject, AVAudioPlayerDelegate {
         let playedDuration: TimeInterval = audioPlayer.currentTime
 
         self.playedDurationPublisher.send(playedDuration)
-    }
-
-    private func normalizeLevel(_ dB: Float, minDb: Float = -30) -> Float {
-        let clamped: Float = min(0, max(minDb, dB))
-        return (clamped - minDb) / (-minDb)
     }
 
     // MARK: - AVAudioPlayerDelgate Implement

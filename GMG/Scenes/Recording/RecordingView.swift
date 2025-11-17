@@ -4,17 +4,18 @@ import SwiftData
 import SwiftUI
 
 struct RecordingView: View {
-    @Environment(\.modelContext) private var context
-    @Environment(Router.self) private var router: Router
-
     @State private var model: RecordingModelStateProtocol
     @State private var intent: RecordingIntentProtocol
+    private weak var router: Router?
 
-    init() {
-        let model: RecordingModel = RecordingModel()
-
+    init(
+        model: RecordingModelStateProtocol,
+        intent: RecordingIntentProtocol,
+        router: Router? = nil
+    ) {
         self.model = model
-        self.intent = RecordingIntent(model: model)
+        self.intent = intent
+        self.router = router
     }
 
     var body: some View {
@@ -39,7 +40,7 @@ struct RecordingView: View {
                 Spacer()
 
                 Controller(
-                    recordingUrl: model.recordingURL,
+                    recordingURL: model.recordingURL,
                     isRecording: model.isRecording,
                     isPlaying: model.isPlaying,
                     recordAction: intent.onTapRecordButton,
@@ -57,11 +58,9 @@ struct RecordingView: View {
                         intent.onTapNextButton(url) {
                             guard let score = model.score else { return }
 
-                            context.insert(score)
+                            router?.popToRoot()
 
-                            router.popToRoot()
-
-                            router.push(.chordProgress(score: score))
+                            router?.push(.chordProgress(score: score))
                         }
                     },
                 )
@@ -85,7 +84,7 @@ struct RecordingView: View {
             .requestMicrophoneAccessPermission,
             isPresented: .constant(model.isRecordPermissionAlertPresented)
         ) {
-            Button(.openSettings, role: .confirm) {
+            Button(.openSettings) {
                 intent.onTapOpenSettingsButton()
             }
             .keyboardShortcut(.defaultAction)
@@ -129,7 +128,7 @@ struct RecordingView: View {
                     Button {
                         skipAction()
                     } label: {
-                        Text("Skip")
+                        Text(.skip)
                             .font(Typography.WantedSansStd.R6)
                             .underline()
                             .foregroundStyle(Color.white1)
@@ -240,7 +239,7 @@ struct RecordingView: View {
     }
 
     struct Controller: View {
-        let recordingUrl: URL?
+        let recordingURL: URL?
         let isRecording: Bool
         let isPlaying: Bool
         let recordAction: () -> Void
@@ -252,13 +251,13 @@ struct RecordingView: View {
 
         private var primaryButtonTitle: String {
             if isRecording {
-                return "Stop"
+                return String(localized: .stop)
             } else if isPlaying {
-                return "Stop"
-            } else if recordingUrl != nil {
-                return "Play"
+                return String(localized: .stop)
+            } else if recordingURL != nil {
+                return String(localized: .replay)
             }
-            return "Record"
+            return String(localized: .record)
         }
 
         private var primaryButtonImage: ImageResource {
@@ -266,7 +265,7 @@ struct RecordingView: View {
                 return .stop
             } else if isPlaying {
                 return .stop
-            } else if recordingUrl != nil {
+            } else if recordingURL != nil {
                 return .play
             }
             return .record
@@ -277,7 +276,7 @@ struct RecordingView: View {
                 return stopRecordAction
             } else if isPlaying {
                 return stopPlayAction
-            } else if recordingUrl != nil {
+            } else if recordingURL != nil {
                 return playAction
             }
             return recordAction
@@ -286,14 +285,14 @@ struct RecordingView: View {
         var body: some View {
             Grid {
                 GridRow {
-                    if recordingUrl != nil {
+                    if recordingURL != nil {
                         ControllerButton {
                             resetAction()
                         } label: {
                             VStack(spacing: Spacing.xs) {
                                 Image(.reset)
                                     .renderingMode(.template)
-                                Text("Reset")
+                                Text(.reset)
                                     .font(Typography.WantedSansStd.M2)
                             }
                         }
@@ -316,14 +315,14 @@ struct RecordingView: View {
                     }
                     .gridCellColumns(2)
 
-                    if recordingUrl != nil {
+                    if recordingURL != nil {
                         ControllerButton {
                             nextAction()
                         } label: {
                             VStack(spacing: Spacing.xs) {
                                 Image(.next)
                                     .renderingMode(.template)
-                                Text("Next")
+                                Text(.next)
                                     .font(Typography.WantedSansStd.M2)
                             }
                         }
@@ -338,11 +337,13 @@ struct RecordingView: View {
             .padding()
             .frame(maxWidth: .infinity, maxHeight: 140)
             .compatibleGlassEffect(in: RoundedRectangle(cornerRadius: 18))
-            .animation(.default, value: recordingUrl)
+            .animation(.default, value: recordingURL)
         }
     }
 }
 
-#Preview(traits: .routerModifier) {
-    RecordingView()
+#Preview {
+    PreviewContainer { router in
+        router.view(.recording)
+    }
 }
