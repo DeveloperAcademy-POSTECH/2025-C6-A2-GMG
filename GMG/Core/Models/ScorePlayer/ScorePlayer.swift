@@ -330,14 +330,14 @@ final class ScorePlayer {
     private func loadSoundBank() throws {
         guard
             let url: URL = Bundle.main.url(
-                forResource: "8MBGMSFX_EP1_Loop",
+                forResource: "KAWAI good piano",
                 withExtension: "sf2"
             )
         else { throw ScorePlayerError.soundBankNotFound }
 
         try sampler.loadSoundBankInstrument(
             at: url,
-            program: 4,
+            program: .zero,
             bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
             bankLSB: UInt8(kAUSampler_DefaultBankLSB)
         )
