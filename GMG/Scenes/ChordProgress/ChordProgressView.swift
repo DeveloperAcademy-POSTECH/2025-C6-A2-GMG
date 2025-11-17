@@ -655,17 +655,16 @@ extension ChordProgressView {
 
                     VStack(spacing: Spacing.xs) {
 
-                        /// TODO: 웨이브 폼 시작 시점이 아니야 ^^
                         Waveform(
                             width: segmentWidth,
                             amplitudes: segmentAudioLevels,
                             startTime: segmentStartTime,
                             endTime: min(segmentEndTime, totalDuration),
-                            elapsedTime: elapsedTime
+                            elapsedTime: elapsedTime,
+                            onScrubStart: waveFormAction,
+                            onScrubChange: waveFormAction,
+                            onScrubEnd: waveFormAction
                         )
-                        .onTapGesture {
-                            waveFormAction(segmentStartTime)
-                        }
 
                         TimeRuler(
                             visibleWidth: segmentWidth,

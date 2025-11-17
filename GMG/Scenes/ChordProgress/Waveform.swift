@@ -9,6 +9,11 @@ struct Waveform: View {
     let startTime: TimeInterval
     let endTime: TimeInterval
     let elapsedTime: TimeInterval
+    let onScrubStart: (TimeInterval) -> Void
+    let onScrubChange: (TimeInterval) -> Void
+    let onScrubEnd: (TimeInterval) -> Void
+
+    @State private var scrubbingTime: TimeInterval?
 
     private let capsuleWidth: CGFloat = 3
     private let capsuleSpacing: CGFloat = 4
@@ -72,7 +77,8 @@ struct Waveform: View {
     private var progressWidth: CGFloat {
         guard endTime > startTime else { return 0 }
 
-        let clampedElapsed = min(max(elapsedTime, startTime), endTime)
+        let lastInteractionTime = scrubbingTime ?? elapsedTime
+        let clampedElapsed = min(max(lastInteractionTime, startTime), endTime)
         let ratio = (clampedElapsed - startTime) / (endTime - startTime)
 
         return width * CGFloat(ratio)
@@ -144,9 +150,39 @@ struct Waveform: View {
                 .animation(.easeInOut(duration: 0.01), value: progressWidth)
             }
             .frame(width: width)
+            .contentShape(Rectangle())
+            .gesture(dragGesture)
 
             Spacer()
         }
+    }
+
+    private var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let time = convertLocationToTime(value.location.x)
+
+                if scrubbingTime == nil {
+                    onScrubStart(time)
+                } else {
+                    onScrubChange(time)
+                }
+
+                scrubbingTime = time
+            }
+            .onEnded { value in
+                let time = convertLocationToTime(value.location.x)
+                scrubbingTime = nil
+                onScrubEnd(time)
+            }
+    }
+
+    private func convertLocationToTime(_ locationX: CGFloat) -> TimeInterval {
+        guard width > 0 else { return startTime }
+
+        let clampedX = min(max(locationX, 0), width)
+        let ratio = clampedX / width
+        return startTime + ((endTime - startTime) * TimeInterval(ratio))
     }
 }
 
