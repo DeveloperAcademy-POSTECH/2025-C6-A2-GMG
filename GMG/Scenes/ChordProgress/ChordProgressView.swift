@@ -69,7 +69,7 @@ struct ChordProgressView: View {
                 isBackButtonHidden: true,
                 leading: {
                     Button {
-                        router.popToRoot()
+                        router?.popToRoot()
                     } label: {
                         Image("Home")
                             .renderingMode(.template)
