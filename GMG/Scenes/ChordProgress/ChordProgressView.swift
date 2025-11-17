@@ -3,8 +3,6 @@
 import SwiftUI
 
 struct ChordProgressView: View {
-    @Environment(\.undoManager) private var undoManager
-
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
     private weak var router: Router?
@@ -103,14 +101,9 @@ struct ChordProgressView: View {
             .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
         )
         .onAppear {
-            intent.updateUndoManager(undoManager)
             intent.onAppear(model.score)
         }
-        .onChange(of: undoManager) { _, newValue in
-            intent.updateUndoManager(newValue)
-        }
         .onDisappear {
-            intent.updateUndoManager(nil)
             intent.onDisappear()
         }
     }
@@ -260,29 +253,40 @@ extension ChordProgressView {
 
         var body: some View {
             HStack(spacing: 24) {
-                Button {
+                EditControllerButton {
                     onTapUndo()
                 } label: {
                     Image(.undo)
                         .renderingMode(.template)
-                        .foregroundStyle(
-                            canUndo
-                                ? .white1
-                                : .black2
-                        )
                 }
+                .disabled(canUndo == false)
 
-                Button {
+                EditControllerButton {
                     onTapRedo()
                 } label: {
                     Image(.redo)
                         .renderingMode(.template)
+                }
+                .disabled(canRedo == false)
+            }
+        }
+
+        struct EditControllerButton<Label: View>: View {
+            @Environment(\.isEnabled) private var isEnabled: Bool
+
+            let action: () -> Void
+            @ViewBuilder let label: () -> Label
+
+            var body: some View {
+                Button {
+                    action()
+                } label: {
+                    label()
                         .foregroundStyle(
-                            canRedo
-                                ? .white1
-                                : .black2
+                            isEnabled ? .white1 : .black2
                         )
                 }
+                .buttonStyle(.bouncy)
             }
         }
     }

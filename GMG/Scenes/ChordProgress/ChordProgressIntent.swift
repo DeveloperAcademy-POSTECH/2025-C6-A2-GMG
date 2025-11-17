@@ -7,7 +7,6 @@ import UIKit
 protocol ChordProgressIntentProtocol {
     func onAppear(_ score: Score)
     func onDisappear()
-    func updateUndoManager(_ undoManager: UndoManager?)
     func onTapEditModeToggle(_ isEditMode: Bool)
     func onTapPlayButton()
     func onTapPauseButton()
@@ -33,7 +32,9 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     private var cancellables: Set<AnyCancellable>
 
-    private var creatingScoreTask: Task<Void, Never>?
+    private let undoManager: UndoManager
+
+    private var undoManagerObservers: [NSObjectProtocol]
 
     init(
         model: ChordProgressModelActionProtocol,
@@ -46,6 +47,10 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         self.scorePlayer = nil
 
         self.cancellables = Set<AnyCancellable>()
+
+        self.undoManager = UndoManager()
+
+        self.undoManagerObservers = []
     }
 
     func onAppear(_ score: Score) {
@@ -67,6 +72,8 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
                     self?.model?.updatePlayhead(playhead)
                 }
                 .store(in: &cancellables)
+
+            registerUndoManagerObservers()
         } catch {
             Logger.error(String(describing: error))
         }
@@ -74,6 +81,8 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onDisappear() {
         cancellables.removeAll()
+
+        unregisterUndoManagerObservers()
 
         self.scorePlayer?.cleanupAfterPlay()
 
@@ -120,35 +129,101 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         for chordCell: ChordCell
     ) {
         guard let scorePlayer = self.scorePlayer,
-            let model = self.model,
             chordCell.chordCandidates.contains(where: { $0 == candidate })
         else { return }
 
         scorePlayer.play(chord: candidate)
 
-        if chordCell.chord == candidate {
-            return
-        }
+        let previousChord: Chord? = chordCell.chord
+        guard previousChord != candidate else { return }
 
-        model.replaceChord(with: candidate, for: chordCell)
-        scorePlayer.prepareChordCells()
-    }
+        replaceChord(candidate, for: chordCell)
 
-    func updateUndoManager(_ undoManager: UndoManager?) {
-        self.model?.setUndoManager(undoManager)
+        registerReplaceChordUndoHandler(
+            chordCell: chordCell,
+            oldChord: previousChord,
+            newChord: candidate
+        )
     }
 
     func onTapUndoButton() {
-        self.model?.performUndo()
+        undoManager.undo()
     }
 
     func onTapRedoButton() {
-        self.model?.performRedo()
+        undoManager.redo()
     }
 
     func onEnterTitle(_ title: String) {
         guard let model = self.model else { return }
 
         model.updateTitle(title)
+    }
+
+    private func registerUndoManagerObservers() {
+        let notificationCenter: NotificationCenter = .default
+        let notificationNames: [Notification.Name] = [
+            .NSUndoManagerDidOpenUndoGroup,
+            .NSUndoManagerDidCloseUndoGroup,
+            .NSUndoManagerDidUndoChange,
+            .NSUndoManagerDidRedoChange,
+        ]
+
+        let observers: [NSObjectProtocol] =
+            notificationNames
+            .map { notificationName in
+                return notificationCenter.addObserver(
+                    forName: notificationName,
+                    object: nil,
+                    queue: nil
+                ) { [weak self] notification in
+                    self?.updateCanUndoRedo()
+                }
+            }
+
+        self.undoManagerObservers = observers
+    }
+
+    private func unregisterUndoManagerObservers() {
+        let notificationCenter: NotificationCenter = .default
+
+        self.undoManagerObservers.forEach { observer in
+            notificationCenter.removeObserver(observer)
+        }
+
+        self.undoManagerObservers.removeAll()
+    }
+
+    private func updateCanUndoRedo() {
+        guard let model = self.model else { return }
+
+        let canUndo: Bool = undoManager.canUndo
+        let canRedo: Bool = undoManager.canRedo
+
+        model.updateCanUndo(canUndo)
+        model.updateCanRedo(canRedo)
+    }
+
+    private func replaceChord(_ chord: Chord?, for chordCell: ChordCell) {
+        guard let model = self.model, let scorePlayer = self.scorePlayer else { return }
+
+        model.replaceChord(with: chord, for: chordCell)
+        scorePlayer.prepareChordCells()
+    }
+
+    private func registerReplaceChordUndoHandler(
+        chordCell: ChordCell,
+        oldChord: Chord?,
+        newChord: Chord?
+    ) {
+        undoManager.registerUndo(withTarget: self) { target in
+            target.replaceChord(oldChord, for: chordCell)
+            target.registerReplaceChordUndoHandler(
+                chordCell: chordCell,
+                oldChord: newChord,
+                newChord: oldChord
+            )
+        }
+        undoManager.setActionName("Chord Change")
     }
 }
