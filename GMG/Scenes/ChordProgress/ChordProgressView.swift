@@ -48,6 +48,7 @@ struct ChordProgressView: View {
                             )
                         )
                     }
+                    .layoutPriority(1)
                 }
                 .padding(Spacing.md)
 
@@ -65,7 +66,19 @@ struct ChordProgressView: View {
                 )
             }
             .navigationBar(
-                leading: {},
+                isBackButtonHidden: true,
+                leading: {
+                    Button {
+                        router.popToRoot()
+                    } label: {
+                        Image("Home")
+                            .renderingMode(.template)
+                            .foregroundStyle(
+                                model.isEditMode == false
+                                    ? Color.black1 : Color.white1
+                            )
+                    }
+                },
                 center: {
                     NavigationTitle(
                         title: model.score.title,
@@ -166,13 +179,19 @@ extension ChordProgressView {
                         .font(Typography.WantedSansStd.R6)
                         .foregroundStyle(
                             colorScheme == .light
-                                ? Color.black1 : Color.white1
+                                ? Color.black4 : Color.black3
                         )
                         .opacity(
                             isTitleEditing ? 0 : 1
                         )
 
-                    Image(systemName: "pencil")
+                    Image(.pencil)
+                        .renderingMode(.template)
+                        .foregroundColor(
+                            colorScheme == .light
+                                ? Color.black1
+                                : Color.white1
+                        )
                         .opacity(
                             isTitleEditing ? 0 : 1
                         )
@@ -304,6 +323,7 @@ extension ChordProgressView {
                 ) {
                     isEditMode = false
                 }
+
                 ToggleButton(
                     title: String(localized: .edit),
                     isSelected: isEditMode,
@@ -327,7 +347,7 @@ extension ChordProgressView {
                     action()
                 } label: {
                     Text(title)
-                        .font(Typography.WantedSansStd.R2)
+                        .font(Typography.WantedSansStd.B3)
                         .bold(isSelected)
                         .foregroundStyle(
                             isSelected ? Color.white1 : Color.black1
@@ -644,17 +664,16 @@ extension ChordProgressView {
 
                     VStack(spacing: Spacing.xs) {
 
-                        /// TODO: 웨이브 폼 시작 시점이 아니야 ^^
                         Waveform(
                             width: segmentWidth,
                             amplitudes: segmentAudioLevels,
                             startTime: segmentStartTime,
                             endTime: min(segmentEndTime, totalDuration),
-                            elapsedTime: elapsedTime
+                            elapsedTime: elapsedTime,
+                            onScrubStart: waveFormAction,
+                            onScrubChange: waveFormAction,
+                            onScrubEnd: waveFormAction
                         )
-                        .onTapGesture {
-                            waveFormAction(segmentStartTime)
-                        }
 
                         TimeRuler(
                             visibleWidth: segmentWidth,
