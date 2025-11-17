@@ -48,8 +48,6 @@ final class HomeIntent: HomeIntentProtocol {
         guard let model else { return }
 
         model.setSelectedScore(score)
-
-        setupPlayer(for: score)
     }
 
     func renameScore(_ score: Score, newTitle: String) {
@@ -92,6 +90,7 @@ final class HomeIntent: HomeIntentProtocol {
             setupPlayer(for: score)
         }
 
+        setupPlayer(for: score)
         scorePlayer?.play()
     }
 
@@ -104,8 +103,9 @@ final class HomeIntent: HomeIntentProtocol {
 
         do {
             let scores: [Score] = try scoreRepository.fetch()
-
             model.setAllScores(scores)
+
+            selectLastScore(scores)
         } catch {
             Logger.error(String(describing: error))
         }
@@ -136,6 +136,6 @@ final class HomeIntent: HomeIntentProtocol {
             model?.setSelectedScore(nil)
             return
         }
-        selectScore(last)  // setupPlayer 포함
+        selectScore(last)
     }
 }

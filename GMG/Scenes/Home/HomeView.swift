@@ -34,7 +34,6 @@ struct HomeView: View {
                 .scrollIndicators(.hidden)
                 .task {
                     intent.onAppear()
-                    intent.selectLastScore(model.sortedScores)
                 }
             }
         }
