@@ -3,7 +3,6 @@
 import SwiftUI
 
 struct ChordProgressView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(Router.self) private var router: Router
     @Environment(\.undoManager) private var undoManager
 
@@ -69,7 +68,7 @@ struct ChordProgressView: View {
                 isBackButtonHidden: true,
                 leading: {
                     Button {
-                        dismiss()
+                        router.popToRoot()
                     } label: {
                         Image("Home")
                             .renderingMode(.template)
@@ -187,7 +186,7 @@ extension ChordProgressView {
                             isTitleEditing ? 0 : 1
                         )
 
-                    Image("Pencil")
+                    Image(.pencil)
                         .renderingMode(.template)
                         .foregroundColor(
                             colorScheme == .light
