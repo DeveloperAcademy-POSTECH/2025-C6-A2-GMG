@@ -126,6 +126,7 @@ struct RecordingView: View {
                         )
                         .foregroundStyle(Color.white1)
                         .contentTransition(.numericText())
+                        .offset(y: -80)
 
                     Button {
                         skipAction()
