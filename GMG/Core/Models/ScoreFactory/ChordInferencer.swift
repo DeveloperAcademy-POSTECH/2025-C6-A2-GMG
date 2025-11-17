@@ -46,14 +46,14 @@ final class ChordInferencer {
         }
 
         guard
-            let vocabUrl =
+            let vocabURL =
                 Bundle.main.url(
                     forResource: "TransformerChordInferenceVocab",
                     withExtension: "json"
                 )
         else { throw ChordInferencerError.notFoundVocab }
 
-        let vocabData = try Data(contentsOf: vocabUrl)
+        let vocabData = try Data(contentsOf: vocabURL)
 
         self.vocab = try JSONDecoder().decode(Vocab.self, from: vocabData)
     }

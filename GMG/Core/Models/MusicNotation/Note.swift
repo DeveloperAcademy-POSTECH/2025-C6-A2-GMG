@@ -10,3 +10,5 @@ struct Note {
 }
 
 extension Note: Codable {}
+
+extension Note: Hashable {}

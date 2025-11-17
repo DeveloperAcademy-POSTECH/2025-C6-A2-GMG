@@ -5,50 +5,110 @@ import Foundation
 import SwiftData
 
 protocol HomeIntentProtocol {
-    func loadScores(_ context: ModelContext)
+    func onAppear()
     func setIsLatest(_ isLatest: Bool)
-    func deleteScore(_ score: Score, context: ModelContext)
-    func selectScore(_ score: Score?)
+    func selectScore(_ score: Score)
     func renameScore(_ score: Score, newTitle: String)
+    func deleteScore(_ score: Score)
+    func onTapScore(_ score: Score)
     func onTapPlayButton(score: Score, selectedScore: Score?)
     func onTapStopButton()
-    func onTapScore(_ score: Score, context: ModelContext)
     func selectLastScore(_ scores: [Score])
 }
 
 final class HomeIntent: HomeIntentProtocol {
-    private var model: HomeModelActionProtocol?
+    private weak var model: HomeModelActionProtocol?
+
+    private let scoreRepository: ScoreRepository
     private var scorePlayer: ScorePlayer?
     private var cancellables: Set<AnyCancellable>
 
-    init(model: HomeModelActionProtocol) {
+    init(
+        model: HomeModelActionProtocol,
+        scoreRepository: ScoreRepository
+    ) {
         self.model = model
+
+        self.scoreRepository = scoreRepository
         self.scorePlayer = nil
         self.cancellables = []
     }
 
-    func loadScores(_ context: ModelContext) {
-        model?.fetchScores(context)
+    func onAppear() {
+        fetchScores()
     }
 
     func setIsLatest(_ isLatest: Bool) {
-        model?.setIsLatest(isLatest)
+        guard let model else { return }
+
+        model.setIsLatest(isLatest)
     }
 
-    func deleteScore(_ score: Score, context: ModelContext) {
-        model?.deleteScore(score, context: context)
-    }
+    func selectScore(_ score: Score) {
+        guard let model else { return }
 
-    func selectScore(_ score: Score?) {
-        guard let score else { return }
-
-        model?.setSelectedScore(score)
+        model.setSelectedScore(score)
 
         setupPlayer(for: score)
     }
 
     func renameScore(_ score: Score, newTitle: String) {
-        model?.renameScore(score, newTitle: newTitle)
+        do {
+            score.updateTitle(newTitle)
+
+            try scoreRepository.update(score)
+        } catch {
+            Logger.error(String(describing: error))
+        }
+    }
+
+    func deleteScore(_ score: Score) {
+        do {
+            try scoreRepository.delete(score)
+
+            fetchScores()
+        } catch {
+            Logger.error(String(describing: error))
+        }
+    }
+
+    func onTapScore(_ score: Score) {
+        guard let model else { return }
+
+        score.setUpdatedAt(.now)
+
+        do {
+            try scoreRepository.update(score)
+        } catch {
+            Logger.error(String(describing: error))
+        }
+
+        model.setSelectedScore(score)
+    }
+
+    func onTapPlayButton(score: Score, selectedScore: Score?) {
+        if selectedScore?.id != score.id {
+            model?.setSelectedScore(score)
+            setupPlayer(for: score)
+        }
+
+        scorePlayer?.play()
+    }
+
+    func onTapStopButton() {
+        scorePlayer?.stop()
+    }
+
+    private func fetchScores() {
+        guard let model else { return }
+
+        do {
+            let scores: [Score] = try scoreRepository.fetch()
+
+            model.setAllScores(scores)
+        } catch {
+            Logger.error(String(describing: error))
+        }
     }
 
     private func setupPlayer(for score: Score) {
@@ -69,27 +129,6 @@ final class HomeIntent: HomeIntentProtocol {
         } catch {
             Logger.error(String(describing: error))
         }
-    }
-
-    func onTapPlayButton(score: Score, selectedScore: Score?) {
-        if selectedScore?.persistentModelID != score.persistentModelID {
-            model?.setSelectedScore(score)
-            setupPlayer(for: score)
-        }
-
-        scorePlayer?.play()
-    }
-
-    func onTapStopButton() {
-        scorePlayer?.stop()
-    }
-
-    func onTapScore(_ score: Score, context: ModelContext) {
-        model?.setUpdatedAt(score, at: .now)
-
-        model?.setSelectedScore(score)
-
-        model?.fetchScores(context)
     }
 
     func selectLastScore(_ scores: [Score]) {

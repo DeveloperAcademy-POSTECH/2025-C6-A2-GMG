@@ -9,12 +9,20 @@ struct Waveform: View {
     let startTime: TimeInterval
     let endTime: TimeInterval
     let elapsedTime: TimeInterval
+    let onScrubStart: (TimeInterval) -> Void
+    let onScrubChange: (TimeInterval) -> Void
+    let onScrubEnd: (TimeInterval) -> Void
+
+    @State private var scrubbingTime: TimeInterval?
 
     private let capsuleWidth: CGFloat = 3
     private let capsuleSpacing: CGFloat = 4
     private let horizontalPadding: CGFloat = 11
     private let minCapsuleHeight: CGFloat = 6
     private let maxCapsuleHeight: CGFloat = 21
+    private var capsuleUnitWidth: CGFloat {
+        capsuleWidth + capsuleSpacing
+    }
 
     private var backgroundColor: Color {
         if editMode?.wrappedValue.isEditing == true {
@@ -69,7 +77,13 @@ struct Waveform: View {
     private var progressWidth: CGFloat {
         guard endTime > startTime else { return 0 }
 
-        let clampedElapsed = min(max(elapsedTime, startTime), endTime)
+        var lastInteractionTime = elapsedTime
+
+        if let scrubbingTime = self.scrubbingTime {
+            lastInteractionTime = scrubbingTime
+        }
+
+        let clampedElapsed = min(max(lastInteractionTime, startTime), endTime)
         let ratio = (clampedElapsed - startTime) / (endTime - startTime)
 
         return width * CGFloat(ratio)
@@ -81,9 +95,19 @@ struct Waveform: View {
             return Array(repeating: value, count: targetCount)
         }
 
+        let paddingOffsetIndex: Float
+        if capsuleUnitWidth > 0 {
+            paddingOffsetIndex = Float(horizontalPadding / capsuleUnitWidth)
+        } else {
+            paddingOffsetIndex = 0
+        }
+
+        let maxIndex = max(1, targetCount - 1)
+
         return (0..<targetCount).map { index in
-            let position = Float(index) / Float(targetCount - 1)
-            let scaled = position * Float(source.count - 1)
+            let position = (Float(index) + paddingOffsetIndex) / Float(maxIndex)
+            let normalizedPosition = min(max(position, 0), 1)
+            let scaled = normalizedPosition * Float(source.count - 1)
             let lower = Int(floor(scaled))
             let upper = Int(ceil(scaled))
 
@@ -128,12 +152,41 @@ struct Waveform: View {
                         Spacer(minLength: 0)
                     }
                 )
-                .animation(.easeInOut(duration: 0.25), value: progressWidth)
             }
             .frame(width: width)
+            .contentShape(Rectangle())
+            .gesture(dragGesture)
 
             Spacer()
         }
+    }
+
+    private var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let time = convertLocationToTime(value.location.x)
+
+                if scrubbingTime == nil {
+                    onScrubStart(time)
+                } else {
+                    onScrubChange(time)
+                }
+
+                scrubbingTime = time
+            }
+            .onEnded { value in
+                let time = convertLocationToTime(value.location.x)
+                scrubbingTime = nil
+                onScrubEnd(time)
+            }
+    }
+
+    private func convertLocationToTime(_ locationX: CGFloat) -> TimeInterval {
+        guard width > 0 else { return startTime }
+
+        let clampedX = min(max(locationX, 0), width)
+        let ratio = clampedX / width
+        return startTime + ((endTime - startTime) * TimeInterval(ratio))
     }
 }
 
