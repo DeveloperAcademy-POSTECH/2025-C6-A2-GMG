@@ -3,7 +3,8 @@
 import Foundation
 internal import UniformTypeIdentifiers
 
-class Score {
+@Observable
+final class Score {
     private(set) var id: UUID
     private(set) var title: String
     private(set) var key: Key
