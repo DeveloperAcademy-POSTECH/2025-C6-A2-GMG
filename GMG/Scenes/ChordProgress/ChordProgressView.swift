@@ -3,17 +3,18 @@
 import SwiftUI
 
 struct ChordProgressView: View {
-    @Environment(Router.self) private var router: Router
-    @Environment(\.undoManager) private var undoManager
-
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
+    private weak var router: Router?
 
-    init(score: Score) {
-        let model: ChordProgressModel = ChordProgressModel(score: score)
-
+    init(
+        model: ChordProgressModelStateProtocol,
+        intent: ChordProgressIntentProtocol,
+        router: Router?
+    ) {
         self.model = model
-        self.intent = ChordProgressIntent(model: model)
+        self.intent = intent
+        self.router = router
     }
 
     var body: some View {
@@ -47,6 +48,7 @@ struct ChordProgressView: View {
                             )
                         )
                     }
+                    .layoutPriority(1)
                 }
                 .padding(Spacing.md)
 
@@ -64,7 +66,19 @@ struct ChordProgressView: View {
                 )
             }
             .navigationBar(
-                leading: {},
+                isBackButtonHidden: true,
+                leading: {
+                    Button {
+                        router.popToRoot()
+                    } label: {
+                        Image("Home")
+                            .renderingMode(.template)
+                            .foregroundStyle(
+                                model.isEditMode == false
+                                    ? Color.black1 : Color.white1
+                            )
+                    }
+                },
                 center: {
                     NavigationTitle(
                         title: model.score.title,
@@ -100,14 +114,9 @@ struct ChordProgressView: View {
             .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
         )
         .onAppear {
-            intent.updateUndoManager(undoManager)
             intent.onAppear(model.score)
         }
-        .onChange(of: undoManager) { _, newValue in
-            intent.updateUndoManager(newValue)
-        }
         .onDisappear {
-            intent.updateUndoManager(nil)
             intent.onDisappear()
         }
     }
@@ -146,34 +155,43 @@ extension ChordProgressView {
 
         var body: some View {
             ZStack(alignment: .center) {
-                TextField("Untitled", text: $title)
-                    .multilineTextAlignment(.center)
-                    .font(Typography.WantedSansStd.R6)
-                    .foregroundStyle(
-                        colorScheme == .light
-                            ? Color.black1 : Color.white1
-                    )
-                    .focused($isTitleFieldFocused)
-                    .submitLabel(.done)
-                    .onSubmit {
-                        finishEditingTitle()
-                    }
-                    .opacity(
-                        isTitleFieldFocused ? 1 : 0
-                    )
+                TextField(
+                    String(localized: .enterTitle),
+                    text: $title
+                )
+                .multilineTextAlignment(.center)
+                .font(Typography.WantedSansStd.R6)
+                .foregroundStyle(
+                    colorScheme == .light
+                        ? Color.black1 : Color.white1
+                )
+                .focused($isTitleFieldFocused)
+                .submitLabel(.done)
+                .onSubmit {
+                    finishEditingTitle()
+                }
+                .opacity(
+                    isTitleFieldFocused ? 1 : 0
+                )
 
                 HStack(spacing: 5) {
                     Text(title)
                         .font(Typography.WantedSansStd.R6)
                         .foregroundStyle(
                             colorScheme == .light
-                                ? Color.black1 : Color.white1
+                                ? Color.black4 : Color.black3
                         )
                         .opacity(
                             isTitleEditing ? 0 : 1
                         )
 
-                    Image(systemName: "pencil")
+                    Image(.pencil)
+                        .renderingMode(.template)
+                        .foregroundColor(
+                            colorScheme == .light
+                                ? Color.black1
+                                : Color.white1
+                        )
                         .opacity(
                             isTitleEditing ? 0 : 1
                         )
@@ -254,29 +272,40 @@ extension ChordProgressView {
 
         var body: some View {
             HStack(spacing: 24) {
-                Button {
+                EditControllerButton {
                     onTapUndo()
                 } label: {
                     Image(.undo)
                         .renderingMode(.template)
-                        .foregroundStyle(
-                            canUndo
-                                ? .white1
-                                : .black2
-                        )
                 }
+                .disabled(canUndo == false)
 
-                Button {
+                EditControllerButton {
                     onTapRedo()
                 } label: {
                     Image(.redo)
                         .renderingMode(.template)
+                }
+                .disabled(canRedo == false)
+            }
+        }
+
+        struct EditControllerButton<Label: View>: View {
+            @Environment(\.isEnabled) private var isEnabled: Bool
+
+            let action: () -> Void
+            @ViewBuilder let label: () -> Label
+
+            var body: some View {
+                Button {
+                    action()
+                } label: {
+                    label()
                         .foregroundStyle(
-                            canRedo
-                                ? .white1
-                                : .black2
+                            isEnabled ? .white1 : .black2
                         )
                 }
+                .buttonStyle(.bouncy)
             }
         }
     }
@@ -288,14 +317,15 @@ extension ChordProgressView {
         var body: some View {
             HStack(spacing: .zero) {
                 ToggleButton(
-                    title: "Sheet",
+                    title: String(localized: .sheet),
                     isSelected: !isEditMode,
                     namespace: namespace
                 ) {
                     isEditMode = false
                 }
+
                 ToggleButton(
-                    title: "Edit",
+                    title: String(localized: .edit),
                     isSelected: isEditMode,
                     namespace: namespace
                 ) {
@@ -317,7 +347,7 @@ extension ChordProgressView {
                     action()
                 } label: {
                     Text(title)
-                        .font(Typography.WantedSansStd.R2)
+                        .font(Typography.WantedSansStd.B3)
                         .bold(isSelected)
                         .foregroundStyle(
                             isSelected ? Color.white1 : Color.black1
@@ -634,17 +664,16 @@ extension ChordProgressView {
 
                     VStack(spacing: Spacing.xs) {
 
-                        /// TODO: 웨이브 폼 시작 시점이 아니야 ^^
                         Waveform(
                             width: segmentWidth,
                             amplitudes: segmentAudioLevels,
                             startTime: segmentStartTime,
                             endTime: min(segmentEndTime, totalDuration),
-                            elapsedTime: elapsedTime
+                            elapsedTime: elapsedTime,
+                            onScrubStart: waveFormAction,
+                            onScrubChange: waveFormAction,
+                            onScrubEnd: waveFormAction
                         )
-                        .onTapGesture {
-                            waveFormAction(segmentStartTime)
-                        }
 
                         TimeRuler(
                             visibleWidth: segmentWidth,
@@ -846,8 +875,8 @@ extension ChordProgressView {
     }
 }
 
-#Preview(traits: .routerModifier) {
-    NavigationStack {
-        ChordProgressView(score: .mock)
+#Preview {
+    PreviewContainer { router in
+        router.view(.chordProgress(score: .mock))
     }
 }

@@ -4,6 +4,7 @@ import SwiftUI
 
 struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    @Environment(\.isPresented) private var isPresented: Bool
 
     let isBackButtonHidden: Bool
     let leading: Leading
@@ -25,7 +26,7 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
     var body: some View {
         ZStack {
             HStack {
-                if !isBackButtonHidden {
+                if isPresented == true && isBackButtonHidden == false {
                     BackButton()
                 }
 

@@ -19,11 +19,7 @@ protocol HomeModelActionProtocol: AnyObject {
     func setIsLatest(_ isLatest: Bool)
     func toggleIsLatest()
     func setAllScores(_ scores: [Score])
-    func fetchScores(_ context: ModelContext)
-    func deleteScore(_ score: Score, context: ModelContext)
-    func renameScore(_ score: Score, newTitle: String)
     func updatePlayhead(_ playhead: Playhead)
-    func setUpdatedAt(_ score: Score, at date: Date)
 }
 
 @Observable
@@ -79,39 +75,7 @@ final class HomeModel:
         self.allScores = scores
     }
 
-    func fetchScores(_ context: ModelContext) {
-        do {
-            let scores = try context.fetch(FetchDescriptor<Score>())
-            self.allScores = scores
-        } catch {
-            self.allScores = []
-        }
-    }
-
-    func deleteScore(_ score: Score, context: ModelContext) {
-        context.delete(score)
-        do {
-            self.allScores.removeAll { $0.persistentModelID == score.persistentModelID }
-            if selectedScore?.persistentModelID == score.persistentModelID {
-                selectedScore = nil
-            }
-        }
-    }
-
-    func renameScore(_ score: Score, newTitle: String) {
-        let newTitle = newTitle
-        guard newTitle.isEmpty == false, newTitle != score.title else { return }
-
-        score.title = newTitle
-    }
-
     func updatePlayhead(_ playhead: Playhead) {
         self.playhead = playhead
-    }
-
-    func setUpdatedAt(_ score: Score, at date: Date = .now) {
-        score.updatedAt = date
-
-        self.allScores = self.allScores
     }
 }
