@@ -69,7 +69,7 @@ struct ChordProgressView: View {
                 isBackButtonHidden: true,
                 leading: {
                     Button {
-                        router.popToRoot()
+                        router?.popToRoot()
                     } label: {
                         Image("Home")
                             .renderingMode(.template)
@@ -87,7 +87,7 @@ struct ChordProgressView: View {
                 },
                 trailing: {
                     Button {
-                        router.push(.export(score: model.score))
+                        router?.push(.export(score: model.score))
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }

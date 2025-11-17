@@ -1,34 +1,43 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
+import SwiftUI
+import UIKit
 
 protocol ExportIntentProtocol {
     func onAppear()
 }
 
 final class ExportIntent: ExportIntentProtocol {
-    private let model: ExportModelActionProtocol
+    private(set) var model: ExportModelActionProtocol
 
     init(model: ExportModelActionProtocol) {
         self.model = model
     }
 
     func onAppear() {
-        prepareExportURLs()
-    }
+        model.readScore { score in
+            let renderer = ImageRenderer(content: ChordSheetView(score: score))
 
-    private func prepareExportURLs() {
-        let sheetURL = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "png"
-        )
+            if let uiImage = renderer.uiImage {
+                model.updateSheetImage(uiImage)
 
-        let audioURL = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "m4a"
-        )
+                if let data = uiImage.pngData() {
+                    let fileName = "sheet-\(score.id.uuidString).png"
+                    let url = FileManager.default
+                        .temporaryDirectory
+                        .appendingPathComponent(fileName)
 
-        model.updateSheetURL(sheetURL)
-        model.updateAudioURL(audioURL)
+                    do {
+                        try data.write(to: url)
+                        model.updateSheetURL(url)
+                    } catch {
+                        print("error")
+                    }
+                }
+            }
+
+            model.updateAudioURL(score.audioURL)
+        }
     }
 }

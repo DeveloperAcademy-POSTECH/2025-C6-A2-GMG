@@ -129,7 +129,7 @@ final class ScorePlayer {
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: nil)
 
-        try loadAudioFile(score.audioUrl)
+        try loadAudioFile(score.audioURL)
 
         try loadSoundBank()
 

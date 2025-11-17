@@ -1,21 +1,24 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
+import SwiftUI
 
 protocol ExportModelStateProtocol {
 
-    var title: String { get }
+    var score: Score { get }
+    var sheetImage: UIImage? { get }
+    var audioURL: URL? { get }
+    var sheetURL: URL? { get }
     var keyDescription: String { get }
     var dateString: String { get }
     var imageName: String { get }
-
-    var sheetURL: URL? { get }
-    var audioURL: URL? { get }
 }
 
 protocol ExportModelActionProtocol: AnyObject {
-    func updateSheetURL(_ url: URL?)
+    func updateSheetImage(_ image: UIImage?)
     func updateAudioURL(_ url: URL?)
+    func updateSheetURL(_ url: URL?)
+    func readScore(_ perform: (Score) -> Void)
 }
 
 @Observable
@@ -24,21 +27,17 @@ final class ExportModel:
     ExportModelActionProtocol
 {
 
-    private let score: Score
-
-    private(set) var sheetURL: URL?
+    private(set) var score: Score
+    private(set) var sheetImage: UIImage?
     private(set) var audioURL: URL?
-
-    var title: String {
-        score.title
-    }
+    private(set) var sheetURL: URL?
 
     var keyDescription: String {
         "\(score.key.description) Key"
     }
 
     var dateString: String {
-        Self.dateFormatter.string(from: score.createdAt)
+        Self.dateFormatter.string(from: .now)
     }
 
     var imageName: String {
@@ -47,16 +46,25 @@ final class ExportModel:
 
     init(score: Score) {
         self.score = score
-        self.sheetURL = nil
+        self.sheetImage = nil
         self.audioURL = nil
+        self.sheetURL = nil
+    }
+
+    func updateSheetImage(_ image: UIImage?) {
+        self.sheetImage = image
+    }
+
+    func updateAudioURL(_ url: URL?) {
+        self.audioURL = url
     }
 
     func updateSheetURL(_ url: URL?) {
         self.sheetURL = url
     }
 
-    func updateAudioURL(_ url: URL?) {
-        self.audioURL = url
+    func readScore(_ perform: (Score) -> Void) {
+        perform(score)
     }
 }
 
