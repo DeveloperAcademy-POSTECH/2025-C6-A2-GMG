@@ -77,7 +77,12 @@ struct Waveform: View {
     private var progressWidth: CGFloat {
         guard endTime > startTime else { return 0 }
 
-        let lastInteractionTime = scrubbingTime ?? elapsedTime
+        var lastInteractionTime = elapsedTime
+
+        if let scrubbingTime = self.scrubbingTime {
+            lastInteractionTime = scrubbingTime
+        }
+
         let clampedElapsed = min(max(lastInteractionTime, startTime), endTime)
         let ratio = (clampedElapsed - startTime) / (endTime - startTime)
 
