@@ -52,6 +52,10 @@ struct ChordProgressView: View {
                 }
                 .padding(Spacing.md)
 
+                let chordCandidateAction: (Chord, ChordCell) -> Void = { chord, chordCell in
+                    intent.onTapCandidateChordCell(chord, in: chordCell, for: model.score)
+                }
+
                 SegmentsScrollView(
                     segmentDuration: 5.0,
                     totalDuration: model.score.totalDuration,
@@ -59,7 +63,7 @@ struct ChordProgressView: View {
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
-                    chordCandidateAction: intent.onTapCandidateChordCell,
+                    chordCandidateAction: chordCandidateAction,
                     waveFormAction: intent.onTapWaveform,
                     audioLevels: model.score.audioLevels,
                     elapsedTime: model.playhead.elapsedTime
@@ -80,9 +84,12 @@ struct ChordProgressView: View {
                     }
                 },
                 center: {
+                    let onEnterTitle: (String) -> Void = { title in
+                        intent.onEnterTitle(title, for: model.score)
+                    }
                     NavigationTitle(
                         title: model.score.title,
-                        onEnterTitle: intent.onEnterTitle
+                        onEnterTitle: onEnterTitle
                     )
                 },
                 trailing: {
@@ -126,7 +133,8 @@ extension ChordProgressView {
     struct NavigationTitle: View {
         @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
-        @State var title: String
+        let title: String
+        @State var titleDraft: String
         @State private var isTitleEditing = false
         @FocusState private var isTitleFieldFocused: Bool
 
@@ -137,10 +145,12 @@ extension ChordProgressView {
             onEnterTitle: @escaping (String) -> Void
         ) {
             self.title = title
+            self.titleDraft = title
             self.onEnterTitle = onEnterTitle
         }
 
         private func startTitleEditing() {
+            titleDraft = title
             isTitleEditing = true
             DispatchQueue.main.async {
                 isTitleFieldFocused = true
@@ -150,14 +160,14 @@ extension ChordProgressView {
         private func finishEditingTitle() {
             isTitleEditing = false
             isTitleFieldFocused = false
-            onEnterTitle(title)
+            onEnterTitle(titleDraft)
         }
 
         var body: some View {
             ZStack(alignment: .center) {
                 TextField(
                     String(localized: .enterTitle),
-                    text: $title
+                    text: isTitleFieldFocused ? $titleDraft : .constant(title)
                 )
                 .multilineTextAlignment(.center)
                 .font(Typography.WantedSansStd.R6)
