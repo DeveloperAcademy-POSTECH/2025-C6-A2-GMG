@@ -141,6 +141,12 @@ final class RecordingIntent: RecordingIntentProtocol {
         self.countdownTask?.cancel()
 
         self.countdownTask = Task {
+            do {
+                try recordManager.prepareToRecord()
+            } catch {
+                Logger.error(String(describing: error))
+            }
+
             await withTaskCancellationHandler {
                 for i in (0...3).reversed() {
                     model.updateCountdown(i)
@@ -154,11 +160,7 @@ final class RecordingIntent: RecordingIntentProtocol {
                 }
             }
 
-            do {
-                try recordManager.record()
-            } catch {
-                Logger.error(String(describing: error))
-            }
+            recordManager.record()
         }
     }
 
