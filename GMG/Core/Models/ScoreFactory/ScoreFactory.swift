@@ -97,7 +97,7 @@ final class ScoreFactory {
             filteredChordCells = [newChordCell] + filteredChordCells[1...]
         }
 
-        let audioLevels: [Float] = try AudioLevelMeter.calculateLevel(from: workingURL)
+        let audioLevels: [Float] = try AudioLevelMeter.calculateLevel(from: copiedAudioURL)
 
         return Score(
             title: "Untitled",
