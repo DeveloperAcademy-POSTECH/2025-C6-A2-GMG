@@ -6,18 +6,23 @@ internal import UniformTypeIdentifiers
 struct ExportView: View {
     @State private var model: any ExportModelStateProtocol
     @State private var intent: any ExportIntentProtocol
+    private weak var router: Router?
 
-    init(score: Score) {
-        let model: ExportModel = ExportModel(score: score)
+    init(
+        model: ExportModelStateProtocol,
+        intent: ExportIntentProtocol,
+        router: Router? = nil
+    ) {
         self.model = model
-        self.intent = ExportIntent(model: model)
+        self.intent = intent
+        self.router = router
     }
 
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
             VStack(spacing: 0) {
-                Title(title: model.title)
+                Title(title: model.score.title)
                 KeyDate(
                     keyDescription: model.keyDescription,
                     dateString: model.dateString
@@ -45,11 +50,11 @@ extension ExportView {
                 Image(systemName: "chevron.left")
                     .frame(width: 15)
                 Spacer()
-                Text("Export")
+                Text(.export)
                     .font(Typography.WantedSansStd.R6)
                     .foregroundStyle(Color.black1)
                 Spacer()
-                Image("Home")
+                Image(.home)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 15)
