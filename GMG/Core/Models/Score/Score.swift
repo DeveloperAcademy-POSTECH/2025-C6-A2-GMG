@@ -89,10 +89,6 @@ class Score {
         self.title = title
     }
 
-    func updateAudioLevels(_ audioLevels: [Float]) {
-        self.audioLevels = audioLevels
-    }
-
     func setUpdatedAt(_ updatedAt: Date) {
         self.updatedAt = updatedAt
     }
