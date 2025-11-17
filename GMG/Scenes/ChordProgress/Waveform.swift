@@ -147,7 +147,6 @@ struct Waveform: View {
                         Spacer(minLength: 0)
                     }
                 )
-                .animation(.easeInOut(duration: 0.01), value: progressWidth)
             }
             .frame(width: width)
             .contentShape(Rectangle())
