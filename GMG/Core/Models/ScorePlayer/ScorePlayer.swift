@@ -93,7 +93,7 @@ final class ScorePlayer {
         self.playheadPublisherTimer = Timer.publish(
             every: 0.1,
             on: RunLoop.main,
-            in: RunLoop.Mode.default
+            in: RunLoop.Mode.common
         )
         .autoconnect()
         .sink { [weak self] _ in
