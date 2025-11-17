@@ -84,7 +84,7 @@ struct RecordingView: View {
             .requestMicrophoneAccessPermission,
             isPresented: .constant(model.isRecordPermissionAlertPresented)
         ) {
-            Button(.openSettings, role: .confirm) {
+            Button(.openSettings) {
                 intent.onTapOpenSettingsButton()
             }
             .keyboardShortcut(.defaultAction)

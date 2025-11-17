@@ -149,21 +149,24 @@ extension ChordProgressView {
 
         var body: some View {
             ZStack(alignment: .center) {
-                TextField(.enterTitle, text: $title)
-                    .multilineTextAlignment(.center)
-                    .font(Typography.WantedSansStd.R6)
-                    .foregroundStyle(
-                        colorScheme == .light
-                            ? Color.black1 : Color.white1
-                    )
-                    .focused($isTitleFieldFocused)
-                    .submitLabel(.done)
-                    .onSubmit {
-                        finishEditingTitle()
-                    }
-                    .opacity(
-                        isTitleFieldFocused ? 1 : 0
-                    )
+                TextField(
+                    String(localized: .enterTitle),
+                    text: $title
+                )
+                .multilineTextAlignment(.center)
+                .font(Typography.WantedSansStd.R6)
+                .foregroundStyle(
+                    colorScheme == .light
+                        ? Color.black1 : Color.white1
+                )
+                .focused($isTitleFieldFocused)
+                .submitLabel(.done)
+                .onSubmit {
+                    finishEditingTitle()
+                }
+                .opacity(
+                    isTitleFieldFocused ? 1 : 0
+                )
 
                 HStack(spacing: 5) {
                     Text(title)
