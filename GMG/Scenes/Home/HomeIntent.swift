@@ -105,7 +105,11 @@ final class HomeIntent: HomeIntentProtocol {
             let scores: [Score] = try scoreRepository.fetch()
             model.setAllScores(scores)
 
-            selectLastScore(scores)
+            let sortedForSelection = scores.sorted {
+                ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
+            }
+
+            selectLastScore(sortedForSelection)
         } catch {
             Logger.error(String(describing: error))
         }
@@ -132,10 +136,14 @@ final class HomeIntent: HomeIntentProtocol {
     }
 
     func selectLastScore(_ scores: [Score]) {
-        guard let last = scores.last else {
-            model?.setSelectedScore(nil)
+        guard let model else { return }
+
+        if scores.isEmpty {
+            model.setSelectedScore(nil)
             return
         }
-        selectScore(last)
+
+        let last = scores.last!
+        model.setSelectedScore(last)
     }
 }
