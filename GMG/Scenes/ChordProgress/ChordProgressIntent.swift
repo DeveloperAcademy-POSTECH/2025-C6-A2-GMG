@@ -2,7 +2,7 @@
 
 import Combine
 import Foundation
-import UIKit
+internal import UIKit
 
 protocol ChordProgressIntentProtocol {
     func onAppear(_ score: Score)
