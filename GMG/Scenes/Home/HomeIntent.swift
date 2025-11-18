@@ -46,7 +46,7 @@ final class HomeIntent: HomeIntentProtocol {
 
     func selectScore(_ score: Score) {
         guard let model else { return }
-        
+
         scorePlayer?.stop()
 
         model.setSelectedScore(score)
@@ -75,10 +75,10 @@ final class HomeIntent: HomeIntentProtocol {
     func onTapScore(_ score: Score) {
         guard let model else { return }
 
-        score.setUpdatedAt(.now)
-
         do {
+            score.setUpdatedAt(.now)
             try scoreRepository.update(score)
+            model.updateScore(score)
         } catch {
             Logger.error(String(describing: error))
         }
@@ -93,7 +93,6 @@ final class HomeIntent: HomeIntentProtocol {
         } else {
             setupPlayer(for: score)
         }
-
         scorePlayer?.play()
     }
 
@@ -108,11 +107,10 @@ final class HomeIntent: HomeIntentProtocol {
             let scores: [Score] = try scoreRepository.fetch()
             model.setAllScores(scores)
 
-            let sortedForSelection = scores.sorted {
+            let recent = scores.sorted {
                 ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
             }
-
-            selectLastScore(sortedForSelection)
+            selectLastScore(recent)
         } catch {
             Logger.error(String(describing: error))
         }
