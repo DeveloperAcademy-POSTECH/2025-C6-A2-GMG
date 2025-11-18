@@ -371,8 +371,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GMG/Info.plist;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the microphone to record audio.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the Photo Library to save photo.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio for chord detection.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Access to your photo library is required to save the chord sheet.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -424,8 +424,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GMG/Info.plist;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the microphone to record audio.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the Photo Library to save photo.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio for chord detection.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Access to your photo library is required to save the chord sheet.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
