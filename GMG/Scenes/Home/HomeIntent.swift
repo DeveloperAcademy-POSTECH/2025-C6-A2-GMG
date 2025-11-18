@@ -57,7 +57,7 @@ final class HomeIntent: HomeIntentProtocol {
 
             try scoreRepository.update(score)
 
-            fetchScores()
+            model?.updateScore(score)
         } catch {
             Logger.error(String(describing: error))
         }
