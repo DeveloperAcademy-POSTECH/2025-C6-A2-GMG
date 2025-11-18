@@ -241,7 +241,7 @@ extension ChordCell {
         return .init(
             chord: self.chord?.toPersistence(),
             chordCandidates: self.chordCandidates.map { $0.toPersistence() },
-            startTime: self.startTime)
+            startTime: self.startTime, duration: self.duration)
     }
 }
 
@@ -250,5 +250,47 @@ extension ScoreSchema.ChordCell {
         return .init(
             chord: self.chord?.toDomain(),
             chordCandidates: self.chordCandidates.map { $0.toDomain() }, startTime: self.startTime)
+    }
+}
+
+extension ScoreSchema.NoteName {
+    init?(fromDomain domain: NoteName) {
+        switch domain {
+        case .C: self = .C
+        case .Cs: self = .Cs
+        case .Db: self = .Db
+        case .D: self = .D
+        case .Ds: self = .Ds
+        case .Eb: self = .Eb
+        case .E: self = .E
+        case .Fb: self = .Fb
+        case .F: self = .F
+        case .Fs: self = .Fs
+        case .Gb: self = .Gb
+        case .G: self = .G
+        case .Gs: self = .Gs
+        case .Ab: self = .Ab
+        case .A: self = .A
+        case .As: self = .As
+        case .Bb: self = .Bb
+        case .B: self = .B
+        }
+    }
+}
+
+extension ScoreSchema.ChordQuality {
+    init?(fromDomain domain: ChordQuality) {
+        switch domain {
+        case .maj: self = .maj
+        case .maj7: self = .maj7
+        case .maj9: self = .maj9
+        case .min: self = .min
+        case .min7: self = .min7
+        case .dom7: self = .dom7
+        case .dom9: self = .dom9
+        case .dim: self = .dim
+        case .dim7: self = .dim7
+        case .halfDim7: self = .halfDim7
+        }
     }
 }
