@@ -87,7 +87,7 @@ struct ChordProgressView: View {
                 },
                 trailing: {
                     Button {
-                        router?.push(.export)
+                        router?.push(.export(score: model.score))
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
