@@ -52,6 +52,9 @@ struct HomeView: View {
                     .ignoresSafeArea()
                 }
         }
+        .onDisappear {
+            intent.onTapStopButton()
+        }
         .alert(
             .deleteScoreAlertTitle(title: model.scoreToDelete?.title ?? ""),
             isPresented: .constant(model.scoreToDelete != nil)
