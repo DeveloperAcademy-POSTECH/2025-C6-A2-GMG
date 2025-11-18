@@ -34,7 +34,6 @@ final class HomeIntent: HomeIntentProtocol {
     }
 
     func onAppear() {
-        model?.setSelectedScore(nil)
         fetchScores()
     }
 
@@ -57,6 +56,8 @@ final class HomeIntent: HomeIntentProtocol {
             score.updateTitle(newTitle)
 
             try scoreRepository.update(score)
+
+            fetchScores()
         } catch {
             Logger.error(String(describing: error))
         }
@@ -89,10 +90,8 @@ final class HomeIntent: HomeIntentProtocol {
     func onTapPlayButton(score: Score, selectedScore: Score?) {
         if selectedScore?.id != score.id {
             model?.setSelectedScore(score)
-            setupPlayer(for: score)
-        } else {
-            setupPlayer(for: score)
         }
+        setupPlayer(for: score)
         scorePlayer?.play()
     }
 
@@ -100,7 +99,7 @@ final class HomeIntent: HomeIntentProtocol {
         scorePlayer?.stop()
     }
 
-    func fetchScores() {
+    private func fetchScores() {
         guard let model else { return }
 
         do {
@@ -111,7 +110,7 @@ final class HomeIntent: HomeIntentProtocol {
         }
     }
 
-    func setupPlayer(for score: Score) {
+    private func setupPlayer(for score: Score) {
         cancellables.removeAll()
         scorePlayer?.cleanupAfterPlay()
         scorePlayer = nil
