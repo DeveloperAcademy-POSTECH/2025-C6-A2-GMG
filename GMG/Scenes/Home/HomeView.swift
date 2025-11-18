@@ -351,7 +351,7 @@ extension HomeView {
                                     intent.renameScore(score, newTitle: newTitle)
                                 },
                                 exportScoreAction: { score in
-                                    router?.push(.export)
+                                    router?.push(.export(score: score))
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score)
@@ -493,7 +493,7 @@ extension HomeView {
                                     intent.renameScore(score, newTitle: newTitle)
                                 },
                                 exportScoreAction: { score in
-                                    router?.push(.export)
+                                    router?.push(.export(score: score))
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score)

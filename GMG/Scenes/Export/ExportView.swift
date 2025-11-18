@@ -1,32 +1,44 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import SwiftUI
-import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
-    @State private var isSharing = false
-    @State private var shareItems: [Any] = []
+    @State private var model: any ExportModelStateProtocol
+    @State private var intent: any ExportIntentProtocol
+    private weak var router: Router?
+
+    init(
+        model: ExportModelStateProtocol,
+        intent: ExportIntentProtocol,
+        router: Router? = nil
+    ) {
+        self.model = model
+        self.intent = intent
+        self.router = router
+    }
 
     var body: some View {
         ZStack {
             Color.bg1.ignoresSafeArea()
             VStack(spacing: 0) {
-                //                Header()
-                Title()
-                KeyDate()
-                Image("DummyScore")
+                Title(title: model.score.title)
+                KeyDate(
+                    keyDescription: model.keyDescription,
+                    dateString: model.dateString
+                )
+                Image(model.imageName)
                     .padding(.bottom, 69.5)
                 ExportButton(
-                    exportSheet: exportSheet,
-                    exportAudio: exportAudio
+                    sheetURL: model.sheetURL,
+                    audioURL: model.audioURL
                 )
                 Spacer()
             }
             .navigationBar(leading: {}, center: {}, trailing: {})
         }
-        .sheet(isPresented: $isSharing) {
-            ActivityView(activityItems: shareItems)
+        .onAppear {
+            intent.onAppear()
         }
     }
 }
@@ -38,11 +50,11 @@ extension ExportView {
                 Image(systemName: "chevron.left")
                     .frame(width: 15)
                 Spacer()
-                Text("Export")
+                Text(.export)
                     .font(Typography.WantedSansStd.R6)
                     .foregroundStyle(Color.black1)
                 Spacer()
-                Image("Home")
+                Image(.home)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 15)
@@ -53,9 +65,11 @@ extension ExportView {
     }
 
     struct Title: View {
+        let title: String
+
         var body: some View {
             HStack(spacing: 0) {
-                Text("Title 1")
+                Text(title)
                     .font(Typography.WantedSansStd.B15)
                     .foregroundStyle(Color.black1)
                 Spacer()
@@ -66,13 +80,16 @@ extension ExportView {
     }
 
     struct KeyDate: View {
+        let keyDescription: String
+        let dateString: String
+
         var body: some View {
             HStack(spacing: 0) {
-                Text("E Key")
+                Text(keyDescription)
                     .font(Typography.WantedSansStd.R7)
                     .foregroundStyle(Color.black1)
                 Spacer()
-                Text("25. 11. 05")
+                Text(dateString)
                     .font(Typography.WantedSansStd.R4)
                     .foregroundStyle(Color.black5)
             }
@@ -82,92 +99,51 @@ extension ExportView {
     }
 
     struct ExportButton: View {
-        let exportSheet: () -> Void
-        let exportAudio: () -> Void
+        let sheetURL: URL?
+        let audioURL: URL?
 
         var body: some View {
             HStack(spacing: 19) {
-                Button(action: exportSheet) {
-                    HStack(spacing: 4) {
-                        Text("sheet")
-                            .font(Typography.WantedSansStd.M2)
-                            .foregroundStyle(Color.white1)
-                        Image("Export")
-                    }
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18).foregroundStyle(
-                            Color.black1
+
+                if let sheetURL {
+                    ShareLink(item: sheetURL) {
+                        HStack(spacing: 4) {
+                            Text("sheet")
+                                .font(Typography.WantedSansStd.M2)
+                                .foregroundStyle(Color.white1)
+                            Image("Export")
+                        }
+                        .padding(.vertical, 20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .foregroundStyle(Color.black1)
                         )
-                    )
+                    }
                 }
 
-                Button(action: exportAudio) {
-                    HStack(spacing: 4) {
-                        Text("Audio")
-                            .font(Typography.WantedSansStd.M2)
-                            .foregroundStyle(Color.white1)
-                        Image("Export")
-                    }
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18).foregroundStyle(
-                            Color.black1
+                if let audioURL {
+                    ShareLink(item: audioURL) {
+                        HStack(spacing: 4) {
+                            Text("Audio")
+                                .font(Typography.WantedSansStd.M2)
+                                .foregroundStyle(Color.white1)
+                            Image("Export")
+                        }
+                        .padding(.vertical, 20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .foregroundStyle(Color.black1)
                         )
-                    )
+                    }
                 }
             }
             .padding(.horizontal, 16)
         }
     }
-
-    struct ActivityView: UIViewControllerRepresentable {
-        let activityItems: [Any]
-
-        func makeUIViewController(context: Context) -> UIActivityViewController {
-            UIActivityViewController(
-                activityItems: activityItems,
-                applicationActivities: nil
-            )
-        }
-
-        func updateUIViewController(
-            _ controller: UIActivityViewController,
-            context: Context
-        ) {}
-    }
 }
 
-extension ExportView {
-    func exportSheet() {
-        if let url = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "png"
-        ) {
-            print("image success")
-            shareItems = [url]
-            isSharing = true
-        } else {
-            print("err: image not found")
-        }
-    }
-
-    func exportAudio() {
-        if let url = Bundle.main.url(
-            forResource: "Sample",
-            withExtension: "m4a"
-        ) {
-            print("audio success")
-            shareItems = [url]
-            isSharing = true
-        } else {
-            print("err: audio not found")
-        }
-    }
-}
-
-#Preview {
-    ExportView()
-}
+//#Preview {
+//    ExportView(score: Score)
+//}

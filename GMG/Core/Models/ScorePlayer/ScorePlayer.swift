@@ -122,6 +122,20 @@ final class ScorePlayer {
         }
     }
 
+    func prepareToExport() throws {
+        engine.attach(sampler)
+        engine.connect(sampler, to: engine.mainMixerNode, format: nil)
+
+        engine.attach(player)
+        engine.connect(player, to: engine.mainMixerNode, format: nil)
+
+        try loadAudioFile(score.audioURL)
+
+        try loadSoundBank()
+
+        prepareChordCells()
+    }
+
     /// onDisappear 시 실행될 메서드
     func cleanupAfterPlay() {
         try? deactivateAudioSession()
