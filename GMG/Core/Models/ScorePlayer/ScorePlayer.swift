@@ -32,7 +32,7 @@ final class ScorePlayer {
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
     private var playheadPublisherTimer: AnyCancellable?
 
-    private var routeChangeObserver: NSObjectProtocol?
+    private var cancellables: Set<AnyCancellable>
 
     init(score: Score) {
         self.score = score
@@ -63,7 +63,7 @@ final class ScorePlayer {
         )
         self.playheadPublisherTimer = nil
 
-        self.routeChangeObserver = nil
+        self.cancellables = Set<AnyCancellable>()
     }
 
     /// onAppear 시 실행될 메서드
@@ -111,15 +111,18 @@ final class ScorePlayer {
             )
         }
 
-        routeChangeObserver = NotificationCenter.default.addObserver(
-            forName: AVAudioSession.routeChangeNotification,
-            object: nil,
-            queue: nil
-        ) { [weak self] notification in
-            try? self?.activateAudioSession()
+        NotificationCenter.default.publisher(for: AVAudioSession.routeChangeNotification)
+            .sink { [weak self] notification in
+                guard let self else { return }
 
-            try? self?.engine.start()
-        }
+                do {
+                    try self.activateAudioSession()
+                    try self.engine.start()
+                } catch {
+                    Logger.error(String(describing: error))
+                }
+            }
+            .store(in: &cancellables)
     }
 
     func prepareToExport() throws {
@@ -143,10 +146,7 @@ final class ScorePlayer {
         playheadPublisherTimer?.cancel()
         playheadPublisherTimer = nil
 
-        if let observer = routeChangeObserver {
-            NotificationCenter.default.removeObserver(observer)
-            routeChangeObserver = nil
-        }
+        cancellables.removeAll()
 
         engine.stop()
     }
