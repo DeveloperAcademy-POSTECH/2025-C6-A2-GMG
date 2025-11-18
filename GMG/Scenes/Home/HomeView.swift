@@ -22,14 +22,12 @@ struct HomeView: View {
         ZStack {
             Color.bg1.ignoresSafeArea()
             VStack {
-                HeaderSection(count: model.songCount)
-                    .safeAreaPadding()
                 ScrollView {
                     LazyVStack(spacing: Spacing.xl) {
                         RecentFileSection(model: model, intent: intent, router: router)
                         AllFilesSection(model: model, intent: intent, router: router)
                     }
-                    .safeAreaPadding()
+                    .safeAreaPadding(Spacing.md)
                 }
                 .scrollIndicators(.hidden)
                 .task {
@@ -39,6 +37,20 @@ struct HomeView: View {
                     }
                 }
             }
+        }
+        .safeAreaInset(edge: .top) {
+            HeaderSection(count: model.songCount)
+                .padding(Spacing.md)
+                .padding(.top, Spacing.xs)
+                .background {
+                    LinearGradient(
+                        colors: [Color.bg1, Color.clear], startPoint: .top, endPoint: .bottom
+                    )
+                    .ignoresSafeArea()
+
+                    VariableBlurView(maxBlurRadius: 16, direction: .blurredTopClearBottom)
+                        .ignoresSafeArea()
+                }
         }
         .alert(
             .deleteScoreAlertTitle(title: model.scoreToDelete?.title ?? ""),

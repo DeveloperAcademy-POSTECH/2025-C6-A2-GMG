@@ -1,6 +1,7 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import SwiftUI
+internal import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
