@@ -34,6 +34,9 @@ struct HomeView: View {
                 .scrollIndicators(.hidden)
                 .task {
                     intent.onAppear()
+                    if let lastScore = model.sortedScores.last {
+                        intent.selectScore(lastScore)
+                    }
                 }
             }
         }
@@ -57,9 +60,12 @@ extension HomeView {
         let progress: Double
         let tapAction: () -> Void
         let playButtonAction: () -> Void
+        let stopButtonAction: () -> Void
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
+        let latestPalette: [Color]
+        let earliestPalette: [Color]
 
         var body: some View {
             HStack {
@@ -68,7 +74,7 @@ extension HomeView {
                         String(localized: .enterTitle),
                         text: isEditable ? $tempTitle : .constant(score.title)
                     )
-                    .font(Typography.WantedSansStd.R4)
+                    .font(isSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5)
                     .foregroundStyle(Color.white1)
                     .autocorrectionDisabled()
                     .focused($isTitleFocused)
@@ -81,13 +87,13 @@ extension HomeView {
                         }
                     }
 
-                    Text("\(score.key.description) Key")
+                    Text(Self.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
 
                     Spacer()
 
-                    Text(Self.dateConverter(score.createdAt))
+                    Text("\(score.key.description) Key")
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.black6)
                 }
@@ -124,36 +130,45 @@ extension HomeView {
                         .padding(.top, -6)
 
                     Button {
-                        playButtonAction()
-                    } label: {
-                        ZStack {
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 10, height: 10)
-                                .padding(.leading, isPlaying ? 0 : 2)
-                                .foregroundStyle(Color.black1)
-                                .padding(Spacing.xs)
-                                .background(Color.white2, in: Circle())
-
-                            Circle()
-                                .stroke(Color.gray.opacity(0.25), lineWidth: 3)
-                                .frame(width: 24, height: 24)
-                                .opacity(isSelected && (isPlaying || progress > 0) ? 1 : 0)
-
-                            Circle()
-                                .trim(from: 0, to: progress)
-                                .stroke(
-                                    Color.bg2,
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                                )
-                                .rotationEffect(.degrees(-90))
-                                .frame(width: 24, height: 24)
-                                .opacity(isSelected && (isPlaying || progress > 0) ? 1 : 0)
+                        if isPlaying {
+                            stopButtonAction()
+                        } else {
+                            playButtonAction()
                         }
-                        .opacity(isSelected ? 1 : 0)
+                    } label: {
+                        Image(isPlaying ? .pause : .play)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 12, height: 12)
+                            .padding(.leading, isPlaying ? 0 : 2)
+                            .foregroundStyle(Color.black1)
+                            .padding(Spacing.xs)
+                            .background {
+                                let lineWidth: CGFloat = 3
+                                let isProgressPresented: Bool =
+                                    isSelected && (isPlaying || progress > 0)
+                                Circle()
+                                    .inset(by: lineWidth / 2)
+                                    .fill(Color.white2)
+                                    .stroke(
+                                        isProgressPresented ? Color.bg1 : Color.white2,
+                                        lineWidth: lineWidth
+                                    )
+                                    .drawingGroup()
+                                Circle()
+                                    .inset(by: lineWidth / 2)
+                                    .trim(from: 0, to: progress)
+                                    .stroke(
+                                        Color.bg2,
+                                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                                    )
+                                    .rotationEffect(.degrees(-90))
+                                    .opacity(isProgressPresented ? 1 : 0)
+                            }
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.bouncy)
+                    .opacity(isSelected ? 1 : 0)
                 }
             }
             .padding(Spacing.lg)
@@ -164,7 +179,7 @@ extension HomeView {
                 maxHeight: 128
             )
             .background(
-                isLatest ? latestBackgroundColor : earliestBackgroundColor,
+                backgroundColor,
                 in: RoundedRectangle(cornerRadius: 32)
             )
             .contentShape(RoundedRectangle(cornerRadius: 32))
@@ -199,13 +214,14 @@ extension HomeView {
         }
 
         // MARK: - Color Helpers
-        private var latestBackgroundColor: Color {
-            let palette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
-            return palette[index % palette.count]
-        }
-        private var earliestBackgroundColor: Color {
-            let palette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
-            return palette[index % palette.count]
+        private var backgroundColor: Color {
+            if isSmall {
+                return latestPalette[index % latestPalette.count]
+            } else {
+                return isLatest
+                    ? latestPalette[index % latestPalette.count]
+                    : earliestPalette[index % earliestPalette.count]
+            }
         }
 
         // MARK: - data Helpers
@@ -326,12 +342,13 @@ extension HomeView {
                                     )
                                 },
                                 playButtonAction: {
-                                    if isSelected && model.playhead.isPlaying {
-                                        intent.onTapStopButton()
-                                    } else {
-                                        intent.onTapPlayButton(
-                                            score: score, selectedScore: model.selectedScore)
-                                    }
+                                    intent.onTapPlayButton(
+                                        score: score,
+                                        selectedScore: model.selectedScore
+                                    )
+                                },
+                                stopButtonAction: {
+                                    intent.onTapStopButton()
                                 },
                                 renameScoreAction: { newTitle in
                                     intent.renameScore(score, newTitle: newTitle)
@@ -341,8 +358,9 @@ extension HomeView {
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score)
-                                }
-                            )
+                                },
+                                latestPalette: latestPalette,
+                                earliestPalette: earliestPalette)
                         }
                     }
                 }
@@ -391,7 +409,14 @@ extension HomeView {
                             model.isLatest ? Color.black5 : Color.black3
                         )
                         .padding(.trailing, 12)
-                        .onTapGesture { if model.isLatest == false { intent.setIsLatest(true) } }
+                        .onTapGesture {
+                            if model.isLatest == false {
+                                intent.setIsLatest(true)
+                                if let last = model.sortedScores.last {
+                                    intent.selectScore(last)
+                                }
+                            }
+                        }
 
                     Text(.earliest)
                         .font(Typography.WantedSansStd.R5)
@@ -399,7 +424,14 @@ extension HomeView {
                             model.isLatest ? Color.black3 : Color.black5
                         )
                         .padding(.trailing, 12)
-                        .onTapGesture { if model.isLatest == true { intent.setIsLatest(false) } }
+                        .onTapGesture {
+                            if model.isLatest == true {
+                                intent.setIsLatest(false)
+                                if let last = model.sortedScores.last {
+                                    intent.selectScore(last)
+                                }
+                            }
+                        }
 
                     Spacer()
                 }
@@ -407,13 +439,13 @@ extension HomeView {
                 if model.songCount == 0 {
                     VStack(alignment: .leading, spacing: Spacing.xs) {
                         Text("An experience")
-                            .foregroundStyle(Color.white3.opacity(0.6))
+                            .foregroundStyle(Color.white3.opacity(0.55))
                         Text("where humming")
-                            .foregroundStyle(Color.black8.opacity(0.4))
+                            .foregroundStyle(Color.black8.opacity(0.3))
                         Text("becomes the")
-                            .foregroundStyle(Color.black4.opacity(0.4))
+                            .foregroundStyle(Color.black4.opacity(0.3))
                         Text("start of a song")
-                            .foregroundStyle(Color.black4.opacity(0.55))
+                            .foregroundStyle(Color.black4.opacity(0.35))
                     }
                     .font(
                         .custom(
@@ -424,7 +456,7 @@ extension HomeView {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 48)
                 } else {
-                    VStack(spacing: -82) {
+                    VStack(spacing: -60) {
                         ForEach(
                             Array(model.sortedScores.enumerated()),
                             id: \.element.id
@@ -456,12 +488,13 @@ extension HomeView {
                                     }
                                 },
                                 playButtonAction: {
-                                    if isSelected && model.playhead.isPlaying {
-                                        intent.onTapStopButton()
-                                    } else {
-                                        intent.onTapPlayButton(
-                                            score: score, selectedScore: model.selectedScore)
-                                    }
+                                    intent.onTapPlayButton(
+                                        score: score,
+                                        selectedScore: model.selectedScore
+                                    )
+                                },
+                                stopButtonAction: {
+                                    intent.onTapStopButton()
                                 },
                                 renameScoreAction: { newTitle in
                                     intent.renameScore(score, newTitle: newTitle)
@@ -471,7 +504,12 @@ extension HomeView {
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score)
-                                }
+                                    if let last = model.sortedScores.last {
+                                        intent.selectScore(last)
+                                    }
+                                },
+                                latestPalette: latestPalette,
+                                earliestPalette: earliestPalette
                             )
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
@@ -484,6 +522,8 @@ extension HomeView {
         }
     }
 
+    static let latestPalette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
+    static let earliestPalette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
 }
 
 #Preview {
