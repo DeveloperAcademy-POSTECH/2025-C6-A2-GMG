@@ -39,6 +39,9 @@ struct HomeView: View {
                 }
             }
         }
+        .onDisappear {
+            intent.onDisappear()
+        }
         .safeAreaInset(edge: .top) {
             HeaderSection(count: model.songCount)
                 .padding(Spacing.md)
