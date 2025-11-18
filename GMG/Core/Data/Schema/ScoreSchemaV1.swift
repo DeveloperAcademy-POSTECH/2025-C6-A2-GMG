@@ -13,16 +13,17 @@ enum ScoreSchemaV1: VersionedSchema {
 
     @Model
     final class Score {
-        @Attribute(.unique) var id: UUID
-        var title: String
-        var key: Key
-        var audioFileName: String
-        var totalDuration: TimeInterval
-        var createdAt: Date
-        var updatedAt: Date
-        var notes: [Note]
-        var chordCells: [ChordCell]
-        var audioLevels: [Float]
+        @Attribute(.unique) var id: UUID = UUID()
+        var title: String = ""
+        var key: Key = Key(root: .C)
+        var audioFileName: String = ""
+        var totalDuration: TimeInterval = TimeInterval.zero
+        var createdAt: Date = Date.now
+        var updatedAt: Date = Date.now
+        var notes: [Note] = []
+        var chordCells: [ChordCell] = []
+        var audioLevels: [Float] = []
+        var isDeleted: Bool = false
 
         init(
             id: UUID,
@@ -34,7 +35,8 @@ enum ScoreSchemaV1: VersionedSchema {
             updatedAt: Date,
             notes: [Note],
             chordCells: [ChordCell],
-            audioLevels: [Float]
+            audioLevels: [Float],
+            isDeleted: Bool
         ) {
             self.id = id
             self.title = title
@@ -46,6 +48,7 @@ enum ScoreSchemaV1: VersionedSchema {
             self.notes = notes
             self.chordCells = chordCells
             self.audioLevels = audioLevels
+            self.isDeleted = isDeleted
         }
     }
 
