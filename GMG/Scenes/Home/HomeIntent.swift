@@ -46,6 +46,8 @@ final class HomeIntent: HomeIntentProtocol {
 
     func selectScore(_ score: Score) {
         guard let model else { return }
+        
+        scorePlayer?.stop()
 
         model.setSelectedScore(score)
     }
@@ -88,9 +90,10 @@ final class HomeIntent: HomeIntentProtocol {
         if selectedScore?.id != score.id {
             model?.setSelectedScore(score)
             setupPlayer(for: score)
+        } else {
+            setupPlayer(for: score)
         }
 
-        setupPlayer(for: score)
         scorePlayer?.play()
     }
 
