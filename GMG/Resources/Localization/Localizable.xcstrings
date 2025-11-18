@@ -140,6 +140,40 @@
         }
       }
     },
+    "DeleteScoreAlertDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This action cannot be undone."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 작업은 되돌릴 수 없습니다."
+          }
+        }
+      }
+    },
+    "DeleteScoreAlertTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete ‘%1$(title)@’?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "‘%(title)@’를 삭제하시겠습니까?"
+          }
+        }
+      }
+    },
     "Earliest" : {
       "extractionState" : "manual",
       "localizations" : {
