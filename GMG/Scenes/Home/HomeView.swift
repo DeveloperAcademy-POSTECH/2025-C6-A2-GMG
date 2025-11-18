@@ -40,6 +40,38 @@ struct HomeView: View {
                 }
             }
         }
+        .alert(
+            .deleteScoreAlertTitle(title: model.scoreToDelete?.title ?? ""),
+            isPresented: .constant(model.scoreToDelete != nil)
+        ) {
+            Button(.delete, role: .destructive) {
+                if let scoreToDelete = model.scoreToDelete {
+                    intent.deleteScore(scoreToDelete)
+                }
+                intent.requestDeleteScoreConfirmation(nil)
+            }
+            Button(.cancel, role: .cancel) {
+                intent.requestDeleteScoreConfirmation(nil)
+            }
+        } message: {
+            Text(.deleteScoreAlertDescription)
+        }
+        .alert(
+            .deleteScoreAlertTitle(title: model.scoreToDelete?.title ?? ""),
+            isPresented: .constant(model.scoreToDelete != nil)
+        ) {
+            Button(.delete, role: .destructive) {
+                if let scoreToDelete = model.scoreToDelete {
+                    intent.deleteScore(scoreToDelete)
+                }
+                intent.requestDeleteScoreConfirmation(nil)
+            }
+            Button(.cancel, role: .cancel) {
+                intent.requestDeleteScoreConfirmation(nil)
+            }
+        } message: {
+            Text(.deleteScoreAlertDescription)
+        }
     }
 }
 
@@ -357,7 +389,7 @@ extension HomeView {
                                     router?.push(.export(score: score))
                                 },
                                 deleteScoreAction: { score in
-                                    intent.deleteScore(score)
+                                    intent.requestDeleteScoreConfirmation(score)
                                 },
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette)
@@ -503,7 +535,7 @@ extension HomeView {
                                     router?.push(.export(score: score))
                                 },
                                 deleteScoreAction: { score in
-                                    intent.deleteScore(score)
+                                    intent.requestDeleteScoreConfirmation(score)
                                     if let last = model.sortedScores.last {
                                         intent.selectScore(last)
                                     }

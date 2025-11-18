@@ -9,6 +9,7 @@ protocol HomeIntentProtocol {
     func setIsLatest(_ isLatest: Bool)
     func selectScore(_ score: Score)
     func renameScore(_ score: Score, newTitle: String)
+    func requestDeleteScoreConfirmation(_ score: Score?)
     func deleteScore(_ score: Score)
     func onTapScore(_ score: Score)
     func onTapPlayButton(score: Score, selectedScore: Score?)
@@ -61,6 +62,12 @@ final class HomeIntent: HomeIntentProtocol {
         } catch {
             Logger.error(String(describing: error))
         }
+    }
+
+    func requestDeleteScoreConfirmation(_ score: Score?) {
+        guard let model = self.model else { return }
+
+        model.setScoreToDelete(score)
     }
 
     func deleteScore(_ score: Score) {

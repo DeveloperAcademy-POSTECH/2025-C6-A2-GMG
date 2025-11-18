@@ -12,6 +12,7 @@ protocol HomeModelStateProtocol {
     var isScoresEmpty: Bool { get }
     var sortedScores: [Score] { get }
     var recentScores: [Score] { get }
+    var scoreToDelete: Score? { get }
 }
 
 protocol HomeModelActionProtocol: AnyObject {
@@ -21,6 +22,7 @@ protocol HomeModelActionProtocol: AnyObject {
     func setAllScores(_ scores: [Score])
     func updateScore(_ score: Score)
     func updatePlayhead(_ playhead: Playhead)
+    func setScoreToDelete(_ score: Score?)
 }
 
 @Observable
@@ -32,12 +34,14 @@ final class HomeModel:
     private(set) var isLatest: Bool
     private(set) var allScores: [Score]
     private(set) var playhead: Playhead
+    private(set) var scoreToDelete: Score?
 
     init() {
         self.selectedScore = nil
         self.isLatest = true
         self.allScores = []
         self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
+        self.scoreToDelete = nil
     }
 
     var songCount: Int { allScores.count }
@@ -82,5 +86,9 @@ final class HomeModel:
 
     func updatePlayhead(_ playhead: Playhead) {
         self.playhead = playhead
+    }
+
+    func setScoreToDelete(_ score: Score?) {
+        self.scoreToDelete = score
     }
 }
