@@ -357,7 +357,13 @@ extension ChordProgressView {
                     action()
                 } label: {
                     Text(title)
-                        .font(Typography.WantedSansStd.B3)
+                        .font(
+                            .english(
+                                isSelected
+                                    ? Typography.WantedSansStd.B3 : Typography.WantedSansStd.R3),
+                            .korean(
+                                isSelected ? Typography.Pretendard.SB4 : Typography.Pretendard.R1)
+                        )
                         .bold(isSelected)
                         .foregroundStyle(
                             isSelected ? Color.white1 : Color.black1
@@ -889,4 +895,5 @@ extension ChordProgressView {
     PreviewContainer { router in
         router.view(.chordProgress(score: .mock))
     }
+    .environment(\.locale, .init(languageCode: .english))
 }

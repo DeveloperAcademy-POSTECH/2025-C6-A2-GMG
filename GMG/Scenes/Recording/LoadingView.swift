@@ -52,7 +52,10 @@ struct LoadingView: View {
                     .frame(width: 20, height: 20)
                     .background(color, in: Circle())
                 Text(text)
-                    .font(Typography.WantedSansStd.R6)
+                    .font(
+                        .english(Typography.WantedSansStd.R6),
+                        .korean(Typography.Pretendard.M6)
+                    )
                     .foregroundStyle(color)
             }
         }

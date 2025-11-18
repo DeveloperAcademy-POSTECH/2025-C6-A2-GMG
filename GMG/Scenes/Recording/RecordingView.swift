@@ -296,7 +296,10 @@ struct RecordingView: View {
                                 Image(.reset)
                                     .renderingMode(.template)
                                 Text(.reset)
-                                    .font(Typography.WantedSansStd.M2)
+                                    .font(
+                                        .english(Typography.WantedSansStd.M2),
+                                        .korean(Typography.Pretendard.M5)
+                                    )
                             }
                         }
                         .transition(
@@ -313,7 +316,10 @@ struct RecordingView: View {
                             Image(primaryButtonImage)
                                 .renderingMode(.template)
                             Text(primaryButtonTitle)
-                                .font(Typography.WantedSansStd.M2)
+                                .font(
+                                    .english(Typography.WantedSansStd.M2),
+                                    .korean(Typography.Pretendard.M5)
+                                )
                         }
                     }
                     .gridCellColumns(2)
@@ -326,7 +332,10 @@ struct RecordingView: View {
                                 Image(.next)
                                     .renderingMode(.template)
                                 Text(.next)
-                                    .font(Typography.WantedSansStd.M2)
+                                    .font(
+                                        .english(Typography.WantedSansStd.M2),
+                                        .korean(Typography.Pretendard.M5)
+                                    )
                             }
                         }
                         .transition(
@@ -349,4 +358,5 @@ struct RecordingView: View {
     PreviewContainer { router in
         router.view(.recording)
     }
+    .environment(\.locale, .init(languageCode: .english))
 }
