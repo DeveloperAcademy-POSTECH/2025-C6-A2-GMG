@@ -34,6 +34,9 @@ struct HomeView: View {
                 .scrollIndicators(.hidden)
                 .task {
                     intent.onAppear()
+                    if let lastScore = model.sortedScores.last {
+                        intent.selectScore(lastScore)
+                    }
                 }
             }
         }
@@ -409,7 +412,9 @@ extension HomeView {
                         .onTapGesture {
                             if model.isLatest == false {
                                 intent.setIsLatest(true)
-                                intent.selectLastScore(model.sortedScores)
+                                if let last = model.sortedScores.last {
+                                    intent.selectScore(last)
+                                }
                             }
                         }
 
@@ -422,7 +427,9 @@ extension HomeView {
                         .onTapGesture {
                             if model.isLatest == true {
                                 intent.setIsLatest(false)
-                                intent.selectLastScore(model.sortedScores)
+                                if let last = model.sortedScores.last {
+                                    intent.selectScore(last)
+                                }
                             }
                         }
 
@@ -497,7 +504,9 @@ extension HomeView {
                                 },
                                 deleteScoreAction: { score in
                                     intent.deleteScore(score)
-                                    intent.selectLastScore(model.sortedScores)
+                                    if let last = model.sortedScores.last {
+                                        intent.selectScore(last)
+                                    }
                                 },
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette
