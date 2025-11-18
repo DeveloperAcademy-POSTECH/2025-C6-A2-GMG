@@ -6,6 +6,7 @@ import SwiftData
 
 protocol HomeIntentProtocol {
     func onAppear()
+    func onDisappear()
     func setIsLatest(_ isLatest: Bool)
     func selectScore(_ score: Score)
     func renameScore(_ score: Score, newTitle: String)
@@ -36,6 +37,10 @@ final class HomeIntent: HomeIntentProtocol {
 
     func onAppear() {
         fetchScores()
+    }
+
+    func onDisappear() {
+        cleanupPlayer()
     }
 
     func setIsLatest(_ isLatest: Bool) {
@@ -118,9 +123,7 @@ final class HomeIntent: HomeIntentProtocol {
     }
 
     private func setupPlayer(for score: Score) {
-        cancellables.removeAll()
-        scorePlayer?.cleanupAfterPlay()
-        scorePlayer = nil
+        cleanupPlayer()
 
         do {
             let scorePlayer = ScorePlayer(score: score)
@@ -137,4 +140,9 @@ final class HomeIntent: HomeIntentProtocol {
         }
     }
 
+    private func cleanupPlayer() {
+        cancellables.removeAll()
+        scorePlayer?.cleanupAfterPlay()
+        scorePlayer = nil
+    }
 }
