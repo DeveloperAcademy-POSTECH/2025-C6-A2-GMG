@@ -52,10 +52,19 @@ struct ChordProgressView: View {
                 }
                 .padding(Spacing.md)
 
-                SegmentsScrollView(
-                    segmentDuration: 5.0,
+                let chordCells = model.score.retrieveAllChordCells()
+                let segmentDuration = 5.0
+                let segmentEntries = buildSegmentEntries(
+                    chordCells: chordCells,
                     totalDuration: model.score.totalDuration,
-                    chordCells: model.score.retrieveAllChordCells(),
+                    segmentDuration: segmentDuration
+                )
+
+                SegmentsScrollView(
+                    segmentDuration: segmentDuration,
+                    totalDuration: model.score.totalDuration,
+                    chordCells: chordCells,
+                    segmentEntries: segmentEntries,
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
@@ -119,6 +128,121 @@ struct ChordProgressView: View {
         .onDisappear {
             intent.onDisappear()
         }
+    }
+}
+
+extension ChordProgressView {
+    fileprivate func buildSegmentEntries(
+        chordCells: [ChordCell],
+        totalDuration: TimeInterval,
+        segmentDuration: TimeInterval
+    ) -> [Int: [Segment.SegmentChordEntry]] {
+        let segmentCount = Int(ceil(totalDuration / segmentDuration))
+        guard segmentCount > 0 else { return [:] }
+
+        var result: [Int: [Segment.SegmentChordEntry]] = [:]
+        for index in 0..<segmentCount {
+            result[index] = buildSegmentEntries(
+                index: index,
+                totalDuration: totalDuration,
+                chordCells: chordCells,
+                segmentDuration: segmentDuration
+            )
+        }
+
+        return result
+    }
+
+    fileprivate func buildSegmentEntries(
+        index: Int,
+        totalDuration: TimeInterval,
+        chordCells: [ChordCell],
+        segmentDuration: TimeInterval
+    ) -> [Segment.SegmentChordEntry] {
+        let segmentStartTime = TimeInterval(index) * segmentDuration
+        let segmentEndTime = segmentStartTime + segmentDuration
+
+        var targetChordCells: [ChordCell] = chordCells.filter {
+            chordCell in
+            segmentStartTime <= chordCell.startTime
+                && chordCell.startTime < segmentEndTime
+        }
+
+        let previousChordCell: ChordCell =
+            chordCells.filter({ v in
+                v.startTime <= segmentStartTime
+            }).last
+            ?? ChordCell(
+                chord: nil,
+                chordCandidates: [],
+                startTime: segmentStartTime
+            )
+
+        if targetChordCells.isEmpty {
+            targetChordCells = [previousChordCell]
+        }
+
+        if let firstStartTime = targetChordCells.first?.startTime,
+            firstStartTime > segmentStartTime
+        {
+            targetChordCells.insert(previousChordCell, at: 0)
+        }
+
+        if index == Int(floor(totalDuration / segmentDuration))
+            && totalDuration < segmentEndTime
+        {
+            targetChordCells.append(
+                ChordCell(
+                    chord: nil,
+                    chordCandidates: [],
+                    startTime: totalDuration
+                )
+            )
+        }
+
+        var entries: [Segment.SegmentChordEntry] = []
+
+        for cursor in 0..<targetChordCells.endIndex - 1 {
+            let currentTargetChord = targetChordCells[cursor]
+            let nextTargetChord = targetChordCells[cursor + 1]
+
+            let clampedCurrentStart = max(currentTargetChord.startTime, segmentStartTime)
+            let clampedNextStart = min(nextTargetChord.startTime, segmentEndTime)
+
+            let rawDuration = clampedNextStart - clampedCurrentStart
+            let clampedDuration = min(segmentDuration, rawDuration)
+
+            let occupancyRatio = clampedDuration / max(1, segmentDuration)
+
+            if occupancyRatio > 0.02 {
+                entries.append(
+                    Segment.SegmentChordEntry(
+                        chordCell: currentTargetChord,
+                        duration: clampedDuration
+                    )
+                )
+            }
+        }
+
+        guard let lastChordCell = targetChordCells.last else {
+            return entries
+        }
+
+        let clampedStartTime = max(lastChordCell.startTime, segmentStartTime)
+        let clampedDuration = segmentEndTime - clampedStartTime
+
+        let lastOccupancyRatio = clampedDuration / max(1, segmentDuration)
+
+        if lastOccupancyRatio > 0.02 {
+            entries.append(
+                Segment.SegmentChordEntry(
+                    chordCell: lastChordCell,
+                    duration: clampedDuration
+                )
+            )
+        }
+
+        return entries
     }
 }
 
@@ -432,6 +556,7 @@ extension ChordProgressView {
         let segmentDuration: TimeInterval
         let totalDuration: TimeInterval
         let chordCells: [ChordCell]
+        let segmentEntries: [Int: [Segment.SegmentChordEntry]]
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
@@ -451,6 +576,7 @@ extension ChordProgressView {
                             index: index,
                             totalDuration: totalDuration,
                             chordCells: chordCells,
+                            segmentChordEntries: segmentEntries[index] ?? [],
                             segmentDuration: segmentDuration,
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,
@@ -479,403 +605,6 @@ extension ChordProgressView {
                     Color.white
                 }
                 .ignoresSafeArea()
-            }
-        }
-    }
-
-    struct Segment: View {
-        let index: Int
-        let totalDuration: TimeInterval
-        let chordCells: [ChordCell]  // 전체 악보의 코드 셀 리스트
-        let segmentDuration: TimeInterval
-        let currentChordCell: ChordCell?  // 재생 중인 코드 셀
-        let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
-        let chordCellAction: (ChordCell) -> Void
-        let chordCandidateAction: (Chord, ChordCell) -> Void
-        let waveFormAction: (_ time: TimeInterval) -> Void
-        let audioLevels: [Float]
-        let elapsedTime: TimeInterval
-
-        @Environment(\.editMode) private var editMode
-
-        private let audioSampleInterval: TimeInterval = 0.1
-
-        private var segmentStartTime: TimeInterval {
-            TimeInterval(index) * segmentDuration
-        }
-
-        private var segmentEndTime: TimeInterval {
-            segmentStartTime + segmentDuration
-        }
-
-        private var segmentAudioLevels: [Float] {
-            guard !audioLevels.isEmpty else { return [] }
-
-            let clampedEndTime: TimeInterval = min(segmentEndTime, totalDuration)
-            guard clampedEndTime > segmentStartTime else { return [] }
-
-            let startIndex: Int = max(
-                0,
-                Int(floor(segmentStartTime / audioSampleInterval))
-            )
-            let endIndex: Int = min(
-                audioLevels.count,
-                Int(ceil(clampedEndTime / audioSampleInterval))
-            )
-
-            guard startIndex < endIndex else { return [] }
-
-            return Array(audioLevels[startIndex..<endIndex])
-        }
-
-        private var segmentChordEntries: [SegmentChordEntry] {
-            var targetChordCells: [ChordCell] = chordCells.filter {
-                chordCell in
-                segmentStartTime <= chordCell.startTime
-                    && chordCell.startTime < segmentEndTime
-            }
-
-            let previousChordCell: ChordCell =
-                chordCells.filter({ v in
-                    v.startTime <= segmentStartTime
-                }).last ?? ChordCell(chord: nil, chordCandidates: [], startTime: segmentStartTime)
-
-            /// 세그먼트에 코드가 없는 경우, 전 세그먼트의 마지막 코드를 사용
-            if targetChordCells.isEmpty {
-                targetChordCells = [previousChordCell]
-            }
-
-            /// 코드가 존재하고, 첫 코드가 segmentStartTime보다 늦게 시작하는 경우,
-            ///  전 세그먼트의 마지막 코드를 사용
-            if let firstStartTime = targetChordCells.first?.startTime,
-                firstStartTime > segmentStartTime
-            {
-                targetChordCells.insert(previousChordCell, at: 0)
-            }
-
-            /// 오디오 파일의 끝 처리
-            if index == Int(floor(totalDuration / segmentDuration))
-                && totalDuration < segmentEndTime
-            {
-                targetChordCells.append(
-                    ChordCell(
-                        chord: nil,
-                        chordCandidates: [],
-                        startTime: totalDuration
-                    )
-                )
-            }
-
-            var entries: [SegmentChordEntry] = []
-
-            for index in 0..<targetChordCells.endIndex - 1 {
-                let currentTargetChord = targetChordCells[index]
-                let nextTargetChord = targetChordCells[index + 1]
-
-                let clampedCurrentStart = max(currentTargetChord.startTime, segmentStartTime)
-                let clampedNextStart = min(nextTargetChord.startTime, segmentEndTime)
-
-                let rawDuration = clampedNextStart - clampedCurrentStart
-                let clampedDuration = min(segmentDuration, rawDuration)
-
-                let occupancyRatio = clampedDuration / max(1, segmentDuration)
-
-                if occupancyRatio > 0.02 {
-                    entries.append(
-                        SegmentChordEntry(
-                            chordCell: currentTargetChord,
-                            duration: clampedDuration
-                        )
-                    )
-                }
-            }
-
-            guard let lastChordCell = targetChordCells.last else {
-                return entries
-            }
-
-            let clampedStartTime = max(lastChordCell.startTime, segmentStartTime)
-            let clampedDuration = segmentEndTime - clampedStartTime
-
-            let lastOccupancyRatio = clampedDuration / max(1, segmentDuration)
-
-            if lastOccupancyRatio > 0.02 {
-                entries.append(
-                    SegmentChordEntry(
-                        chordCell: lastChordCell,
-                        duration: clampedDuration
-                    )
-                )
-            }
-
-            return entries
-        }
-
-        var body: some View {
-            VStack(spacing: Spacing.xs) {
-                GeometryReader { proxy in
-                    let totalSpacing = Spacing.xs * CGFloat(segmentChordEntries.count - 1)
-                    let availableWidth = proxy.size.width - totalSpacing
-
-                    HStack(spacing: Spacing.xs) {
-                        ForEach(segmentChordEntries) { cell in
-                            let widthRatio = cell.duration / max(1, segmentDuration)
-                            let cellWidth = availableWidth * widthRatio
-                            let clampedWidth = cellWidth < 1 ? 0 : cellWidth
-
-                            ZStack {
-                                if let chord = cell.chordCell.chord {
-                                    ChordCellButton(
-                                        chord: chord,
-                                        isCurrentChord: currentChordCell?.startTime
-                                            == cell.chordCell.startTime,
-                                        isSelected: selectedChordCell?.startTime
-                                            == cell.chordCell.startTime
-                                    ) {
-                                        chordCellAction(cell.chordCell)
-                                    }
-                                }
-                            }
-                            .frame(width: clampedWidth, height: 62)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 62, maxHeight: 62)
-
-                let showCandidates: Bool =
-                    editMode?.wrappedValue.isEditing == true
-                    && segmentChordEntries.contains(where: {
-                        $0.chordCell.startTime == selectedChordCell?.startTime
-                    })
-                    && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
-
-                ChordCellCandidates(
-                    chordCell: selectedChordCell ?? ChordCell.empty,
-                    onTapAction: chordCandidateAction
-                )
-                .frame(height: showCandidates ? 62 : 0)
-                .scaleEffect(y: showCandidates ? 1.0 : 0.0)
-                .opacity(showCandidates ? 1.0 : 0.0)
-
-                GeometryReader { proxy in
-                    let segmentWidth =
-                        proxy.size.width
-                        * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
-
-                    VStack(spacing: Spacing.xs) {
-
-                        Waveform(
-                            width: segmentWidth,
-                            amplitudes: segmentAudioLevels,
-                            startTime: segmentStartTime,
-                            endTime: min(segmentEndTime, totalDuration),
-                            elapsedTime: elapsedTime,
-                            onScrubStart: waveFormAction,
-                            onScrubChange: waveFormAction,
-                            onScrubEnd: waveFormAction
-                        )
-
-                        TimeRuler(
-                            visibleWidth: segmentWidth,
-                            startTime: segmentStartTime,
-                            endTime: segmentEndTime,
-                            dotCount: Int(segmentDuration * 2) - 1
-                        )
-                    }
-                }
-                .frame(height: 55)
-            }
-            .animation(.default, value: editMode?.wrappedValue)
-            .animation(.default, value: selectedChordCell?.startTime)
-        }
-
-        struct SegmentChordEntry: Identifiable {
-            let id: TimeInterval
-            let chordCell: ChordCell
-            let duration: TimeInterval
-
-            init(chordCell: ChordCell, duration: TimeInterval) {
-                self.id = chordCell.startTime
-                self.chordCell = chordCell
-                self.duration = duration
-            }
-        }
-
-        struct ChordCellCandidates: View {
-            let chordCell: ChordCell
-            let onTapAction: (Chord, ChordCell) -> Void
-
-            var body: some View {
-                ZStack {
-                    Color.black2
-
-                    HStack {
-                        Spacer()
-
-                        ForEach(Array(chordCell.chordCandidates.enumerated()), id: \.offset) {
-                            (_, chord) in
-                            Button {
-                                onTapAction(chord, chordCell)
-                            } label: {
-                                VStack {
-                                    Text(chord.description)
-                                        .font(Typography.WantedSansStd.R5)
-                                        .foregroundStyle(.white1)
-                                }
-                                .frame(minWidth: 60, minHeight: 40)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(
-                                            chord.description == chordCell.chord?.description
-                                                ? .blue6
-                                                : .blue3
-                                        )
-                                }
-                            }
-                        }
-
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                .frame(minHeight: 62)
-                .padding(.horizontal, -Spacing.md)
-            }
-        }
-
-        struct ChordCellButton: View {
-            let chord: Chord
-            let isCurrentChord: Bool
-            let isSelected: Bool
-            let action: () -> Void
-
-            @Environment(\.editMode) private var editMode
-
-            private var foregroundColor: Color {
-                if editMode?.wrappedValue.isEditing == true {
-                    if isSelected {
-                        return Color.white1
-                    } else if isCurrentChord {
-                        return Color.black1
-                    } else {
-                        return Color.white1
-                    }
-                } else {
-                    if isCurrentChord {
-                        return Color.white1
-                    } else {
-                        return Color.black1
-                    }
-                }
-            }
-
-            private var backgroundColor: Color {
-                if editMode?.wrappedValue.isEditing == true {
-                    if isSelected {
-                        return Color.blue6
-                    } else if isCurrentChord {
-                        return Color.white1
-                    } else {
-                        return Color.black2
-                    }
-                } else {
-                    if isCurrentChord {
-                        return Color.blue4
-                    } else {
-                        return Color.white1
-                    }
-                }
-            }
-
-            var body: some View {
-                Button {
-                    action()
-                } label: {
-                    ZStack {
-                        ViewThatFits(in: .horizontal) {
-                            /// CASE 1: one line
-                            Text(chord.description)
-                                .font(Typography.WantedSansStd.R7)
-                                .foregroundStyle(
-                                    foregroundColor
-                                )
-                                .frame(
-                                    maxWidth: .infinity,
-                                    maxHeight: .infinity
-                                )
-                                .background(
-                                    backgroundColor,
-                                    in: RoundedRectangle(cornerRadius: 12)
-                                )
-
-                            /// CASE 2: multi line
-                            VStack(alignment: .center) {
-                                Text(chord.root.description)
-                                Text(chord.quality.description)
-                            }
-                            .font(Typography.WantedSansStd.R7)
-                            .foregroundStyle(
-                                foregroundColor
-                            )
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity
-                            )
-                            .background(
-                                backgroundColor,
-                                in: RoundedRectangle(cornerRadius: 12)
-                            )
-                            .minimumScaleFactor(0.1)
-                        }
-                    }
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
-                    .background(
-                        backgroundColor,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
-                }
-                .buttonStyle(.bouncy)
-            }
-        }
-
-        struct TimeRuler: View {
-            let visibleWidth: CGFloat
-            let startTime: TimeInterval
-            let endTime: TimeInterval
-            let dotCount: Int
-
-            @Environment(\.editMode) private var editMode
-
-            var body: some View {
-                HStack {
-                    Text("\(startTime, specifier: "%.0f")s")
-                        .font(Typography.WantedSansStd.R2)
-                        .fixedSize()
-                    ForEach(0..<dotCount, id: \.self) { _ in
-                        Circle()
-                            .frame(width: 2, height: 2)
-                            .frame(maxWidth: .infinity)
-                    }
-                    Text("\(endTime, specifier: "%.0f")s")
-                        .font(Typography.WantedSansStd.R2)
-                        .fixedSize()
-                }
-                .mask {
-                    HStack {
-                        Rectangle()
-                            .frame(width: visibleWidth)
-
-                        Spacer()
-                    }
-                }
-                .foregroundStyle(
-                    editMode?.wrappedValue.isEditing == true
-                        ? Color.black5 : Color.black8
-                )
-                .padding(.horizontal, Spacing.xs)
             }
         }
     }
