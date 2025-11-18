@@ -348,19 +348,36 @@
         }
       }
     },
-    "RequestMicrophoneAccessPermission" : {
+    "RequestMicrophoneAccessPermissionAlertDescription" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Microphone access is required for recording."
+            "value" : "To record audio for chord detection, please allow the app to access your microphone."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "녹음을 위해서는 마이크 접근 권한이 필요합니다."
+            "value" : "코드 추론을 위한 사운드를 녹음하기 위해 마이크에 액세스 할 수 있는 권한을 허용해주세요."
+          }
+        }
+      }
+    },
+    "RequestMicrophoneAccessPermissionAlertTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Microphone Access Required"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크 접근 권한이 필요합니다."
           }
         }
       }

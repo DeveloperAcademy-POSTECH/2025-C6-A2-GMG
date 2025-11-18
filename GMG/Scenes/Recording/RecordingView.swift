@@ -81,7 +81,7 @@ struct RecordingView: View {
             await intent.onAppear()
         }
         .alert(
-            .requestMicrophoneAccessPermission,
+            .requestMicrophoneAccessPermissionAlertTitle,
             isPresented: .constant(model.isRecordPermissionAlertPresented)
         ) {
             Button(.openSettings) {
@@ -91,6 +91,8 @@ struct RecordingView: View {
             Button(.cancel, role: .cancel) {
                 intent.onTapRecordPermissionAlertCancelButton()
             }
+        } message: {
+            Text(.requestMicrophoneAccessPermissionAlertDescription)
         }
         .alert(
             .resetConfirmationAlert, isPresented: .constant(model.isResetConfirmationAlertPresented)
