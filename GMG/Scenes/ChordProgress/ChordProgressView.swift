@@ -690,9 +690,15 @@ extension ChordProgressView {
         }
 
         struct SegmentChordEntry: Identifiable {
-            let id = UUID()
+            let id: TimeInterval
             let chordCell: ChordCell
             let duration: TimeInterval
+
+            init(chordCell: ChordCell, duration: TimeInterval) {
+                self.id = chordCell.startTime
+                self.chordCell = chordCell
+                self.duration = duration
+            }
         }
 
         struct ChordCellCandidates: View {
