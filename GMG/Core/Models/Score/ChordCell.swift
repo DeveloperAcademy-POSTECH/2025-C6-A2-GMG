@@ -12,7 +12,7 @@ struct ChordCell {
         self.chord = chord
         self.chordCandidates = chordCandidates
         self.startTime = startTime
-        self.duration = startTime
+        self.duration = 0.0
     }
 
     init(chord: Chord?, chordCandidates: [Chord], startTime: TimeInterval, duration: TimeInterval) {
