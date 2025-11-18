@@ -19,6 +19,7 @@ protocol HomeModelActionProtocol: AnyObject {
     func setIsLatest(_ isLatest: Bool)
     func toggleIsLatest()
     func setAllScores(_ scores: [Score])
+    func updateScore(_ score: Score)
     func updatePlayhead(_ playhead: Playhead)
 }
 
@@ -45,10 +46,9 @@ final class HomeModel:
     var sortedScores: [Score] {
         let comparator: (Score, Score) -> Bool = {
             self.isLatest
-                ? ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
-                : ($0.updatedAt, $0.createdAt) < ($1.updatedAt, $1.createdAt)
+                ? $0.createdAt > $1.createdAt
+                : $0.createdAt < $1.createdAt
         }
-
         return allScores.sorted(by: comparator)
     }
 
@@ -73,6 +73,11 @@ final class HomeModel:
 
     func setAllScores(_ scores: [Score]) {
         self.allScores = scores
+    }
+
+    func updateScore(_ score: Score) {
+        guard let index = allScores.firstIndex(where: { $0.id == score.id }) else { return }
+        allScores[index] = score
     }
 
     func updatePlayhead(_ playhead: Playhead) {
