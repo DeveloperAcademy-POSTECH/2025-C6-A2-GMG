@@ -35,8 +35,6 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     private let undoManager: UndoManager
 
-    private var undoManagerObservers: [NSObjectProtocol]
-
     init(
         model: ChordProgressModelActionProtocol,
         scoreRepository: ScoreRepository
@@ -50,8 +48,6 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         self.cancellables = Set<AnyCancellable>()
 
         self.undoManager = UndoManager()
-
-        self.undoManagerObservers = []
     }
 
     func onAppear(_ score: Score) {
@@ -62,19 +58,9 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
             self.scorePlayer = scorePlayer
 
-            scorePlayer.playerMutedPublisher
-                .sink { [weak self] isPlayerMuted in
-                    self?.model?.setMuted(isPlayerMuted)
-                }
-                .store(in: &cancellables)
+            setupScorePlayerPublisher()
 
-            scorePlayer.playheadPublisher
-                .sink { [weak self] playhead in
-                    self?.model?.updatePlayhead(playhead)
-                }
-                .store(in: &cancellables)
-
-            registerUndoManagerObservers()
+            setupUndoManagerPublisher()
         } catch {
             Logger.error(String(describing: error))
         }
@@ -82,8 +68,6 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onDisappear() {
         cancellables.removeAll()
-
-        unregisterUndoManagerObservers()
 
         self.scorePlayer?.cleanupAfterPlay()
 
@@ -162,7 +146,23 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         updateScoreTitle(oldTitle: score.title, newTitle: title, score: score)
     }
 
-    private func registerUndoManagerObservers() {
+    private func setupScorePlayerPublisher() {
+        guard let scorePlayer = self.scorePlayer else { return }
+
+        scorePlayer.playerMutedPublisher
+            .sink { [weak self] isPlayerMuted in
+                self?.model?.setMuted(isPlayerMuted)
+            }
+            .store(in: &cancellables)
+
+        scorePlayer.playheadPublisher
+            .sink { [weak self] playhead in
+                self?.model?.updatePlayhead(playhead)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setupUndoManagerPublisher() {
         let notificationCenter: NotificationCenter = .default
         let notificationNames: [Notification.Name] = [
             .NSUndoManagerDidOpenUndoGroup,
@@ -170,30 +170,20 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             .NSUndoManagerDidUndoChange,
             .NSUndoManagerDidRedoChange,
         ]
-
-        let observers: [NSObjectProtocol] =
-            notificationNames
-            .map { notificationName in
-                return notificationCenter.addObserver(
-                    forName: notificationName,
-                    object: nil,
-                    queue: nil
-                ) { [weak self] notification in
-                    self?.updateCanUndoRedo()
-                }
-            }
-
-        self.undoManagerObservers = observers
-    }
-
-    private func unregisterUndoManagerObservers() {
-        let notificationCenter: NotificationCenter = .default
-
-        self.undoManagerObservers.forEach { observer in
-            notificationCenter.removeObserver(observer)
+        let undoManagerPublishers: [NotificationCenter.Publisher] = notificationNames.map {
+            notificationName in
+            return notificationCenter.publisher(for: notificationName)
         }
 
-        self.undoManagerObservers.removeAll()
+        let undoManagerMergedPublisher: Publishers.MergeMany<NotificationCenter.Publisher> =
+            Publishers.MergeMany(undoManagerPublishers)
+
+        undoManagerMergedPublisher
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.updateCanUndoRedo()
+            }
+            .store(in: &cancellables)
     }
 
     private func updateCanUndoRedo() {
