@@ -1,5 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import BlurUIKit
 import SwiftData
 import SwiftUI
 
@@ -43,13 +44,12 @@ struct HomeView: View {
                 .padding(Spacing.md)
                 .padding(.top, Spacing.xs)
                 .background {
-                    LinearGradient(
-                        colors: [Color.bg1, Color.clear], startPoint: .top, endPoint: .bottom
+                    BlurUIKitView(
+                        maximumBlurRadius: 4,
+                        dimmingTintColor: UIColor.bg1,
+                        dimmingAlpha: .constant(alpha: 1)
                     )
                     .ignoresSafeArea()
-
-                    VariableBlurView(maxBlurRadius: 16, direction: .blurredTopClearBottom)
-                        .ignoresSafeArea()
                 }
         }
         .alert(
