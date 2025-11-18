@@ -6,7 +6,7 @@ enum Route: Hashable {
     case home
     case recording
     case chordProgress(score: Score)
-    case export
+    case export(score: Score)
 }
 
 @Observable
@@ -65,8 +65,11 @@ final class Router {
             } else {
                 Text("Error")
             }
-        case .export:
-            ExportView()
+        case .export(let score):
+            let model: ExportModel = ExportModel(score: score)
+            let intent: ExportIntent = ExportIntent(model: model)
+
+            ExportView(model: model, intent: intent, router: self)
         }
     }
 }
