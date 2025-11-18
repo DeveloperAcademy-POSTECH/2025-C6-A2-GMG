@@ -2,7 +2,7 @@
 
 import SwiftData
 
-typealias ScoreSchema = ScoreSchemaV1
+typealias ScoreSchema = ScoreSchemaV2
 
 final class SwiftDataStorage {
     private let container: ModelContainer
@@ -14,10 +14,12 @@ final class SwiftDataStorage {
         isStoredInMemoryOnly: Bool = false
     ) throws {
         let configuration: ModelConfiguration = ModelConfiguration(
-            isStoredInMemoryOnly: isStoredInMemoryOnly)
+            isStoredInMemoryOnly: isStoredInMemoryOnly
+        )
 
         self.container = try ModelContainer(
             for: Schema(ScoreSchema.models),
+            migrationPlan: ScoreMigrationPlans.self,
             configurations: configuration
         )
     }
