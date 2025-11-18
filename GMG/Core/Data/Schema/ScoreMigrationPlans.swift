@@ -26,12 +26,11 @@ enum ScoreMigrationPlans: SchemaMigrationPlan {
 
     nonisolated(unsafe) static var scoreSchemaV1Backup: ScoreShemaV1Backup? = nil
 
-    //    static let migrateV1toV2: MigrationStage = .lightweight(fromVersion: ScoreSchemaV1.self, toVersion: ScoreSchemaV2.self)
     static let migrateV1toV2 = MigrationStage.custom(
         fromVersion: ScoreSchemaV1.self,
         toVersion: ScoreSchemaV2.self,
         willMigrate: { context in
-            if let oldScore = (try? context.fetch(FetchDescriptor<ScoreSchemaV1.Score>()))?.first {
+            if let oldScore = try context.fetch(FetchDescriptor<ScoreSchemaV1.Score>()).first {
                 scoreSchemaV1Backup = ScoreShemaV1Backup(
                     id: oldScore.id,
                     title: oldScore.title,
@@ -47,7 +46,7 @@ enum ScoreMigrationPlans: SchemaMigrationPlan {
             }
         },
         didMigrate: { context in
-            if let newScore = (try? context.fetch(FetchDescriptor<ScoreSchemaV2.Score>()))?.first {
+            if let newScore = try context.fetch(FetchDescriptor<ScoreSchemaV2.Score>()).first {
                 if let backup = scoreSchemaV1Backup {
                     newScore.chordCells = backup.chordCells.map { cell in
                         let schemaChord: ScoreSchemaV2.Chord? = cell.chord.flatMap { domainChord in
@@ -73,7 +72,7 @@ enum ScoreMigrationPlans: SchemaMigrationPlan {
                             chord: schemaChord,
                             chordCandidates: schemaCandidates,
                             startTime: cell.startTime,
-                            duration: cell.duration
+                            duration: cell.startTime
                         )
                     }
 
