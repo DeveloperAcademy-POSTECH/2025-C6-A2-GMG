@@ -1,3 +1,4 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-NSMicrophoneUsageDescription = "Microphone access is required for recording.";
+NSMicrophoneUsageDescription = "Microphone access is required to record audio for chord detection.";
+NSPhotoLibraryAddUsageDescription = "Access to your photo library is required to save the chord sheet.";
