@@ -110,7 +110,8 @@ final class ScoreFactory {
             updatedAt: Date(),
             notes: notes,
             chordCells: filteredChordCells,
-            audioLevels: audioLevels
+            audioLevels: audioLevels,
+            isDeleted: false
         )
     }
 

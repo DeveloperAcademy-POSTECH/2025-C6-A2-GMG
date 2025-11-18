@@ -21,7 +21,9 @@ final class SwiftDataScoreRepository: ScoreRepository {
     }
 
     func fetch() throws -> [Score] {
-        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init()
+        /// Soft Delete 되지 않은 Score만 가져오기
+        let predicate: Predicate<ScoreSchema.Score> = #Predicate { $0.isDeleted == false }
+        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init(predicate: predicate)
         let scorePersitences: [ScoreSchema.Score] = try context.fetch(fetchDescriptor)
 
         let scores: [Score] = scorePersitences.map { $0.toDomain() }
@@ -48,25 +50,35 @@ final class SwiftDataScoreRepository: ScoreRepository {
     }
 
     func update(_ score: Score) throws {
-        let scorePersistence: ScoreSchema.Score = score.toPersistence()
+        let id: UUID = score.id
+        guard let scorePersistence: ScoreSchema.Score = try fetchPersistence(id: id) else {
+            return
+        }
 
-        context.insert(scorePersistence)
+        scorePersistence.apply(domain: score)
 
         try context.save()
     }
 
     func delete(_ score: Score) throws {
-        let id: UUID = score.id
-        let predicate: Predicate<ScoreSchema.Score> = #Predicate { $0.id == id }
-        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init(predicate: predicate)
-        guard let scorePersistence: ScoreSchema.Score = try context.fetch(fetchDescriptor).first
-        else {
-            return
+        if score.isDeleted == true {
+            /// Soft Delete 상태면 Hard Delete 수행
+            let id: UUID = score.id
+            guard let scorePersistence: ScoreSchema.Score = try fetchPersistence(id: id) else {
+                return
+            }
+
+            try? FileManager.default.removeItem(at: score.audioURL)
+
+            context.delete(scorePersistence)
+
+            try context.save()
+        } else {
+            /// Soft Delete 수행
+            score.setDeleted(true)
+
+            try update(score)
         }
-
-        context.delete(scorePersistence)
-
-        try context.save()
     }
 
     private func fetchPersistence(id: UUID) throws -> ScoreSchema.Score? {
@@ -90,7 +102,8 @@ extension Score {
             updatedAt: self.updatedAt,
             notes: self.notes.map { $0.toPersistence() },
             chordCells: self.chordCells.map { $0.toPersistence() },
-            audioLevels: self.audioLevels
+            audioLevels: self.audioLevels,
+            isDeleted: self.isDeleted
         )
     }
 }
@@ -107,8 +120,24 @@ extension ScoreSchema.Score {
             updatedAt: self.updatedAt,
             notes: self.notes.map { $0.toDomain() },
             chordCells: self.chordCells.map { $0.toDomain() },
-            audioLevels: self.audioLevels
+            audioLevels: self.audioLevels,
+            isDeleted: self.isDeleted
         )
+    }
+}
+
+extension ScoreSchema.Score {
+    fileprivate func apply(domain: Score) {
+        self.title = domain.title
+        self.key = domain.key.toPersistence()
+        self.audioFileName = domain.audioURL.lastPathComponent
+        self.totalDuration = domain.totalDuration
+        self.createdAt = domain.createdAt
+        self.updatedAt = domain.updatedAt
+        self.notes = domain.notes.map { $0.toPersistence() }
+        self.chordCells = domain.chordCells.map { $0.toPersistence() }
+        self.audioLevels = domain.audioLevels
+        self.isDeleted = domain.isDeleted
     }
 }
 
