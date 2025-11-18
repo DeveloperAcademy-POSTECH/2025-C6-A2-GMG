@@ -2,7 +2,7 @@
 
 import Foundation
 import SwiftUI
-import UIKit
+internal import UIKit
 
 protocol ExportIntentProtocol {
     func onAppear()
