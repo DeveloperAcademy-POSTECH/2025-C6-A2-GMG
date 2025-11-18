@@ -13,7 +13,6 @@ protocol HomeIntentProtocol {
     func onTapScore(_ score: Score)
     func onTapPlayButton(score: Score, selectedScore: Score?)
     func onTapStopButton()
-    func selectLastScore(_ scores: [Score])
 }
 
 final class HomeIntent: HomeIntentProtocol {
@@ -35,6 +34,7 @@ final class HomeIntent: HomeIntentProtocol {
     }
 
     func onAppear() {
+        model?.setSelectedScore(nil)
         fetchScores()
     }
 
@@ -100,23 +100,18 @@ final class HomeIntent: HomeIntentProtocol {
         scorePlayer?.stop()
     }
 
-    private func fetchScores() {
+    func fetchScores() {
         guard let model else { return }
 
         do {
             let scores: [Score] = try scoreRepository.fetch()
             model.setAllScores(scores)
-
-            let recent = scores.sorted {
-                ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
-            }
-            selectLastScore(recent)
         } catch {
             Logger.error(String(describing: error))
         }
     }
 
-    private func setupPlayer(for score: Score) {
+    func setupPlayer(for score: Score) {
         cancellables.removeAll()
         scorePlayer?.cleanupAfterPlay()
         scorePlayer = nil
@@ -136,15 +131,4 @@ final class HomeIntent: HomeIntentProtocol {
         }
     }
 
-    func selectLastScore(_ scores: [Score]) {
-        guard let model else { return }
-
-        if scores.isEmpty {
-            model.setSelectedScore(nil)
-            return
-        }
-
-        let last = scores.last!
-        model.setSelectedScore(last)
-    }
 }
