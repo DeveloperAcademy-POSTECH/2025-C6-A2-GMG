@@ -13,11 +13,11 @@ enum ScorePlayerError: Error {
 final class ScorePlayer {
     private let score: Score
 
-    private let engine: AVAudioEngine
+    let engine: AVAudioEngine
 
     private let sampler: AVAudioUnitSampler
-    private let sequencer: AVAudioSequencer
-    private let player: AVAudioPlayerNode
+    let sequencer: AVAudioSequencer
+    let player: AVAudioPlayerNode
 
     private var audioFile: AVAudioFile?
     private var pausedTime: TimeInterval
@@ -137,81 +137,6 @@ final class ScorePlayer {
         try loadSoundBank()
 
         prepareChordCells()
-    }
-
-    func renderToAudioFile(score: Score) async throws -> URL {
-        let scorePlayer = ScorePlayer(score: score)
-        try scorePlayer.prepareToExport()
-
-        let engine = scorePlayer.engine
-
-        // Offline rendering용 출력 포맷
-        let outputFormat = AVAudioFormat(standardFormatWithSampleRate: 48000, channels: 2)!
-
-        // Offline rendering 시작
-        let maxFrames: AVAudioFrameCount = 4096
-        try engine.enableManualRenderingMode(
-            .offline,
-            format: outputFormat,
-            maximumFrameCount: maxFrames
-        )
-
-        try engine.start()
-
-        // 출력 파일 URL 설정
-        let outputURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("accompaniment-\(UUID().uuidString).m4a")
-
-        let outputFile = try AVAudioFile(
-            forWriting: outputURL,
-            settings: outputFormat.settings
-        )
-
-        // Sequencer & PlayerNode 시작
-        scorePlayer.sequencer.prepareToPlay()
-        try scorePlayer.sequencer.start()
-        scorePlayer.player.play()
-
-        // 오디오 렌더링 버퍼
-        guard
-            let buffer = AVAudioPCMBuffer(
-                pcmFormat: outputFormat,
-                frameCapacity: maxFrames
-            )
-        else {
-            throw NSError(domain: "BufferAlloc", code: -1)
-        }
-
-        let totalFrames = AVAudioFrameCount(score.totalDuration * outputFormat.sampleRate)
-
-        /// 렌더링 루프
-        while engine.manualRenderingSampleTime < AVAudioFramePosition(totalFrames) {
-            let framesToRender = min(
-                maxFrames,
-                totalFrames - AVAudioFrameCount(engine.manualRenderingSampleTime)
-            )
-
-            let status = try engine.renderOffline(framesToRender, to: buffer)
-
-            switch status {
-            case .success:
-                try outputFile.write(from: buffer)
-
-            case .insufficientDataFromInputNode:
-                continue  // 입력 데이터 부족 → 다음 루프 돌기
-
-            case .error:
-                throw NSError(domain: "OfflineRender", code: -1)
-
-            @unknown default:
-                break
-            }
-        }
-
-        scorePlayer.stop()
-        engine.stop()
-
-        return outputURL
     }
 
     /// onDisappear 시 실행될 메서드
