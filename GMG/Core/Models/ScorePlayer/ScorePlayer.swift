@@ -26,6 +26,7 @@ final class ScorePlayer {
     private var totalFrames: AVAudioFramePosition
 
     private var chordPlayTask: Task<Void, Never>?
+    private var previousIsPlaying: Bool
 
     let playerMutedPublisher: CurrentValueSubject<Bool, Never>
 
@@ -64,6 +65,7 @@ final class ScorePlayer {
         self.playheadPublisherTimer = nil
 
         self.routeChangeObserver = nil
+        self.previousIsPlaying = false
     }
 
     /// onAppear 시 실행될 메서드
@@ -138,6 +140,7 @@ final class ScorePlayer {
     }
 
     func play() {
+        previousIsPlaying = player.isPlaying
         scheduleAudioFile(from: pausedTime)
         player.play()
 
@@ -191,6 +194,7 @@ final class ScorePlayer {
     }
 
     func pause() {
+        previousIsPlaying = player.isPlaying
         let pausedTime = currentPlaybackTime()
 
         player.pause()
@@ -200,9 +204,18 @@ final class ScorePlayer {
     }
 
     func stop() {
+        previousIsPlaying = false
         player.stop()
         sequencer.stop()
         pausedTime = .zero
+    }
+
+    var isPlaying: Bool {
+        player.isPlaying
+    }
+
+    var wasPlayingBeforeLastCommand: Bool {
+        previousIsPlaying
     }
 
     func seek(to time: TimeInterval) {

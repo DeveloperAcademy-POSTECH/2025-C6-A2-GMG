@@ -9,11 +9,11 @@ struct Waveform: View {
     let startTime: TimeInterval
     let endTime: TimeInterval
     let elapsedTime: TimeInterval
-    let onScrubStart: (TimeInterval) -> Void
-    let onScrubChange: (TimeInterval) -> Void
-    let onScrubEnd: (TimeInterval) -> Void
+    let onDragStart: (TimeInterval) -> Void
+    let onDragChange: (TimeInterval) -> Void
+    let onDragEnd: (TimeInterval) -> Void
 
-    @State private var scrubbingTime: TimeInterval?
+    @State private var draggingTime: TimeInterval?
 
     private let capsuleWidth: CGFloat = 3
     private let capsuleSpacing: CGFloat = 4
@@ -79,8 +79,8 @@ struct Waveform: View {
 
         var lastInteractionTime = elapsedTime
 
-        if let scrubbingTime = self.scrubbingTime {
-            lastInteractionTime = scrubbingTime
+        if let draggingTime = self.draggingTime {
+            lastInteractionTime = draggingTime
         }
 
         let clampedElapsed = min(max(lastInteractionTime, startTime), endTime)
@@ -166,18 +166,18 @@ struct Waveform: View {
             .onChanged { value in
                 let time = convertLocationToTime(value.location.x)
 
-                if scrubbingTime == nil {
-                    onScrubStart(time)
+                if draggingTime == nil {
+                    onDragStart(time)
                 } else {
-                    onScrubChange(time)
+                    onDragChange(time)
                 }
 
-                scrubbingTime = time
+                draggingTime = time
             }
             .onEnded { value in
                 let time = convertLocationToTime(value.location.x)
-                scrubbingTime = nil
-                onScrubEnd(time)
+                draggingTime = nil
+                onDragEnd(time)
             }
     }
 
