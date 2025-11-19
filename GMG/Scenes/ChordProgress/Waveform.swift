@@ -9,6 +9,7 @@ struct Waveform: View {
     let startTime: TimeInterval
     let endTime: TimeInterval
     let elapsedTime: TimeInterval
+    let onTap: (TimeInterval) -> Void
     let onDragStart: (TimeInterval) -> Void
     let onDragChange: (TimeInterval) -> Void
     let onDragEnd: (TimeInterval) -> Void
@@ -156,6 +157,10 @@ struct Waveform: View {
             .frame(width: width)
             .contentShape(Rectangle())
             .gesture(dragGesture)
+            .onTapGesture { location in
+                let tappedTime = convertLocationToTime(location.x)
+                onTap(tappedTime)
+            }
 
             Spacer()
         }
