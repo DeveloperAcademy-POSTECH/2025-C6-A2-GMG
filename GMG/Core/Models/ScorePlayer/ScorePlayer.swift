@@ -134,6 +134,8 @@ final class ScorePlayer {
 
         try loadAudioFile(score.audioURL)
 
+        scheduleAudioFile(from: .zero)
+
         try loadSoundBank()
 
         prepareChordCells()

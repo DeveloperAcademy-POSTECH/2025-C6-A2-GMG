@@ -80,12 +80,4 @@ final class AudioRenderingService {
 
         return outputURL
     }
-
-    func mixAudioFiles(
-        accompanimentURL: URL,
-        vocalURL: URL
-    ) throws -> URL {
-        // 여기 나중에 Accelerate 믹싱 들어감
-        throw NSError(domain: "", code: -1)
-    }
 }
