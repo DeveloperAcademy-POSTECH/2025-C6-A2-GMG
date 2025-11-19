@@ -3,7 +3,7 @@
 import AVFAudio
 import Combine
 import Foundation
-import UIKit
+internal import UIKit
 
 protocol RecordingIntentProtocol {
     func onAppear() async
@@ -141,6 +141,12 @@ final class RecordingIntent: RecordingIntentProtocol {
         self.countdownTask?.cancel()
 
         self.countdownTask = Task {
+            do {
+                try recordManager.prepareToRecord()
+            } catch {
+                Logger.error(String(describing: error))
+            }
+
             await withTaskCancellationHandler {
                 for i in (0...3).reversed() {
                     model.updateCountdown(i)
@@ -154,11 +160,7 @@ final class RecordingIntent: RecordingIntentProtocol {
                 }
             }
 
-            do {
-                try recordManager.record()
-            } catch {
-                Logger.error(String(describing: error))
-            }
+            recordManager.record()
         }
     }
 
@@ -224,20 +226,7 @@ final class RecordingIntent: RecordingIntentProtocol {
             else { return }
 
             do {
-                // TODO: Swift Concurrency 방법 찾아보기!
-                // DispatchQueue.global()을 사용하지 않으면 MainThread에서 실행되어 로딩 화면이 안나옴
-                let score: Score = try await withCheckedThrowingContinuation {
-                    continuation in
-                    DispatchQueue.global().async {
-                        do {
-                            let score: Score = try self.scoreFactory
-                                .createScore(audioURL: url)
-                            continuation.resume(returning: score)
-                        } catch {
-                            continuation.resume(throwing: error)
-                        }
-                    }
-                }
+                let score: Score = try await self.scoreFactory.createScore(audioURL: url)
 
                 try self.scoreRepository.insert(score)
 

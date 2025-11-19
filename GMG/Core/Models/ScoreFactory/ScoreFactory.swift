@@ -44,7 +44,7 @@ final class ScoreFactory {
 
     func createScore(
         audioURL: URL
-    ) throws -> Score {
+    ) async throws -> Score {
         let audioFileName: String = audioURL.lastPathComponent
 
         if FileManager.default.fileExists(atPath: Score.recordingFolder.path()) == false {
@@ -61,13 +61,15 @@ final class ScoreFactory {
 
         scoreFactoryStatePublisher.send(.hummingAnalysis)
 
-        let notes: [Note] = try self.convertAudioToNotes(audioURL: copiedAudioURL)
+        let notes: [Note] = try await Task.detached {
+            return try await self.convertAudioToNotes(audioURL: copiedAudioURL)
+        }.value
 
         scoreFactoryStatePublisher.send(.chordGeneration)
 
         let inferencer = try ChordInferencer()
         let chordInferencerResult: ChordInferencerResult =
-            try inferencer.inference(notes: notes)
+            try await inferencer.inference(notes: notes)
 
         let key: Key = chordInferencerResult.key
         let chordCells: [ChordCell] = chordInferencerResult.chordCells
@@ -108,11 +110,12 @@ final class ScoreFactory {
             updatedAt: Date(),
             notes: notes,
             chordCells: filteredChordCells,
-            audioLevels: audioLevels
+            audioLevels: audioLevels,
+            isDeleted: false
         )
     }
 
-    private func convertAudioToNotes(audioURL: URL) throws -> [Note] {
+    private nonisolated func convertAudioToNotes(audioURL: URL) async throws -> [Note] {
         guard
             let modelURL: URL = Bundle.main.url(
                 forResource: "SwiftF0",
@@ -153,7 +156,7 @@ final class ScoreFactory {
 }
 
 extension SwiftF0.Note {
-    fileprivate var note: Note {
+    fileprivate nonisolated var note: Note {
         let noteNames: [NoteName] = [
             .C,
             .Cs,

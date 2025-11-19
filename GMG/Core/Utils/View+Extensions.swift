@@ -18,6 +18,13 @@ extension View {
 }
 
 extension View {
+    func font(_ primary: LocalizedCustomFont, _ secondary: LocalizedCustomFont...) -> some View {
+        self
+            .modifier(LocalizedCustomFontModifier(primary: primary, secondary: secondary))
+    }
+}
+
+extension View {
     func navigationBar<Leading: View, Center: View, Trailing: View>(
         isBackButtonHidden: Bool = false,
         @ViewBuilder leading: () -> Leading,

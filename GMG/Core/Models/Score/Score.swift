@@ -3,7 +3,8 @@
 import Foundation
 internal import UniformTypeIdentifiers
 
-class Score {
+@Observable
+final class Score {
     private(set) var id: UUID
     private(set) var title: String
     private(set) var key: Key
@@ -14,6 +15,7 @@ class Score {
     private(set) var notes: [Note]
     private(set) var chordCells: [ChordCell]
     private(set) var audioLevels: [Float]  // 0.1s초 간격으로 audio의 amplitude 값이 저장
+    private(set) var isDeleted: Bool
 
     init(
         id: UUID = UUID(),
@@ -25,7 +27,8 @@ class Score {
         updatedAt: Date,
         notes: [Note],
         chordCells: [ChordCell],  // 정렬되어 있어야 함
-        audioLevels: [Float]
+        audioLevels: [Float],
+        isDeleted: Bool
     ) {
         self.id = id
         self.title = title
@@ -40,6 +43,7 @@ class Score {
             chordCells: chordCells,
             totalDuration: totalDuration
         )
+        self.isDeleted = isDeleted
     }
 
     func retrieveAllChordCells() -> [ChordCell] {
@@ -93,12 +97,12 @@ class Score {
         self.title = title
     }
 
-    func updateAudioLevels(_ audioLevels: [Float]) {
-        self.audioLevels = audioLevels
-    }
-
     func setUpdatedAt(_ updatedAt: Date) {
         self.updatedAt = updatedAt
+    }
+
+    func setDeleted(_ isDeleted: Bool) {
+        self.isDeleted = isDeleted
     }
 }
 
@@ -268,7 +272,8 @@ extension Score {
                 0.00,
                 0.36, 0.33, 0.30, 0.27, 0.24, 0.21, 0.18, 0.15, 0.12, 0.09,
                 0.06, 0.03, 0.00, 0.00, 0.00,
-            ]
+            ],
+            isDeleted: false
         )
     }
 }

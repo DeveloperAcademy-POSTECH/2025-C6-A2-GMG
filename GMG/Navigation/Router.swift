@@ -6,7 +6,7 @@ enum Route: Hashable {
     case home
     case recording
     case chordProgress(score: Score)
-    case export
+    case export(score: Score)
 }
 
 @Observable
@@ -53,7 +53,7 @@ final class Router {
 
                 RecordingView(model: model, intent: intent, router: self)
             } else {
-                Text("Error")
+                ErrorView(description: "Failed to create database")
             }
         case .chordProgress(let score):
             if let scoreRepository: ScoreRepository = diContainer.makeScoreRepository() {
@@ -63,10 +63,13 @@ final class Router {
 
                 ChordProgressView(model: model, intent: intent, router: self)
             } else {
-                Text("Error")
+                ErrorView(description: "Failed to create database")
             }
-        case .export:
-            ExportView()
+        case .export(let score):
+            let model: ExportModel = ExportModel(score: score)
+            let intent: ExportIntent = ExportIntent(model: model)
+
+            ExportView(model: model, intent: intent, router: self)
         }
     }
 }

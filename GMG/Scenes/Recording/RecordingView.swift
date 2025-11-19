@@ -81,7 +81,7 @@ struct RecordingView: View {
             await intent.onAppear()
         }
         .alert(
-            .requestMicrophoneAccessPermission,
+            .requestMicrophoneAccessPermissionAlertTitle,
             isPresented: .constant(model.isRecordPermissionAlertPresented)
         ) {
             Button(.openSettings) {
@@ -91,6 +91,8 @@ struct RecordingView: View {
             Button(.cancel, role: .cancel) {
                 intent.onTapRecordPermissionAlertCancelButton()
             }
+        } message: {
+            Text(.requestMicrophoneAccessPermissionAlertDescription)
         }
         .alert(
             .resetConfirmationAlert, isPresented: .constant(model.isResetConfirmationAlertPresented)
@@ -124,6 +126,7 @@ struct RecordingView: View {
                         )
                         .foregroundStyle(Color.white1)
                         .contentTransition(.numericText())
+                        .offset(y: -80)
 
                     Button {
                         skipAction()
@@ -293,7 +296,10 @@ struct RecordingView: View {
                                 Image(.reset)
                                     .renderingMode(.template)
                                 Text(.reset)
-                                    .font(Typography.WantedSansStd.M2)
+                                    .font(
+                                        .english(Typography.WantedSansStd.M2),
+                                        .korean(Typography.Pretendard.M5)
+                                    )
                             }
                         }
                         .transition(
@@ -310,7 +316,10 @@ struct RecordingView: View {
                             Image(primaryButtonImage)
                                 .renderingMode(.template)
                             Text(primaryButtonTitle)
-                                .font(Typography.WantedSansStd.M2)
+                                .font(
+                                    .english(Typography.WantedSansStd.M2),
+                                    .korean(Typography.Pretendard.M5)
+                                )
                         }
                     }
                     .gridCellColumns(2)
@@ -323,7 +332,10 @@ struct RecordingView: View {
                                 Image(.next)
                                     .renderingMode(.template)
                                 Text(.next)
-                                    .font(Typography.WantedSansStd.M2)
+                                    .font(
+                                        .english(Typography.WantedSansStd.M2),
+                                        .korean(Typography.Pretendard.M5)
+                                    )
                             }
                         }
                         .transition(
@@ -346,4 +358,5 @@ struct RecordingView: View {
     PreviewContainer { router in
         router.view(.recording)
     }
+    .environment(\.locale, .init(languageCode: .english))
 }

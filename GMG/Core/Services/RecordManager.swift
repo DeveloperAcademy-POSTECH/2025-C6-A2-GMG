@@ -25,10 +25,10 @@ final class RecordManager {
         self.cancellables = Set<AnyCancellable>()
     }
 
-    func record() throws {
-        try activateAudioSession()
-
+    func prepareToRecord() throws {
         do {
+            try activateAudioSession()
+
             let url: URL = URL.temporaryDirectory
                 .appending(component: "recording-\(Date().ISO8601Format()).m4a")
             let settings: [String: Any] = [
@@ -43,7 +43,7 @@ final class RecordManager {
             )
 
             audioRecorder.isMeteringEnabled = true
-            audioRecorder.record()
+            audioRecorder.prepareToRecord()
 
             Timer.publish(
                 every: 0.1,
@@ -60,12 +60,19 @@ final class RecordManager {
             .store(in: &cancellables)
 
             self.audioRecorder = audioRecorder
-
-            self.isRecordingPublisher.send(audioRecorder.isRecording)
         } catch {
             _ = stop()
+
             throw error
         }
+    }
+
+    func record() {
+        guard let audioRecorder else { return }
+
+        audioRecorder.record()
+
+        self.isRecordingPublisher.send(audioRecorder.isRecording)
     }
 
     func stop() -> URL? {

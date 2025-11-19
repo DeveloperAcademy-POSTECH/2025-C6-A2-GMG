@@ -10,6 +10,7 @@
 		E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */ = {isa = PBXBuildFile; productRef = E32372042EB8D8A4004C5BC9 /* SwiftF0 */; };
 		E331F8DF2EB9F44400752589 /* Tonic in Frameworks */ = {isa = PBXBuildFile; productRef = E331F8DE2EB9F44400752589 /* Tonic */; };
 		E356F0842EC34EB600E92231 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = E356F0832EC34EB600E92231 /* Lottie */; };
+		E38B7F472ECC615400162848 /* BlurUIKit in Frameworks */ = {isa = PBXBuildFile; productRef = E38B7F462ECC615400162848 /* BlurUIKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E38B7F472ECC615400162848 /* BlurUIKit in Frameworks */,
 				E331F8DF2EB9F44400752589 /* Tonic in Frameworks */,
 				E32372052EB8D8A4004C5BC9 /* SwiftF0 in Frameworks */,
 				E356F0842EC34EB600E92231 /* Lottie in Frameworks */,
@@ -117,6 +119,7 @@
 				E32372042EB8D8A4004C5BC9 /* SwiftF0 */,
 				E331F8DE2EB9F44400752589 /* Tonic */,
 				E356F0832EC34EB600E92231 /* Lottie */,
+				E38B7F462ECC615400162848 /* BlurUIKit */,
 			);
 			productName = GMG;
 			productReference = 32C5AB512EA213420007BEFD /* GMG.app */;
@@ -178,6 +181,7 @@
 				E32372032EB8D8A4004C5BC9 /* XCRemoteSwiftPackageReference "SwiftF0" */,
 				E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */,
 				E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				E38B7F452ECC615400162848 /* XCRemoteSwiftPackageReference "BlurUIKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 32C5AB522EA213420007BEFD /* Products */;
@@ -238,6 +242,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -303,6 +308,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -371,7 +377,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GMG/Info.plist;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the microphone to record audio.";
+				INFOPLIST_KEY_CFBundleDisplayName = "Re:chord";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio for chord detection.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Access to your photo library is required to save the chord sheet.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -380,8 +389,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
@@ -402,7 +411,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -423,7 +432,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GMG/Info.plist;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the microphone to record audio.";
+				INFOPLIST_KEY_CFBundleDisplayName = "Re:chord";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio for chord detection.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Access to your photo library is required to save the chord sheet.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -432,8 +444,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
@@ -454,7 +466,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -571,6 +583,14 @@
 				minimumVersion = 4.5.2;
 			};
 		};
+		E38B7F452ECC615400162848 /* XCRemoteSwiftPackageReference "BlurUIKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TimOliver/BlurUIKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -588,6 +608,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E356F0822EC34EB600E92231 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		E38B7F462ECC615400162848 /* BlurUIKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E38B7F452ECC615400162848 /* XCRemoteSwiftPackageReference "BlurUIKit" */;
+			productName = BlurUIKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
