@@ -31,9 +31,8 @@ final class ScorePlayer {
     let playerMutedPublisher: CurrentValueSubject<Bool, Never>
 
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
-    private var playheadPublisherTimer: AnyCancellable?
 
-    private var routeChangeObserver: NSObjectProtocol?
+    private var cancellables: Set<AnyCancellable>
 
     init(score: Score) {
         self.score = score
@@ -62,10 +61,9 @@ final class ScorePlayer {
                 elapsedTime: .zero
             )
         )
-        self.playheadPublisherTimer = nil
 
-        self.routeChangeObserver = nil
         self.previousIsPlaying = false
+        self.cancellables = Set<AnyCancellable>()
     }
 
     /// onAppear 시 실행될 메서드
@@ -92,7 +90,7 @@ final class ScorePlayer {
         prepareChordCells()
 
         // 타이머 설정
-        self.playheadPublisherTimer = Timer.publish(
+        Timer.publish(
             every: 0.1,
             on: RunLoop.main,
             in: RunLoop.Mode.common
@@ -112,35 +110,52 @@ final class ScorePlayer {
                 )
             )
         }
+        .store(in: &cancellables)
 
-        routeChangeObserver = NotificationCenter.default.addObserver(
-            forName: AVAudioSession.routeChangeNotification,
-            object: nil,
-            queue: nil
-        ) { [weak self] notification in
-            try? self?.activateAudioSession()
+        NotificationCenter.default.publisher(for: AVAudioSession.routeChangeNotification)
+            .sink { [weak self] notification in
+                guard let self else { return }
 
-            try? self?.engine.start()
-        }
+                do {
+                    try self.activateAudioSession()
+                    try self.engine.start()
+                } catch {
+                    Logger.error(String(describing: error))
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    func prepareToExport() throws {
+        engine.attach(sampler)
+        engine.connect(sampler, to: engine.mainMixerNode, format: nil)
+
+        engine.attach(player)
+        engine.connect(player, to: engine.mainMixerNode, format: nil)
+
+        try loadAudioFile(score.audioURL)
+
+        try loadSoundBank()
+
+        prepareChordCells()
     }
 
     /// onDisappear 시 실행될 메서드
     func cleanupAfterPlay() {
         try? deactivateAudioSession()
 
-        playheadPublisherTimer?.cancel()
-        playheadPublisherTimer = nil
-
-        if let observer = routeChangeObserver {
-            NotificationCenter.default.removeObserver(observer)
-            routeChangeObserver = nil
-        }
+        cancellables.removeAll()
 
         engine.stop()
     }
 
     func play() {
         previousIsPlaying = player.isPlaying
+      
+        if engine.isRunning == false {
+            try? engine.start()
+        }
+
         scheduleAudioFile(from: pausedTime)
         player.play()
 
@@ -308,14 +323,14 @@ final class ScorePlayer {
     private func loadSoundBank() throws {
         guard
             let url: URL = Bundle.main.url(
-                forResource: "8MBGMSFX_EP1_Loop",
+                forResource: "KAWAI good piano",
                 withExtension: "sf2"
             )
         else { throw ScorePlayerError.soundBankNotFound }
 
         try sampler.loadSoundBankInstrument(
             at: url,
-            program: 4,
+            program: .zero,
             bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
             bankLSB: UInt8(kAUSampler_DefaultBankLSB)
         )

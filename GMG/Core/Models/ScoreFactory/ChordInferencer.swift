@@ -58,7 +58,7 @@ final class ChordInferencer {
         self.vocab = try JSONDecoder().decode(Vocab.self, from: vocabData)
     }
 
-    func inference(notes: [Note]) throws -> ChordInferencerResult {
+    func inference(notes: [Note]) async throws -> ChordInferencerResult {
         guard !notes.isEmpty else {
             return ChordInferencerResult(key: Key(root: .C), chordCells: [])
         }
@@ -96,7 +96,7 @@ final class ChordInferencer {
                 }
                 .flatMap { $0.tokens }
 
-            let inferenceResults: [[InferenceResult]] = try inference(
+            let inferenceResults: [[InferenceResult]] = try await inference(
                 tokens: slicedTokens,
                 previousResults: previousResults
             )
@@ -174,7 +174,7 @@ extension ChordInferencer {
     private func inference(
         tokens: [String],
         previousResults: [[InferenceResult]]? = nil
-    ) throws -> [[InferenceResult]] {
+    ) async throws -> [[InferenceResult]] {
         var tokenIds: [Int] = []
 
         tokenIds.reserveCapacity(maxMelodyLength)
@@ -205,7 +205,7 @@ extension ChordInferencer {
 
         let melodyTokens = MLMultiArray(melodyArray)
 
-        let chordInferenceResults = try generateOutputSequence(
+        let chordInferenceResults = try await generateOutputSequence(
             melodyTokens: melodyTokens,
             previousResults: previousResults,
             topK: 5,
@@ -220,7 +220,7 @@ extension ChordInferencer {
         previousResults: [[InferenceResult]]? = nil,
         topK: Int? = 5,
         temperature: Float = 0.9
-    ) throws -> [[InferenceResult]] {
+    ) async throws -> [[InferenceResult]] {
         var results: [[InferenceResult]] = previousResults ?? []
 
         var chordArray: MLShapedArray<Int32> = MLShapedArray(
@@ -242,7 +242,7 @@ extension ChordInferencer {
                     melody_tokens: melodyTokens,
                     chord_input: chordInput
                 )
-            let output: TransformerChordInferenceOutput = try model.prediction(
+            let output: TransformerChordInferenceOutput = try await model.prediction(
                 input: input
             )
 
