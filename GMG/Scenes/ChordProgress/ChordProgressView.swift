@@ -54,17 +54,11 @@ struct ChordProgressView: View {
 
                 let chordCells = model.score.retrieveAllChordCells()
                 let segmentDuration = 5.0
-                let segmentEntries = buildSegmentEntries(
-                    chordCells: chordCells,
-                    totalDuration: model.score.totalDuration,
-                    segmentDuration: segmentDuration
-                )
 
                 SegmentsScrollView(
                     segmentDuration: segmentDuration,
                     totalDuration: model.score.totalDuration,
                     chordCells: chordCells,
-                    segmentEntries: segmentEntries,
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
@@ -128,121 +122,6 @@ struct ChordProgressView: View {
         .onDisappear {
             intent.onDisappear()
         }
-    }
-}
-
-extension ChordProgressView {
-    fileprivate func buildSegmentEntries(
-        chordCells: [ChordCell],
-        totalDuration: TimeInterval,
-        segmentDuration: TimeInterval
-    ) -> [Int: [Segment.SegmentChordEntry]] {
-        let segmentCount = Int(ceil(totalDuration / segmentDuration))
-        guard segmentCount > 0 else { return [:] }
-
-        var result: [Int: [Segment.SegmentChordEntry]] = [:]
-        for index in 0..<segmentCount {
-            result[index] = buildSegmentEntries(
-                index: index,
-                totalDuration: totalDuration,
-                chordCells: chordCells,
-                segmentDuration: segmentDuration
-            )
-        }
-
-        return result
-    }
-
-    fileprivate func buildSegmentEntries(
-        index: Int,
-        totalDuration: TimeInterval,
-        chordCells: [ChordCell],
-        segmentDuration: TimeInterval
-    ) -> [Segment.SegmentChordEntry] {
-        let segmentStartTime = TimeInterval(index) * segmentDuration
-        let segmentEndTime = segmentStartTime + segmentDuration
-
-        var targetChordCells: [ChordCell] = chordCells.filter {
-            chordCell in
-            segmentStartTime <= chordCell.startTime
-                && chordCell.startTime < segmentEndTime
-        }
-
-        let previousChordCell: ChordCell =
-            chordCells.filter({ v in
-                v.startTime <= segmentStartTime
-            }).last
-            ?? ChordCell(
-                chord: nil,
-                chordCandidates: [],
-                startTime: segmentStartTime
-            )
-
-        if targetChordCells.isEmpty {
-            targetChordCells = [previousChordCell]
-        }
-
-        if let firstStartTime = targetChordCells.first?.startTime,
-            firstStartTime > segmentStartTime
-        {
-            targetChordCells.insert(previousChordCell, at: 0)
-        }
-
-        if index == Int(floor(totalDuration / segmentDuration))
-            && totalDuration < segmentEndTime
-        {
-            targetChordCells.append(
-                ChordCell(
-                    chord: nil,
-                    chordCandidates: [],
-                    startTime: totalDuration
-                )
-            )
-        }
-
-        var entries: [Segment.SegmentChordEntry] = []
-
-        for cursor in 0..<targetChordCells.endIndex - 1 {
-            let currentTargetChord = targetChordCells[cursor]
-            let nextTargetChord = targetChordCells[cursor + 1]
-
-            let clampedCurrentStart = max(currentTargetChord.startTime, segmentStartTime)
-            let clampedNextStart = min(nextTargetChord.startTime, segmentEndTime)
-
-            let rawDuration = clampedNextStart - clampedCurrentStart
-            let clampedDuration = min(segmentDuration, rawDuration)
-
-            let occupancyRatio = clampedDuration / max(1, segmentDuration)
-
-            if occupancyRatio > 0.02 {
-                entries.append(
-                    Segment.SegmentChordEntry(
-                        chordCell: currentTargetChord,
-                        duration: clampedDuration
-                    )
-                )
-            }
-        }
-
-        guard let lastChordCell = targetChordCells.last else {
-            return entries
-        }
-
-        let clampedStartTime = max(lastChordCell.startTime, segmentStartTime)
-        let clampedDuration = segmentEndTime - clampedStartTime
-
-        let lastOccupancyRatio = clampedDuration / max(1, segmentDuration)
-
-        if lastOccupancyRatio > 0.02 {
-            entries.append(
-                Segment.SegmentChordEntry(
-                    chordCell: lastChordCell,
-                    duration: clampedDuration
-                )
-            )
-        }
-
-        return entries
     }
 }
 
@@ -556,7 +435,6 @@ extension ChordProgressView {
         let segmentDuration: TimeInterval
         let totalDuration: TimeInterval
         let chordCells: [ChordCell]
-        let segmentEntries: [Int: [Segment.SegmentChordEntry]]
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
@@ -576,7 +454,6 @@ extension ChordProgressView {
                             index: index,
                             totalDuration: totalDuration,
                             chordCells: chordCells,
-                            segmentChordEntries: segmentEntries[index] ?? [],
                             segmentDuration: segmentDuration,
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,
