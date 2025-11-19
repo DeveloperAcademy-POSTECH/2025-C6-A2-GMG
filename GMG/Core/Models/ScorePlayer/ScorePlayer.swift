@@ -152,6 +152,10 @@ final class ScorePlayer {
     }
 
     func play() {
+        if engine.isRunning == false {
+            try? engine.start()
+        }
+
         scheduleAudioFile(from: pausedTime)
         player.play()
 
