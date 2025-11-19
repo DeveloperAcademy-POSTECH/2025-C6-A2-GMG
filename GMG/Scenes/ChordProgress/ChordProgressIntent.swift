@@ -13,7 +13,9 @@ protocol ChordProgressIntentProtocol {
     func onTapStopButton()
     func onTapMuteButton(_ isMuted: Bool)
     func onTapChordCell(_ chordCell: ChordCell)
-    func onTapWaveform(_ time: TimeInterval)
+    func onDragWaveformStart(_ time: TimeInterval)
+    func onDragWaveformChange(_ time: TimeInterval)
+    func onDragWaveformEnd(_ time: TimeInterval)
     func onTapCandidateChordCell(
         _ candidate: Chord,
         for chordCell: ChordCell
@@ -117,11 +119,24 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         model.selectChordCell(chordCell)
     }
 
-    func onTapWaveform(_ time: TimeInterval) {
+    func onDragWaveformStart(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
-
         scorePlayer.pause()
         scorePlayer.seek(to: time)
+    }
+
+    func onDragWaveformChange(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+        scorePlayer.seek(to: time)
+    }
+
+    func onDragWaveformEnd(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+        scorePlayer.seek(to: time)
+
+        if scorePlayer.wasPlayingBeforeLastCommand {
+            scorePlayer.play()
+        }
     }
 
     func onTapCandidateChordCell(

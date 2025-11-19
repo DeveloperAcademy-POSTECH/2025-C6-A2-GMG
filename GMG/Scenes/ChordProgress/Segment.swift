@@ -11,7 +11,9 @@ struct Segment: View {
     let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
     let chordCellAction: (ChordCell) -> Void
     let chordCandidateAction: (Chord, ChordCell) -> Void
-    let waveFormAction: (_ time: TimeInterval) -> Void
+    let onDragWaveformStart: (TimeInterval) -> Void
+    let onDragWaveformChange: (TimeInterval) -> Void
+    let onDragWaveformEnd: (TimeInterval) -> Void
     let audioLevels: [Float]
     let elapsedTime: TimeInterval
 
@@ -111,9 +113,9 @@ struct Segment: View {
                         startTime: segmentStartTime,
                         endTime: clampedSegmentEndTime,
                         elapsedTime: elapsedTime,
-                        onScrubStart: waveFormAction,
-                        onScrubChange: waveFormAction,
-                        onScrubEnd: waveFormAction
+                        onDragStart: onDragWaveformStart,
+                        onDragChange: onDragWaveformChange,
+                        onDragEnd: onDragWaveformEnd
                     )
 
                     TimeRuler(
