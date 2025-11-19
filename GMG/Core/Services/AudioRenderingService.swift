@@ -6,7 +6,7 @@ import Foundation
 
 final class AudioRenderingService {
 
-    func renderToAudioFile(score: Score) throws -> URL {
+    func renderToAudioFile(score: Score, fileName: String) throws -> URL {
         let scorePlayer = ScorePlayer(score: score)
         try scorePlayer.prepareToExport()
 
@@ -26,8 +26,7 @@ final class AudioRenderingService {
         try engine.start()
 
         // 출력 파일 URL 설정
-        let outputURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("accompaniment-\(UUID().uuidString).m4a")
+        let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 
         let outputFile = try AVAudioFile(
             forWriting: outputURL,
