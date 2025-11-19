@@ -63,7 +63,7 @@ struct ChordProgressView: View {
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
-                    chordCandidateAction: intent.onTapCandidateChordCell,
+                    chordCandidateAction: chordCandidateAction,
                     onTapWaveform: intent.onTapWaveform,
                     onDragWaveformStart: intent.onDragWaveformStart,
                     onDragWaveformChange: intent.onDragWaveformChange,
