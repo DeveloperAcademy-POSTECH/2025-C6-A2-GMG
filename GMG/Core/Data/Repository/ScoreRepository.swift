@@ -241,7 +241,7 @@ extension ChordCell {
         return .init(
             chord: self.chord?.toPersistence(),
             chordCandidates: self.chordCandidates.map { $0.toPersistence() },
-            startTime: self.startTime, duration: self.duration)
+            startTime: self.startTime)
     }
 }
 
