@@ -432,10 +432,10 @@ extension HomeView {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(
                         Color.white,
-                        in: RoundedRectangle(cornerRadius: 18)
+                        in: RoundedRectangle(cornerRadius: 32)
                     )
             }
-            .frame(width: isExpanded ? 156 : 77)
+            .frame(width: isExpanded ? 156 : 124)
         }
     }
 
