@@ -29,7 +29,7 @@ struct LoadingView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     ForEach(ScoreFactoryState.allCases, id: \.self) { state in
-                        LoadingStateRow(text: String(localized: state.localizedStringResource))
+                        LoadingStateRow(state.localizedStringResource)
                             .disabled(scoreFactoryState.rawValue < state.rawValue)
                     }
                 }
@@ -38,9 +38,17 @@ struct LoadingView: View {
     }
 
     struct LoadingStateRow: View {
-        let text: String
+        @Environment(\.isEnabled) private var isEnabled: Bool
 
-        @Environment(\.isEnabled) private var isEnabled
+        let text: Text
+
+        init<S: StringProtocol>(_ string: S) {
+            self.text = Text(string)
+        }
+
+        init(_ resource: LocalizedStringResource) {
+            self.text = Text(resource)
+        }
 
         private var color: Color {
             isEnabled ? Color.black1 : Color.black7
@@ -51,7 +59,7 @@ struct LoadingView: View {
                 Image(.checkmark)
                     .frame(width: 20, height: 20)
                     .background(color, in: Circle())
-                Text(text)
+                text
                     .font(
                         .english(Typography.WantedSansStd.R6),
                         .korean(Typography.Pretendard.M6)
@@ -68,4 +76,5 @@ struct LoadingView: View {
     PhaseAnimator(ScoreFactoryState.allCases) { state in
         LoadingView(scoreFactoryState: state)
     }
+    .environment(\.locale, .init(languageCode: .english))
 }
