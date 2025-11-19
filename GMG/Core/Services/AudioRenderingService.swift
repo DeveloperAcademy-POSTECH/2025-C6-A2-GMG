@@ -48,7 +48,8 @@ final class AudioRenderingService {
             throw NSError(domain: "BufferAlloc", code: -1)
         }
 
-        let totalFrames = AVAudioFrameCount(score.totalDuration * outputFormat.sampleRate)
+        let totalDuration = score.totalDuration + 0.2
+        let totalFrames = AVAudioFrameCount(totalDuration * outputFormat.sampleRate)
 
         /// 렌더링 루프
         while engine.manualRenderingSampleTime < AVAudioFramePosition(totalFrames) {
@@ -64,10 +65,16 @@ final class AudioRenderingService {
                 try outputFile.write(from: buffer)
 
             case .insufficientDataFromInputNode:
-                continue  // 입력 데이터 부족 → 다음 루프 돌기
+                buffer.frameLength = framesToRender
+                memset(
+                    buffer.int16ChannelData?[0], 0, Int(framesToRender) * MemoryLayout<Int16>.size)
+                try outputFile.write(from: buffer)
 
             case .error:
                 throw NSError(domain: "OfflineRender", code: -1)
+
+            case .cannotDoInCurrentContext:
+                break
 
             @unknown default:
                 break
