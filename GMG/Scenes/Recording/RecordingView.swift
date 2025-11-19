@@ -70,12 +70,9 @@ struct RecordingView: View {
             Countdown(countdown: model.countdown, skipAction: intent.onTapSkipButton)
         }
         .overlay {
-            ZStack {
-                if let scoreFactoryState = model.scoreFactoryState {
-                    LoadingView(scoreFactoryState: scoreFactoryState)
-                }
+            if let scoreFactoryState = model.scoreFactoryState {
+                LoadingView(scoreFactoryState: scoreFactoryState)
             }
-            .animation(.default, value: model.scoreFactoryState)
         }
         .task {
             await intent.onAppear()
