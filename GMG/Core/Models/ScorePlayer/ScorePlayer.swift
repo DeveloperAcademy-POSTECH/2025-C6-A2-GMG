@@ -30,7 +30,6 @@ final class ScorePlayer {
     let playerMutedPublisher: CurrentValueSubject<Bool, Never>
 
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
-    private var playheadPublisherTimer: AnyCancellable?
 
     private var cancellables: Set<AnyCancellable>
 
@@ -61,7 +60,6 @@ final class ScorePlayer {
                 elapsedTime: .zero
             )
         )
-        self.playheadPublisherTimer = nil
 
         self.cancellables = Set<AnyCancellable>()
     }
@@ -90,7 +88,7 @@ final class ScorePlayer {
         prepareChordCells()
 
         // 타이머 설정
-        self.playheadPublisherTimer = Timer.publish(
+        Timer.publish(
             every: 0.1,
             on: RunLoop.main,
             in: RunLoop.Mode.common
@@ -110,6 +108,7 @@ final class ScorePlayer {
                 )
             )
         }
+        .store(in: &cancellables)
 
         NotificationCenter.default.publisher(for: AVAudioSession.routeChangeNotification)
             .sink { [weak self] notification in
@@ -145,15 +144,16 @@ final class ScorePlayer {
     func cleanupAfterPlay() {
         try? deactivateAudioSession()
 
-        playheadPublisherTimer?.cancel()
-        playheadPublisherTimer = nil
-
         cancellables.removeAll()
 
         engine.stop()
     }
 
     func play() {
+        if engine.isRunning == false {
+            try? engine.start()
+        }
+
         scheduleAudioFile(from: pausedTime)
         player.play()
 

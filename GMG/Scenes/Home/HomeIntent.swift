@@ -144,5 +144,12 @@ final class HomeIntent: HomeIntentProtocol {
         cancellables.removeAll()
         scorePlayer?.cleanupAfterPlay()
         scorePlayer = nil
+
+        model?.updatePlayhead(
+            Playhead(
+                isPlaying: false,
+                elapsedTime: .zero
+            )
+        )
     }
 }

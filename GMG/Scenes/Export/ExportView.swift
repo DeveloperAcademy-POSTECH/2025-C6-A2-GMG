@@ -36,7 +36,17 @@ struct ExportView: View {
                 )
                 Spacer()
             }
-            .navigationBar(leading: {}, center: {}, trailing: {})
+            .navigationBar(
+                leading: {},
+                center: {
+                    Text(.export)
+                        .font(
+                            .english(Typography.WantedSansStd.R6),
+                            .korean(Typography.Pretendard.M6)
+                        )
+                },
+                trailing: {}
+            )
         }
         .onAppear {
             intent.onAppear()
@@ -110,7 +120,10 @@ extension ExportView {
                     ShareLink(item: sheetURL) {
                         HStack(spacing: 4) {
                             Text(String(localized: .sheet))
-                                .font(Typography.WantedSansStd.M2)
+                                .font(
+                                    .english(Typography.WantedSansStd.M2),
+                                    .korean(Typography.Pretendard.M6)
+                                )
                                 .foregroundStyle(Color.white1)
                             Image(.export)
                         }
@@ -126,9 +139,11 @@ extension ExportView {
                 if let audioURL {
                     ShareLink(item: audioURL) {
                         HStack(spacing: 4) {
-                            //                            Text("Audio")
                             Text(String(localized: .audio))
-                                .font(Typography.WantedSansStd.M2)
+                                .font(
+                                    .english(Typography.WantedSansStd.M2),
+                                    .korean(Typography.Pretendard.M6)
+                                )
                                 .foregroundStyle(Color.white1)
                             Image(.export)
                         }
@@ -146,6 +161,9 @@ extension ExportView {
     }
 }
 
-//#Preview {
-//    ExportView(score: Score)
-//}
+#Preview {
+    PreviewContainer { router in
+        router.view(.export(score: .mock))
+    }
+    .environment(\.locale, .init(languageCode: .english))
+}

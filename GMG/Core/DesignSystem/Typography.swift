@@ -9,6 +9,24 @@ protocol CustomFont {
     var lineHeightMultiple: CGFloat { get }
 }
 
+struct LocalizedCustomFont {
+    let languageCode: Locale.LanguageCode
+    let customFont: CustomFont
+
+    init(_ languageCode: Locale.LanguageCode, _ customFont: CustomFont) {
+        self.languageCode = languageCode
+        self.customFont = customFont
+    }
+
+    static func english(_ font: CustomFont) -> LocalizedCustomFont {
+        .init(.english, font)
+    }
+
+    static func korean(_ font: CustomFont) -> LocalizedCustomFont {
+        .init(.korean, font)
+    }
+}
+
 enum Typography {
     enum WantedSansStd: CustomFont {
         case R1

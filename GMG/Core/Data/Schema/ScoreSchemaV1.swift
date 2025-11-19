@@ -7,8 +7,9 @@ enum ScoreSchemaV1: VersionedSchema {
     static var versionIdentifier: Schema.Version {
         Schema.Version(1, 0, 0)
     }
+
     static var models: [any PersistentModel.Type] {
-        [Score.self]
+        [Score.self, ChordCell.self, Chord.self, Key.self, Note.self]
     }
 
     @Model
@@ -20,8 +21,8 @@ enum ScoreSchemaV1: VersionedSchema {
         var totalDuration: TimeInterval = TimeInterval.zero
         var createdAt: Date = Date.now
         var updatedAt: Date = Date.now
-        var notes: [Note] = []
-        var chordCells: [ChordCell] = []
+        @Relationship(deleteRule: .cascade) var notes: [Note] = []
+        @Relationship(deleteRule: .cascade) var chordCells: [ChordCell] = []
         var audioLevels: [Float] = []
         var isDeleted: Bool = false
 
@@ -52,18 +53,43 @@ enum ScoreSchemaV1: VersionedSchema {
         }
     }
 
-    struct ChordCell: Codable {
-        var chord: Chord?
-        var chordCandidates: [Chord]
-        var startTime: TimeInterval
+    @Model
+    class ChordCell {
+        @Relationship(deleteRule: .cascade) var chord: Chord? = nil
+        @Relationship(deleteRule: .cascade) var chordCandidates: [Chord] = []
+        var startTime: TimeInterval = TimeInterval.zero
+
+        init(
+            chord: Chord?,
+            chordCandidates: [Chord],
+            startTime: TimeInterval
+        ) {
+            self.chord = chord
+            self.chordCandidates = chordCandidates
+            self.startTime = startTime
+        }
     }
 
-    struct Chord: Codable {
-        let root: NoteName
-        let quality: ChordQuality
+    @Model
+    class Chord {
+        var rootRaw: NoteName.RawValue = NoteName.C.rawValue
+        var root: NoteName {
+            get { .init(rawValue: rootRaw) ?? .C }
+            set { rootRaw = newValue.rawValue }
+        }
+        var qualityRaw: ChordQuality.RawValue = ChordQuality.maj.rawValue
+        var quality: ChordQuality {
+            get { .init(rawValue: qualityRaw) ?? .maj }
+            set { qualityRaw = newValue.rawValue }
+        }
+
+        init(root: NoteName, quality: ChordQuality) {
+            self.root = root
+            self.quality = quality
+        }
     }
 
-    enum ChordQuality: Codable {
+    enum ChordQuality: String {
         case maj
         case maj7
         case maj9
@@ -76,18 +102,39 @@ enum ScoreSchemaV1: VersionedSchema {
         case halfDim7
     }
 
-    struct Key: Codable {
-        let root: NoteName
+    @Model
+    class Key {
+        var rootRaw: NoteName.RawValue = NoteName.C.rawValue
+        var root: NoteName {
+            get { .init(rawValue: rootRaw) ?? .C }
+            set { rootRaw = newValue.rawValue }
+        }
+
+        init(root: NoteName) {
+            self.root = root
+        }
     }
 
-    struct Note: Codable {
-        let name: NoteName
-        let octave: Int
-        let startTime: TimeInterval
-        let duration: TimeInterval
+    @Model
+    class Note {
+        var nameRaw: NoteName.RawValue = NoteName.C.rawValue
+        var name: NoteName {
+            get { .init(rawValue: nameRaw) ?? .C }
+            set { nameRaw = newValue.rawValue }
+        }
+        var octave: Int = Int.zero
+        var startTime: TimeInterval = TimeInterval.zero
+        var duration: TimeInterval = TimeInterval.zero
+
+        init(name: NoteName, octave: Int, startTime: TimeInterval, duration: TimeInterval) {
+            self.name = name
+            self.octave = octave
+            self.startTime = startTime
+            self.duration = duration
+        }
     }
 
-    enum NoteName: Codable {
+    enum NoteName: String {
         case C
         case Cs
         case Db

@@ -329,7 +329,7 @@ extension HomeView {
         }
 
         private var unitString: AttributedString {
-            var string: AttributedString = AttributedString(String(localized: .songs))
+            var string: AttributedString = AttributedString("songs")
             string.font = Typography.WantedSansStd.R7.font
             return string
         }
@@ -350,7 +350,10 @@ extension HomeView {
             VStack(spacing: Spacing.md) {
                 HStack {
                     Text(.recentFiles)
-                        .font(Typography.WantedSansStd.R7)
+                        .font(
+                            .english(Typography.WantedSansStd.R7),
+                            .korean(Typography.Pretendard.SB7)
+                        )
                         .foregroundStyle(Color.black1)
                     Spacer()
                 }
@@ -446,12 +449,18 @@ extension HomeView {
             VStack(spacing: Spacing.md) {
                 HStack(alignment: .lastTextBaseline, spacing: 0) {
                     Text(.allFiles)
-                        .font(Typography.WantedSansStd.R7)
+                        .font(
+                            .english(Typography.WantedSansStd.R7),
+                            .korean(Typography.Pretendard.SB7)
+                        )
                         .foregroundStyle(Color.black1)
                         .padding(.trailing, 20)
 
                     Text(.latest)
-                        .font(Typography.WantedSansStd.R5)
+                        .font(
+                            .english(Typography.WantedSansStd.R5),
+                            .korean(Typography.Pretendard.M5)
+                        )
                         .foregroundStyle(
                             model.isLatest ? Color.black5 : Color.black3
                         )
@@ -466,7 +475,10 @@ extension HomeView {
                         }
 
                     Text(.earliest)
-                        .font(Typography.WantedSansStd.R5)
+                        .font(
+                            .english(Typography.WantedSansStd.R5),
+                            .korean(Typography.Pretendard.M5)
+                        )
                         .foregroundStyle(
                             model.isLatest ? Color.black3 : Color.black5
                         )
@@ -577,4 +589,5 @@ extension HomeView {
     PreviewContainer { router in
         router.view(.home)
     }
+    .environment(\.locale, .init(languageCode: .english))
 }
