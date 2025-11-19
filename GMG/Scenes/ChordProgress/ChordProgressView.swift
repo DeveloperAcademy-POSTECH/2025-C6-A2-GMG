@@ -166,7 +166,7 @@ extension ChordProgressView {
         var body: some View {
             ZStack(alignment: .center) {
                 TextField(
-                    String(localized: .enterTitle),
+                    LocalizedStringKey(LocalizedStringResource.enterTitle.key),
                     text: isTitleFieldFocused ? $titleDraft : .constant(title)
                 )
                 .multilineTextAlignment(.center)
@@ -327,7 +327,7 @@ extension ChordProgressView {
         var body: some View {
             HStack(spacing: .zero) {
                 ToggleButton(
-                    title: String(localized: .sheet),
+                    title: .sheet,
                     isSelected: !isEditMode,
                     namespace: namespace
                 ) {
@@ -335,7 +335,7 @@ extension ChordProgressView {
                 }
 
                 ToggleButton(
-                    title: String(localized: .edit),
+                    title: .edit,
                     isSelected: isEditMode,
                     namespace: namespace
                 ) {
@@ -347,16 +347,40 @@ extension ChordProgressView {
         }
 
         struct ToggleButton: View {
-            let title: String
+            let title: Text
             let isSelected: Bool
             let namespace: Namespace.ID
             let action: () -> Void
+
+            init<S: StringProtocol>(
+                title: S,
+                isSelected: Bool,
+                namespace: Namespace.ID,
+                action: @escaping () -> Void
+            ) {
+                self.title = Text(title)
+                self.isSelected = isSelected
+                self.namespace = namespace
+                self.action = action
+            }
+
+            init(
+                title: LocalizedStringResource,
+                isSelected: Bool,
+                namespace: Namespace.ID,
+                action: @escaping () -> Void
+            ) {
+                self.title = Text(title)
+                self.isSelected = isSelected
+                self.namespace = namespace
+                self.action = action
+            }
 
             var body: some View {
                 Button {
                     action()
                 } label: {
-                    Text(title)
+                    title
                         .font(
                             .english(
                                 isSelected
