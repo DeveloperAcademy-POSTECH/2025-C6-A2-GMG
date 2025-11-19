@@ -257,15 +257,13 @@ final class ScorePlayer {
             chordCell.chord != nil && chordCell.startTime < audioDuration
         }
 
-        for index in 0..<max(0, filteredChordCells.count - 1) {
-            let currentChordCell: ChordCell = filteredChordCells[index]
-            let nextChordCell: ChordCell = filteredChordCells[index + 1]
+        for chordCell in filteredChordCells {
+            guard let chord: Chord = chordCell.chord else { continue }
 
-            guard let chord: Chord = currentChordCell.chord else { continue }
+            let position: TimeInterval = chordCell.startTime
+            let clampedDuration = min(chordCell.duration, max(0, audioDuration - position))
+            guard clampedDuration > 0 else { continue }
 
-            let position: TimeInterval = currentChordCell.startTime
-            let duration: TimeInterval =
-                nextChordCell.startTime - position
             let tonicChord: Tonic.Chord = chord.tonicChord
             let midiNotes: [Int8] = tonicChord.midiNoteNumbers
 
@@ -274,26 +272,7 @@ final class ScorePlayer {
                     midiNote: Float(midiNote),
                     velocity: 100,
                     groupID: .zero,
-                    duration: duration
-                )
-                track.addEvent(noteEvent, at: position)
-            }
-        }
-
-        if let lastChordCell: ChordCell = filteredChordCells.last,
-            let chord: Chord = lastChordCell.chord
-        {
-            let position: TimeInterval = lastChordCell.startTime
-            let duration: TimeInterval = audioDuration - position
-            let tonicChord: Tonic.Chord = chord.tonicChord
-            let midiNotes: [Int8] = tonicChord.midiNoteNumbers
-
-            for midiNote in midiNotes {
-                let noteEvent: AVExtendedNoteOnEvent = AVExtendedNoteOnEvent(
-                    midiNote: Float(midiNote),
-                    velocity: 100,
-                    groupID: .zero,
-                    duration: duration
+                    duration: clampedDuration
                 )
                 track.addEvent(noteEvent, at: position)
             }
