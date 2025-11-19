@@ -26,8 +26,10 @@ struct LoadingView: View {
                     }
                     .playing(loopMode: .loop)
                     .frame(width: 196, height: 144)
+                    .scaleEffect(1.1)
+                    .offset(x: 5)
 
-                VStack(alignment: .leading, spacing: Spacing.xs) {
+                VStack(alignment: .leading, spacing: 20) {
                     ForEach(ScoreFactoryState.allCases, id: \.self) { state in
                         LoadingStateRow(state.localizedStringResource)
                             .disabled(scoreFactoryState.rawValue < state.rawValue)
