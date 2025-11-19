@@ -151,44 +151,6 @@ final class ScorePlayer {
         }
     }
 
-    func pause() {
-        let pausedTime = currentPlaybackTime()
-
-        player.pause()
-        sequencer.stop()
-
-        self.pausedTime = pausedTime
-    }
-
-    func stop() {
-        player.stop()
-        sequencer.stop()
-        pausedTime = .zero
-    }
-
-    func seek(to time: TimeInterval) {
-        let wasPlaying: Bool = player.isPlaying
-
-        self.pausedTime = time
-
-        if wasPlaying {
-            play()
-        }
-    }
-
-    func seek(chordCell: ChordCell) {
-        let wasPlaying: Bool = player.isPlaying
-
-        self.pausedTime = chordCell.startTime
-
-        if wasPlaying {
-            play()
-        } else {
-            guard let chord: Chord = chordCell.chord else { return }
-            play(chord: chord)
-        }
-    }
-
     func play(chord: Chord) {
         chordPlayTask?.cancel()
 
@@ -225,6 +187,44 @@ final class ScorePlayer {
                     onChannel: .zero
                 )
             }
+        }
+    }
+
+    func pause() {
+        let pausedTime = currentPlaybackTime()
+
+        player.pause()
+        sequencer.stop()
+
+        self.pausedTime = pausedTime
+    }
+
+    func stop() {
+        player.stop()
+        sequencer.stop()
+        pausedTime = .zero
+    }
+
+    func seek(to time: TimeInterval) {
+        let wasPlaying: Bool = player.isPlaying
+
+        self.pausedTime = time
+
+        if wasPlaying {
+            play()
+        }
+    }
+
+    func seek(chordCell: ChordCell) {
+        let wasPlaying: Bool = player.isPlaying
+
+        self.pausedTime = chordCell.startTime
+
+        if wasPlaying {
+            play()
+        } else {
+            guard let chord: Chord = chordCell.chord else { return }
+            play(chord: chord)
         }
     }
 
