@@ -53,7 +53,7 @@ final class Router {
 
                 RecordingView(model: model, intent: intent, router: self)
             } else {
-                Text("Error")
+                ErrorView(description: "Failed to create database")
             }
         case .chordProgress(let score):
             if let scoreRepository: ScoreRepository = diContainer.makeScoreRepository() {
@@ -63,7 +63,7 @@ final class Router {
 
                 ChordProgressView(model: model, intent: intent, router: self)
             } else {
-                Text("Error")
+                ErrorView(description: "Failed to create database")
             }
         case .export(let score):
             let model: ExportModel = ExportModel(score: score)
