@@ -109,10 +109,10 @@ extension ExportView {
                 if let sheetURL {
                     ShareLink(item: sheetURL) {
                         HStack(spacing: 4) {
-                            Text("sheet")
+                            Text(String(localized: .sheet))
                                 .font(Typography.WantedSansStd.M2)
                                 .foregroundStyle(Color.white1)
-                            Image("Export")
+                            Image(.export)
                         }
                         .padding(.vertical, 20)
                         .frame(maxWidth: .infinity)
@@ -126,10 +126,11 @@ extension ExportView {
                 if let audioURL {
                     ShareLink(item: audioURL) {
                         HStack(spacing: 4) {
-                            Text("Audio")
+                            //                            Text("Audio")
+                            Text(String(localized: .audio))
                                 .font(Typography.WantedSansStd.M2)
                                 .foregroundStyle(Color.white1)
-                            Image("Export")
+                            Image(.export)
                         }
                         .padding(.vertical, 20)
                         .frame(maxWidth: .infinity)
