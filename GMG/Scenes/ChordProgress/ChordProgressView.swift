@@ -52,13 +52,10 @@ struct ChordProgressView: View {
                 }
                 .padding(Spacing.md)
 
-                let chordCells = model.score.retrieveAllChordCells()
-                let segmentDuration = 5.0
-
                 SegmentsScrollView(
-                    segmentDuration: segmentDuration,
+                    segmentDuration: 5.0,
                     totalDuration: model.score.totalDuration,
-                    chordCells: chordCells,
+                    segmentSlices: model.segmentSlices,
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
@@ -434,7 +431,7 @@ extension ChordProgressView {
     struct SegmentsScrollView: View {
         let segmentDuration: TimeInterval
         let totalDuration: TimeInterval
-        let chordCells: [ChordCell]
+        let segmentSlices: [Int: [ChordSegmentSlice]]
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
@@ -453,7 +450,7 @@ extension ChordProgressView {
                         Segment(
                             index: index,
                             totalDuration: totalDuration,
-                            chordCells: chordCells,
+                            chordSlices: segmentSlices[index] ?? [],
                             segmentDuration: segmentDuration,
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,

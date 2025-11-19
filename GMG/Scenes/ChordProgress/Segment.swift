@@ -5,8 +5,7 @@ import SwiftUI
 struct Segment: View {
     let index: Int
     let totalDuration: TimeInterval
-    let chordCells: [ChordCell]  // 전체 악보의 코드 셀 리스트
-    let segmentChordEntries: [SegmentChordEntry]
+    let chordSlices: [ChordSegmentSlice]
     let segmentDuration: TimeInterval
     let currentChordCell: ChordCell?  // 재생 중인 코드 셀
     let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
@@ -28,11 +27,14 @@ struct Segment: View {
         segmentStartTime + segmentDuration
     }
 
+    private var clampedSegmentEndTime: TimeInterval {
+        min(segmentEndTime, totalDuration)
+    }
+
     private var segmentAudioLevels: [Float] {
         guard !audioLevels.isEmpty else { return [] }
 
-        let clampedEndTime: TimeInterval = min(segmentEndTime, totalDuration)
-        guard clampedEndTime > segmentStartTime else { return [] }
+        guard clampedSegmentEndTime > segmentStartTime else { return [] }
 
         let startIndex: Int = max(
             0,
@@ -40,7 +42,7 @@ struct Segment: View {
         )
         let endIndex: Int = min(
             audioLevels.count,
-            Int(ceil(clampedEndTime / audioSampleInterval))
+            Int(ceil(clampedSegmentEndTime / audioSampleInterval))
         )
 
         guard startIndex < endIndex else { return [] }
@@ -51,29 +53,31 @@ struct Segment: View {
     var body: some View {
         VStack(spacing: Spacing.xs) {
             GeometryReader { proxy in
-                let totalSpacing = Spacing.xs * CGFloat(segmentChordEntries.count - 1)
+                let slices = chordSlices
+                let totalSpacing = Spacing.xs * CGFloat(max(0, slices.count - 1))
                 let availableWidth = proxy.size.width - totalSpacing
 
                 HStack(spacing: Spacing.xs) {
-                    ForEach(segmentChordEntries) { cell in
-                        let widthRatio = cell.duration / max(1, segmentDuration)
-                        let cellWidth = availableWidth * widthRatio
-                        let clampedWidth = cellWidth < 1 ? 0 : cellWidth
+                    ForEach(slices) { slice in
+                        let widthRatio = slice.segmentOccupancy / max(1, segmentDuration)
+                        let cellWidth = max(0, availableWidth * widthRatio)
 
-                        ZStack {
-                            if let chord = cell.chordCell.chord {
-                                ChordCellButton(
-                                    chord: chord,
-                                    isCurrentChord: currentChordCell?.startTime
-                                        == cell.chordCell.startTime,
-                                    isSelected: selectedChordCell?.startTime
-                                        == cell.chordCell.startTime
-                                ) {
-                                    chordCellAction(cell.chordCell)
-                                }
+                        if let chord = slice.chordCell.chord {
+                            ChordCellButton(
+                                chord: chord,
+                                isCurrentChord: currentChordCell?.startTime
+                                    == slice.chordCell.startTime,
+                                isSelected: selectedChordCell?.startTime
+                                    == slice.chordCell.startTime
+                            ) {
+                                chordCellAction(slice.chordCell)
                             }
+                            .frame(width: cellWidth, height: 62)
+                        } else {
+                            Rectangle()
+                                .foregroundStyle(Color.clear)
+                                .frame(width: cellWidth, height: 62)
                         }
-                        .frame(width: clampedWidth, height: 62)
                     }
                 }
             }
@@ -81,7 +85,7 @@ struct Segment: View {
 
             let showCandidates: Bool =
                 editMode?.wrappedValue.isEditing == true
-                && segmentChordEntries.contains(where: {
+                && chordSlices.contains(where: {
                     $0.chordCell.startTime == selectedChordCell?.startTime
                 })
                 && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
@@ -97,7 +101,7 @@ struct Segment: View {
             GeometryReader { proxy in
                 let segmentWidth =
                     proxy.size.width
-                    * ((min(segmentEndTime, totalDuration) - segmentStartTime) / 5)
+                    * ((clampedSegmentEndTime - segmentStartTime) / 5)
 
                 VStack(spacing: Spacing.xs) {
 
@@ -105,7 +109,7 @@ struct Segment: View {
                         width: segmentWidth,
                         amplitudes: segmentAudioLevels,
                         startTime: segmentStartTime,
-                        endTime: min(segmentEndTime, totalDuration),
+                        endTime: clampedSegmentEndTime,
                         elapsedTime: elapsedTime,
                         onScrubStart: waveFormAction,
                         onScrubChange: waveFormAction,
@@ -124,18 +128,6 @@ struct Segment: View {
         }
         .animation(.default, value: editMode?.wrappedValue)
         .animation(.default, value: selectedChordCell?.startTime)
-    }
-
-    struct SegmentChordEntry: Identifiable {
-        let id: TimeInterval
-        let chordCell: ChordCell
-        let duration: TimeInterval
-
-        init(chordCell: ChordCell, duration: TimeInterval) {
-            self.id = chordCell.startTime
-            self.chordCell = chordCell
-            self.duration = duration
-        }
     }
 
     struct ChordCellCandidates: View {
