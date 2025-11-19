@@ -44,8 +44,17 @@ struct ExportView: View {
                             .english(Typography.WantedSansStd.R6),
                             .korean(Typography.Pretendard.M6)
                         )
+                        .foregroundStyle(Color.black1)
                 },
-                trailing: {}
+                trailing: {
+                    Button {
+                        router?.popToRoot()
+                    } label: {
+                        Image("Home")
+                            .renderingMode(.template)
+                            .foregroundStyle(Color.black1)
+                    }
+                }
             )
         }
         .onAppear {
@@ -119,7 +128,7 @@ extension ExportView {
                 if let sheetURL {
                     ShareLink(item: sheetURL) {
                         HStack(spacing: 4) {
-                            Text(String(localized: .sheet))
+                            Text(.sheet)
                                 .font(
                                     .english(Typography.WantedSansStd.M2),
                                     .korean(Typography.Pretendard.M6)
@@ -139,7 +148,7 @@ extension ExportView {
                 if let audioURL {
                     ShareLink(item: audioURL) {
                         HStack(spacing: 4) {
-                            Text(String(localized: .audio))
+                            Text(.audio)
                                 .font(
                                     .english(Typography.WantedSansStd.M2),
                                     .korean(Typography.Pretendard.M6)
