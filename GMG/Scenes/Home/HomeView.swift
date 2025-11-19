@@ -136,13 +136,13 @@ extension HomeView {
 
                     Text(Self.dateConverter(score.createdAt))
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(Color.white2)
 
                     Spacer()
 
                     Text("\(score.key.description) Key")
-                        .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.black6)
+                        .font(Typography.WantedSansStd.R4)
+                        .foregroundStyle(Color.white2)
                 }
 
                 Spacer()
@@ -183,14 +183,15 @@ extension HomeView {
                             playButtonAction()
                         }
                     } label: {
-                        Image(isPlaying ? .pause : .play)
+                        Image(isPlaying ? .pause : .playButton)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 12, height: 12)
-                            .padding(.leading, isPlaying ? 0 : 2)
+                            .frame(width: 10, height: 10)
                             .foregroundStyle(Color.black1)
-                            .padding(Spacing.xs)
+                            .padding(.vertical, 9)
+                            .padding(.leading, isPlaying ? 9 : 10)
+                            .padding(.trailing, 9)
                             .background {
                                 let lineWidth: CGFloat = 3
                                 let isProgressPresented: Bool =
