@@ -37,7 +37,13 @@ final class ExportIntent: ExportIntentProtocol {
                 }
             }
 
-            model.updateAudioURL(score.audioURL)
+            let service = AudioRenderingService()
+            do {
+                let renderedURL = try service.renderToAudioFile(score: score)
+                model.updateAudioURL(renderedURL)
+            } catch {
+                print("offline render failed: \(error)")
+            }
         }
     }
 }
