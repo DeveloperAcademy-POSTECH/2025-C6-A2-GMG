@@ -10,7 +10,7 @@ struct CompatibleGlassEffect<S: InsettableShape>: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
             content
-                .glassEffect(.clear, in: shape)
+                .glassEffect(.regular, in: shape)
         } else {
             let (startPoint, endPoint) = calculatePoints(size)
 
