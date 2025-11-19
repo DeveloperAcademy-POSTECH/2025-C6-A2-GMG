@@ -11,6 +11,7 @@ struct Segment: View {
     let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
     let chordCellAction: (ChordCell) -> Void
     let chordCandidateAction: (Chord, ChordCell) -> Void
+    let onTapWaveform: (TimeInterval) -> Void
     let onDragWaveformStart: (TimeInterval) -> Void
     let onDragWaveformChange: (TimeInterval) -> Void
     let onDragWaveformEnd: (TimeInterval) -> Void
@@ -113,6 +114,7 @@ struct Segment: View {
                         startTime: segmentStartTime,
                         endTime: clampedSegmentEndTime,
                         elapsedTime: elapsedTime,
+                        onTap: onTapWaveform,
                         onDragStart: onDragWaveformStart,
                         onDragChange: onDragWaveformChange,
                         onDragEnd: onDragWaveformEnd

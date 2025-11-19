@@ -60,6 +60,7 @@ struct ChordProgressView: View {
                     selectedChordCell: model.selectedChordCell,
                     chordCellAction: intent.onTapChordCell,
                     chordCandidateAction: intent.onTapCandidateChordCell,
+                    onTapWaveform: intent.onTapWaveform,
                     onDragWaveformStart: intent.onDragWaveformStart,
                     onDragWaveformChange: intent.onDragWaveformChange,
                     onDragWaveformEnd: intent.onDragWaveformEnd,
@@ -438,6 +439,7 @@ extension ChordProgressView {
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
         let chordCandidateAction: (Chord, ChordCell) -> Void
+        let onTapWaveform: (TimeInterval) -> Void
         let onDragWaveformStart: (TimeInterval) -> Void
         let onDragWaveformChange: (TimeInterval) -> Void
         let onDragWaveformEnd: (TimeInterval) -> Void
@@ -460,6 +462,7 @@ extension ChordProgressView {
                             selectedChordCell: selectedChordCell,
                             chordCellAction: chordCellAction,
                             chordCandidateAction: chordCandidateAction,
+                            onTapWaveform: onTapWaveform,
                             onDragWaveformStart: onDragWaveformStart,
                             onDragWaveformChange: onDragWaveformChange,
                             onDragWaveformEnd: onDragWaveformEnd,
