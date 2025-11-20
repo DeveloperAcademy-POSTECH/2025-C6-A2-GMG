@@ -27,22 +27,20 @@ extension View {
 extension View {
     func navigationBar<Leading: View, Center: View, Trailing: View>(
         isBackButtonHidden: Bool = false,
-        @ViewBuilder leading: () -> Leading,
-        @ViewBuilder center: () -> Center,
-        @ViewBuilder trailing: () -> Trailing
+        @ViewBuilder leading: () -> Leading = { EmptyView() },
+        @ViewBuilder center: () -> Center = { EmptyView() },
+        @ViewBuilder trailing: () -> Trailing = { EmptyView() }
     ) -> some View {
-        VStack {
-            NavigationBar<Leading, Center, Trailing>(
-                isBackButtonHidden: isBackButtonHidden,
-                leading: leading,
-                center: center,
-                trailing: trailing
-            )
-
-            self
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .toolbarVisibility(.hidden, for: .navigationBar)
+        self
+            .toolbarVisibility(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top) {
+                NavigationBar<Leading, Center, Trailing>(
+                    isBackButtonHidden: isBackButtonHidden,
+                    leading: leading,
+                    center: center,
+                    trailing: trailing
+                )
+            }
     }
 }
 
