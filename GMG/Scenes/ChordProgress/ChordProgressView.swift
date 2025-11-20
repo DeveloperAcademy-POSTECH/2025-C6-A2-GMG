@@ -76,38 +76,6 @@ struct ChordProgressView: View {
                     elapsedTime: model.playhead.elapsedTime
                 )
             }
-            .navigationBar(
-                isBackButtonHidden: true,
-                leading: {
-                    Button {
-                        router?.popToRoot()
-                    } label: {
-                        Image("Home")
-                            .renderingMode(.template)
-                            .foregroundStyle(
-                                model.isEditMode == false
-                                    ? Color.black1 : Color.white1
-                            )
-                    }
-                },
-                center: {
-                    let onEnterTitle: (String) -> Void = { title in
-                        intent.onEnterTitle(title, for: model.score)
-                    }
-                    NavigationTitle(
-                        title: model.score.title,
-                        onEnterTitle: onEnterTitle
-                    )
-                },
-                trailing: {
-                    Button {
-                        router?.push(.export(score: model.score))
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-            )
-            .environment(\.colorScheme, model.isEditMode ? .dark : .light)
 
             VStack {
                 Spacer()
@@ -123,6 +91,38 @@ struct ChordProgressView: View {
             }
             .padding()
         }
+        .navigationBar(
+            isBackButtonHidden: true,
+            leading: {
+                Button {
+                    router?.popToRoot()
+                } label: {
+                    Image("Home")
+                        .renderingMode(.template)
+                        .foregroundStyle(
+                            model.isEditMode == false
+                                ? Color.black1 : Color.white1
+                        )
+                }
+            },
+            center: {
+                let onEnterTitle: (String) -> Void = { title in
+                    intent.onEnterTitle(title, for: model.score)
+                }
+                NavigationTitle(
+                    title: model.score.title,
+                    onEnterTitle: onEnterTitle
+                )
+            },
+            trailing: {
+                Button {
+                    router?.push(.export(score: model.score))
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+        )
+        .environment(\.colorScheme, model.isEditMode ? .dark : .light)
         .environment(
             \.editMode,
             .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
