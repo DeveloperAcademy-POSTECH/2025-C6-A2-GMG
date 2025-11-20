@@ -32,6 +32,7 @@ struct RecordingView: View {
 
                 Spacer()
             }
+            .navigationBar()
 
             WaveForm(audioLevels: model.audioLevels)
 
@@ -68,12 +69,12 @@ struct RecordingView: View {
 
             Countdown(countdown: model.countdown, skipAction: intent.onTapSkipButton)
         }
-        .navigationBar()
         .overlay {
             if let scoreFactoryState = model.scoreFactoryState {
                 LoadingView(scoreFactoryState: scoreFactoryState)
             }
         }
+        .animation(.default, value: model.scoreFactoryState)
         .task {
             await intent.onAppear()
         }
