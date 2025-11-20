@@ -59,26 +59,26 @@ struct ExportView: View {
             }
             .padding(Spacing.md)
             .padding(.bottom, Spacing.xxl)
-        }
-        .navigationBar(
-            center: {
-                Text(.export)
-                    .font(
-                        .english(Typography.WantedSansStd.R6),
-                        .korean(Typography.Pretendard.M6)
-                    )
-                    .foregroundStyle(Color.black1)
-            },
-            trailing: {
-                Button {
-                    router?.popToRoot()
-                } label: {
-                    Image(.home)
-                        .renderingMode(.template)
+            .navigationBar(
+                center: {
+                    Text(.export)
+                        .font(
+                            .english(Typography.WantedSansStd.R6),
+                            .korean(Typography.Pretendard.M6)
+                        )
                         .foregroundStyle(Color.black1)
+                },
+                trailing: {
+                    Button {
+                        router?.popToRoot()
+                    } label: {
+                        Image(.home)
+                            .renderingMode(.template)
+                            .foregroundStyle(Color.black1)
+                    }
                 }
-            }
-        )
+            )
+        }
         .task {
             intent.onAppear(score: model.score)
         }

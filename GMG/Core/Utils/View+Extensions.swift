@@ -31,16 +31,18 @@ extension View {
         @ViewBuilder center: () -> Center = { EmptyView() },
         @ViewBuilder trailing: () -> Trailing = { EmptyView() }
     ) -> some View {
-        self
-            .toolbarVisibility(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top) {
-                NavigationBar<Leading, Center, Trailing>(
-                    isBackButtonHidden: isBackButtonHidden,
-                    leading: leading,
-                    center: center,
-                    trailing: trailing
-                )
-            }
+        VStack {
+            NavigationBar<Leading, Center, Trailing>(
+                isBackButtonHidden: isBackButtonHidden,
+                leading: leading,
+                center: center,
+                trailing: trailing
+            )
+
+            self
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .toolbarVisibility(.hidden, for: .navigationBar)
     }
 }
 
