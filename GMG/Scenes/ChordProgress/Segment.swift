@@ -1,5 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import Foundation
 import SwiftUI
 
 struct Segment: View {
@@ -9,14 +10,14 @@ struct Segment: View {
     let segmentDuration: TimeInterval
     let currentChordCell: ChordCell?  // 재생 중인 코드 셀
     let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
+    let audioLevels: [Float]
+    let elapsedTime: TimeInterval
     let chordCellAction: (ChordCell) -> Void
     let chordCandidateAction: (Chord, ChordCell) -> Void
     let onTapWaveform: (TimeInterval) -> Void
     let onDragWaveformStart: (TimeInterval) -> Void
     let onDragWaveformChange: (TimeInterval) -> Void
     let onDragWaveformEnd: (TimeInterval) -> Void
-    let audioLevels: [Float]
-    let elapsedTime: TimeInterval
 
     @Environment(\.editMode) private var editMode
 
@@ -62,7 +63,7 @@ struct Segment: View {
 
                 HStack(spacing: Spacing.xs) {
                     ForEach(slices) { slice in
-                        let widthRatio = slice.segmentOccupancy / max(1, segmentDuration)
+                        let widthRatio = slice.durationInSegment / max(1, segmentDuration)
                         let cellWidth = max(0, availableWidth * widthRatio)
 
                         if let chord = slice.chordCell.chord {
@@ -104,7 +105,8 @@ struct Segment: View {
             GeometryReader { proxy in
                 let segmentWidth =
                     proxy.size.width
-                    * ((clampedSegmentEndTime - segmentStartTime) / 5)
+                    * ((clampedSegmentEndTime - segmentStartTime)
+                        / ChordProgressConstants.segmentDuration)
 
                 VStack(spacing: Spacing.xs) {
 
@@ -224,28 +226,9 @@ struct Segment: View {
             Button {
                 action()
             } label: {
-                ZStack {
-                    ViewThatFits(in: .horizontal) {
-                        /// CASE 1: one line
-                        Text(chord.description)
-                            .font(Typography.WantedSansStd.R7)
-                            .foregroundStyle(
-                                foregroundColor
-                            )
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity
-                            )
-                            .background(
-                                backgroundColor,
-                                in: RoundedRectangle(cornerRadius: 12)
-                            )
-
-                        /// CASE 2: multi line
-                        VStack(alignment: .center) {
-                            Text(chord.root.description)
-                            Text(chord.quality.description)
-                        }
+                ViewThatFits(in: .horizontal) {
+                    /// CASE 1: one line
+                    Text(chord.description)
                         .font(Typography.WantedSansStd.R7)
                         .foregroundStyle(
                             foregroundColor
@@ -258,18 +241,35 @@ struct Segment: View {
                             backgroundColor,
                             in: RoundedRectangle(cornerRadius: 12)
                         )
-                        .minimumScaleFactor(0.1)
+
+                    /// CASE 2: multi line
+                    VStack(alignment: .center) {
+                        Text(chord.root.description)
+                        Text(chord.quality.description)
                     }
+                    .font(Typography.WantedSansStd.R7)
+                    .foregroundStyle(
+                        foregroundColor
+                    )
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity
+                    )
+                    .background(
+                        backgroundColor,
+                        in: RoundedRectangle(cornerRadius: 12)
+                    )
+                    .minimumScaleFactor(0.1)
                 }
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity
-                )
-                .background(
-                    backgroundColor,
-                    in: RoundedRectangle(cornerRadius: 12)
-                )
             }
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity
+            )
+            .background(
+                backgroundColor,
+                in: RoundedRectangle(cornerRadius: 12)
+            )
             .buttonStyle(.bouncy)
         }
     }

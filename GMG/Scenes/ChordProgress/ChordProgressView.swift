@@ -1,5 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import Foundation
 import SwiftUI
 
 struct ChordProgressView: View {
@@ -57,7 +58,6 @@ struct ChordProgressView: View {
                 }
 
                 SegmentsScrollView(
-                    segmentDuration: 5.0,
                     totalDuration: model.score.totalDuration,
                     segmentSlices: model.segmentSlices,
                     currentChordCell: model.currentChordCell,
@@ -448,9 +448,8 @@ extension ChordProgressView {
     }
 
     struct SegmentsScrollView: View {
-        let segmentDuration: TimeInterval
         let totalDuration: TimeInterval
-        let segmentSlices: [Int: [ChordSegmentSlice]]
+        let segmentSlices: [[ChordSegmentSlice]]
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
         let chordCellAction: (ChordCell) -> Void
@@ -465,25 +464,22 @@ extension ChordProgressView {
         var body: some View {
             ScrollView {
                 LazyVStack(spacing: Spacing.md) {
-                    ForEach(
-                        0..<Int(ceil(totalDuration / segmentDuration)),
-                        id: \.self
-                    ) { index in
+                    ForEach(Array(segmentSlices.enumerated()), id: \.offset) { index, slices in
                         Segment(
                             index: index,
                             totalDuration: totalDuration,
-                            chordSlices: segmentSlices[index] ?? [],
-                            segmentDuration: segmentDuration,
+                            chordSlices: slices,
+                            segmentDuration: ChordProgressConstants.segmentDuration,
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,
+                            audioLevels: audioLevels,
+                            elapsedTime: elapsedTime,
                             chordCellAction: chordCellAction,
                             chordCandidateAction: chordCandidateAction,
                             onTapWaveform: onTapWaveform,
                             onDragWaveformStart: onDragWaveformStart,
                             onDragWaveformChange: onDragWaveformChange,
                             onDragWaveformEnd: onDragWaveformEnd,
-                            audioLevels: audioLevels,
-                            elapsedTime: elapsedTime
                         )
                     }
                 }
