@@ -90,6 +90,9 @@ extension ChordInSegment {
                     nextCell.startTime - max(startTime, currentCell.startTime)
                 let proportion: Double = duration / segmentDuration
 
+                if proportion < 0.01 {  // UI 상에 그려질 수 없는 크기일 경우
+                    continue
+                }
                 segment.append(.init(chord: currentCell.chord, proportion: proportion))
             }
 
@@ -212,14 +215,24 @@ extension ChordSheetView {
         let chord: Chord
 
         var body: some View {
-            Text(chord.description)
-                .font(Typography.WantedSansStd.R7)
-                .foregroundStyle(Color.black1)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.black9)
+            ViewThatFits(in: .horizontal) {
+                Text(chord.description)
+                VStack(alignment: .center) {
+                    Text(chord.root.description)
+                    Text(chord.quality.description)
                 }
+                .minimumScaleFactor(0.1)
+            }
+            .font(Typography.WantedSansStd.R7)
+            .foregroundStyle(Color.black1)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity
+            )
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.black9)
+            }
         }
     }
 
