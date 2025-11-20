@@ -142,14 +142,15 @@ extension Score {
 
         let sorted = chordCells.sorted { $0.startTime < $1.startTime }
 
-        return sorted.enumerated().map { index, cell in
+        return sorted.enumerated().compactMap { index, cell in
             let nextStart =
-                (index + 1 < sorted.count)
+                sorted.indices.contains(index + 1)
                 ? sorted[index + 1].startTime
                 : totalDuration
 
-            let clampedNext = min(max(nextStart, cell.startTime), totalDuration)
-            let duration = max(0, clampedNext - cell.startTime)
+            guard cell.startTime <= nextStart, nextStart <= totalDuration else { return nil }
+
+            let duration = max(0, nextStart - cell.startTime)
 
             return ChordCell(
                 chord: cell.chord,
