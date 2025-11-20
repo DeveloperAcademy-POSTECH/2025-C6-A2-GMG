@@ -435,7 +435,7 @@ extension Chord {
 
 extension Tonic.Chord {
     fileprivate var midiNoteNumbers: [Int8] {
-        let pitches: [Pitch] = self.pitches(octave: 3)
+        let pitches: [Pitch] = self.pitches(octave: 2)
         let midiNoteNumbers: [Int8] = pitches.map { pitch in
             return pitch.midiNoteNumber
         }
