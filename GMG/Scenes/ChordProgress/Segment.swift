@@ -3,6 +3,18 @@
 import Foundation
 import SwiftUI
 
+struct SegmentHandlers {
+    let onTapChordCell: (ChordCell) -> Void
+    let onTapChordCandidate: (Chord, ChordCell) -> Void
+}
+
+struct WaveformHandlers {
+    let onTap: (TimeInterval) -> Void
+    let onDragStart: (TimeInterval) -> Void
+    let onDragChange: (TimeInterval) -> Void
+    let onDragEnd: (TimeInterval) -> Void
+}
+
 struct Segment: View {
     let index: Int
     let totalDuration: TimeInterval
@@ -12,12 +24,8 @@ struct Segment: View {
     let selectedChordCell: ChordCell?  // 편집 모드에서 선택된 코드 셀
     let audioLevels: [Float]
     let elapsedTime: TimeInterval
-    let chordCellAction: (ChordCell) -> Void
-    let chordCandidateAction: (Chord, ChordCell) -> Void
-    let onTapWaveform: (TimeInterval) -> Void
-    let onDragWaveformStart: (TimeInterval) -> Void
-    let onDragWaveformChange: (TimeInterval) -> Void
-    let onDragWaveformEnd: (TimeInterval) -> Void
+    let segmentHandlers: SegmentHandlers
+    let waveformHandlers: WaveformHandlers
 
     @Environment(\.editMode) private var editMode
 
@@ -74,7 +82,7 @@ struct Segment: View {
                                 isSelected: selectedChordCell?.startTime
                                     == slice.chordCell.startTime
                             ) {
-                                chordCellAction(slice.chordCell)
+                                segmentHandlers.onTapChordCell(slice.chordCell)
                             }
                             .frame(width: cellWidth, height: 62)
                         } else {
@@ -96,7 +104,7 @@ struct Segment: View {
 
             ChordCellCandidates(
                 chordCell: selectedChordCell ?? ChordCell.empty,
-                onTapAction: chordCandidateAction
+                onTapAction: segmentHandlers.onTapChordCandidate
             )
             .frame(height: showCandidates ? 62 : 0)
             .scaleEffect(y: showCandidates ? 1.0 : 0.0)
@@ -116,10 +124,10 @@ struct Segment: View {
                         startTime: segmentStartTime,
                         endTime: clampedSegmentEndTime,
                         elapsedTime: elapsedTime,
-                        onTap: onTapWaveform,
-                        onDragStart: onDragWaveformStart,
-                        onDragChange: onDragWaveformChange,
-                        onDragEnd: onDragWaveformEnd
+                        onTap: waveformHandlers.onTap,
+                        onDragStart: waveformHandlers.onDragStart,
+                        onDragChange: waveformHandlers.onDragChange,
+                        onDragEnd: waveformHandlers.onDragEnd
                     )
 
                     TimeRuler(

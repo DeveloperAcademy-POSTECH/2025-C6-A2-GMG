@@ -53,7 +53,7 @@ struct ChordProgressView: View {
                 }
                 .padding(Spacing.md)
 
-                let chordCandidateAction: (Chord, ChordCell) -> Void = { chord, chordCell in
+                let onTapChordCandidate: (Chord, ChordCell) -> Void = { chord, chordCell in
                     intent.onTapCandidateChordCell(chord, in: chordCell, for: model.score)
                 }
 
@@ -62,12 +62,16 @@ struct ChordProgressView: View {
                     segmentSlices: model.segmentSlices,
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
-                    chordCellAction: intent.onTapChordCell,
-                    chordCandidateAction: chordCandidateAction,
-                    onTapWaveform: intent.onTapWaveform,
-                    onDragWaveformStart: intent.onDragWaveformStart,
-                    onDragWaveformChange: intent.onDragWaveformChange,
-                    onDragWaveformEnd: intent.onDragWaveformEnd,
+                    segmentHandlers: SegmentHandlers(
+                        onTapChordCell: intent.onTapChordCell,
+                        onTapChordCandidate: onTapChordCandidate
+                    ),
+                    waveformHandlers: WaveformHandlers(
+                        onTap: intent.onTapWaveform,
+                        onDragStart: intent.onDragWaveformStart,
+                        onDragChange: intent.onDragWaveformChange,
+                        onDragEnd: intent.onDragWaveformEnd
+                    ),
                     audioLevels: model.score.audioLevels,
                     elapsedTime: model.playhead.elapsedTime
                 )
@@ -452,12 +456,8 @@ extension ChordProgressView {
         let segmentSlices: [[ChordSegmentSlice]]
         let currentChordCell: ChordCell?
         let selectedChordCell: ChordCell?
-        let chordCellAction: (ChordCell) -> Void
-        let chordCandidateAction: (Chord, ChordCell) -> Void
-        let onTapWaveform: (TimeInterval) -> Void
-        let onDragWaveformStart: (TimeInterval) -> Void
-        let onDragWaveformChange: (TimeInterval) -> Void
-        let onDragWaveformEnd: (TimeInterval) -> Void
+        let segmentHandlers: SegmentHandlers
+        let waveformHandlers: WaveformHandlers
         let audioLevels: [Float]
         let elapsedTime: TimeInterval
 
@@ -474,12 +474,8 @@ extension ChordProgressView {
                             selectedChordCell: selectedChordCell,
                             audioLevels: audioLevels,
                             elapsedTime: elapsedTime,
-                            chordCellAction: chordCellAction,
-                            chordCandidateAction: chordCandidateAction,
-                            onTapWaveform: onTapWaveform,
-                            onDragWaveformStart: onDragWaveformStart,
-                            onDragWaveformChange: onDragWaveformChange,
-                            onDragWaveformEnd: onDragWaveformEnd,
+                            segmentHandlers: segmentHandlers,
+                            waveformHandlers: waveformHandlers
                         )
                     }
                 }
