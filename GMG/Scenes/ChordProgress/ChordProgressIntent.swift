@@ -35,6 +35,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     private var scorePlayer: ScorePlayer?
 
     private var cancellables: Set<AnyCancellable>
+    private var wasPlayingBeforeDrag = false
 
     private let undoManager: UndoManager
 
@@ -113,6 +114,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onDragWaveformStart(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
+        wasPlayingBeforeDrag = scorePlayer.isPlaying()
         scorePlayer.pause()
         scorePlayer.seek(to: time)
     }
@@ -126,9 +128,11 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         guard let scorePlayer = self.scorePlayer else { return }
         scorePlayer.seek(to: time)
 
-        if scorePlayer.previousIsPlaying {
+        if wasPlayingBeforeDrag {
             scorePlayer.play()
         }
+
+        wasPlayingBeforeDrag = false
     }
 
     func onTapCandidateChordCell(
