@@ -4,9 +4,14 @@ import AVFAudio
 import Accelerate
 import Foundation
 
-final class AudioRenderingService {
+enum ScoreAudioRenderingServiceError: Error {
+    case bufferAllocationFailed
+    case offlineRenderFailed
+}
 
-    func renderToAudioFile(score: Score, fileName: String) throws -> URL {
+enum ScoreAudioRenderer {
+
+    static func renderToAudioFile(score: Score, fileName: String? = nil) throws -> URL {
         let scorePlayer = ScorePlayer(score: score)
         try scorePlayer.prepareToExport()
 
@@ -26,7 +31,7 @@ final class AudioRenderingService {
         try engine.start()
 
         // 출력 파일 URL 설정
-        let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(fileName ?? score.title)")
 
         let outputFile = try AVAudioFile(
             forWriting: outputURL,
@@ -45,7 +50,7 @@ final class AudioRenderingService {
                 frameCapacity: maxFrames
             )
         else {
-            throw NSError(domain: "BufferAlloc", code: -1)
+            throw ScoreAudioRenderingServiceError.bufferAllocationFailed
         }
 
         let totalDuration = score.totalDuration + 0.2
@@ -71,7 +76,7 @@ final class AudioRenderingService {
                 try outputFile.write(from: buffer)
 
             case .error:
-                throw NSError(domain: "OfflineRender", code: -1)
+                throw ScoreAudioRenderingServiceError.offlineRenderFailed
 
             case .cannotDoInCurrentContext:
                 break

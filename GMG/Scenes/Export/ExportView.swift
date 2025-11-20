@@ -50,7 +50,7 @@ struct ExportView: View {
                     Button {
                         router?.popToRoot()
                     } label: {
-                        Image("Home")
+                        Image(.home)
                             .renderingMode(.template)
                             .foregroundStyle(Color.black1)
                     }
@@ -58,7 +58,7 @@ struct ExportView: View {
             )
         }
         .onAppear {
-            intent.onAppear()
+            intent.onAppear(model.score)
         }
     }
 }
