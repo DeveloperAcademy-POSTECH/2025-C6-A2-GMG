@@ -8,14 +8,10 @@ struct ChordCell {
     let startTime: TimeInterval
     let duration: TimeInterval
 
-    init(chord: Chord?, chordCandidates: [Chord], startTime: TimeInterval) {
-        self.chord = chord
-        self.chordCandidates = chordCandidates
-        self.startTime = startTime
-        self.duration = 0.0
-    }
-
-    init(chord: Chord?, chordCandidates: [Chord], startTime: TimeInterval, duration: TimeInterval) {
+    init(
+        chord: Chord?, chordCandidates: [Chord], startTime: TimeInterval,
+        duration: TimeInterval = .zero
+    ) {
         self.chord = chord
         self.chordCandidates = chordCandidates
         self.startTime = startTime
