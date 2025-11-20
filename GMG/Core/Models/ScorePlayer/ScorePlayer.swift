@@ -26,7 +26,7 @@ final class ScorePlayer {
     private var totalFrames: AVAudioFramePosition
 
     private var chordPlayTask: Task<Void, Never>?
-    private var previousIsPlaying: Bool
+    private(set) var previousIsPlaying: Bool
 
     let playerMutedPublisher: CurrentValueSubject<Bool, Never>
 
@@ -151,7 +151,7 @@ final class ScorePlayer {
 
     func play() {
         previousIsPlaying = player.isPlaying
-      
+
         if engine.isRunning == false {
             try? engine.start()
         }
@@ -223,14 +223,6 @@ final class ScorePlayer {
         player.stop()
         sequencer.stop()
         pausedTime = .zero
-    }
-
-    var isPlaying: Bool {
-        player.isPlaying
-    }
-
-    var wasPlayingBeforeLastCommand: Bool {
-        previousIsPlaying
     }
 
     func seek(to time: TimeInterval) {

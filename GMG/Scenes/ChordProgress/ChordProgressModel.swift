@@ -12,7 +12,7 @@ protocol ChordProgressModelStateProtocol {
     var selectedChordCell: ChordCell? { get }
     var canUndo: Bool { get }
     var canRedo: Bool { get }
-    var segmentSlices: [Int: [ChordSegmentSlice]] { get }
+    var segmentSlices: [[ChordSegmentSlice]] { get }
 }
 
 protocol ChordProgressModelActionProtocol: AnyObject {
@@ -28,7 +28,7 @@ protocol ChordProgressModelActionProtocol: AnyObject {
 
 struct ChordSegmentSlice: Identifiable {
     let chordCell: ChordCell
-    let segmentOccupancy: TimeInterval
+    let durationInSegment: TimeInterval
 
     var id: TimeInterval {
         chordCell.startTime
@@ -48,7 +48,7 @@ final class ChordProgressModel:
     private(set) var selectedChordCell: ChordCell?
     private(set) var canUndo: Bool
     private(set) var canRedo: Bool
-    private(set) var segmentSlices: [Int: [ChordSegmentSlice]]
+    private(set) var segmentSlices: [[ChordSegmentSlice]]
 
     init(score: Score) {
         self.score = score
@@ -59,7 +59,7 @@ final class ChordProgressModel:
         self.selectedChordCell = nil
         self.canUndo = false
         self.canRedo = false
-        self.segmentSlices = [:]
+        self.segmentSlices = []
 
         rebuildSegmentSlices()
     }
@@ -109,7 +109,6 @@ final class ChordProgressModel:
 
     func updateTitle(_ title: String) {
         score.updateTitle(title)
-        rebuildSegmentSlices()
     }
 
     func updateCanUndo(_ canUndo: Bool) {
@@ -131,23 +130,23 @@ final class ChordProgressModel:
     /// 스코어 전체에 대해 세그먼트별 코드 조각을 다시 계산한다.
     private func rebuildSegmentSlices() {
         let chordCells = score.retrieveAllChordCells()
-        let segmentDuration: TimeInterval = 5.0
-        let segmentCount = Int(ceil(score.totalDuration / segmentDuration))
+        let segmentCount = Int(ceil(score.totalDuration / ChordProgressConstants.segmentDuration))
 
         guard segmentCount > 0 else {
-            segmentSlices = [:]
+            segmentSlices = []
             return
         }
 
-        var newSlices: [Int: [ChordSegmentSlice]] = [:]
+        var newSlices: [[ChordSegmentSlice]] = []
 
         for index in 0..<segmentCount {
-            newSlices[index] = buildChordSlices(
-                index: index,
-                chordCells: chordCells,
-                totalDuration: score.totalDuration,
-                segmentDuration: segmentDuration
-            )
+            newSlices.append(
+                buildChordSlices(
+                    index: index,
+                    chordCells: chordCells,
+                    totalDuration: score.totalDuration,
+                    segmentDuration: ChordProgressConstants.segmentDuration
+                ))
         }
 
         segmentSlices = newSlices
@@ -167,33 +166,32 @@ final class ChordProgressModel:
         guard segmentStartTime < segmentEndTime else { return [] }
 
         let overlapping = chordCells.filter { cell in
-            let cellEnd = cell.startTime + cell.duration
-            return cellEnd > segmentStartTime && cell.startTime < segmentEndTime
+            let cellEndTime = cell.startTime + cell.duration
+            return segmentStartTime < cellEndTime && cell.startTime < segmentEndTime
         }
 
-        var targetCells: [ChordCell]
-
-        if overlapping.isEmpty {
-            if let previous = chordCells.last(where: { $0.startTime <= segmentStartTime }) {
-                targetCells = [previous]
-            } else if let first = chordCells.first {
-                targetCells = [first]
+        let targetCells: [ChordCell] =
+            if overlapping.isEmpty {
+                if let previous = chordCells.last(where: { $0.startTime <= segmentStartTime }) {
+                    [previous]
+                } else if let first = chordCells.first {
+                    [first]
+                } else {
+                    []
+                }
             } else {
-                targetCells = []
+                overlapping
             }
-        } else {
-            targetCells = overlapping
-        }
 
         return targetCells.compactMap { cell in
             let overlapStart = max(cell.startTime, segmentStartTime)
             let overlapEnd = min(cell.startTime + cell.duration, segmentEndTime)
-            let segmentOccupancy = max(0, overlapEnd - overlapStart)
-            let occupancyRatio = segmentOccupancy / max(1, segmentDuration)
+            let durationInSegment = max(0, overlapEnd - overlapStart)
+            let occupancyRatio = durationInSegment / max(1, segmentDuration)
 
             guard occupancyRatio > 0.02 else { return nil }
 
-            return ChordSegmentSlice(chordCell: cell, segmentOccupancy: segmentOccupancy)
+            return ChordSegmentSlice(chordCell: cell, durationInSegment: durationInSegment)
         }
     }
 }

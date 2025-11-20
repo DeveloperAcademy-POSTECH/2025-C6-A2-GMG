@@ -108,12 +108,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     func onTapWaveform(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
 
-        scorePlayer.pause()
         scorePlayer.seek(to: time)
-
-        if scorePlayer.wasPlayingBeforeLastCommand {
-            scorePlayer.play()
-        }
     }
 
     func onDragWaveformStart(_ time: TimeInterval) {
@@ -131,7 +126,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
         guard let scorePlayer = self.scorePlayer else { return }
         scorePlayer.seek(to: time)
 
-        if scorePlayer.wasPlayingBeforeLastCommand {
+        if scorePlayer.previousIsPlaying {
             scorePlayer.play()
         }
     }
