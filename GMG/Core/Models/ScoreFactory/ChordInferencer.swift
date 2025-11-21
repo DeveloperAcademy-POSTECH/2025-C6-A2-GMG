@@ -126,7 +126,8 @@ final class ChordInferencer {
                 ChordCell(
                     chord: chordCell.chord,
                     chordCandidates: chordCell.chordCandidates,
-                    startTime: startTime + chordCell.startTime
+                    startTime: startTime + chordCell.startTime,
+                    duration: .zero
                 )
             }
             .filter { $0.startTime >= endTime }
@@ -160,7 +161,8 @@ final class ChordInferencer {
                 let chordCell: ChordCell = ChordCell(
                     chord: chordCell.chord,
                     chordCandidates: chordCell.chordCandidates,
-                    startTime: chordCell.startTime - startTime
+                    startTime: chordCell.startTime - startTime,
+                    duration: .zero
                 )
 
                 return [
@@ -382,7 +384,8 @@ extension ChordInferencer {
             let chordCell: ChordCell = ChordCell(
                 chord: chordCandidates.first,
                 chordCandidates: chordCandidates,
-                startTime: position
+                startTime: position,
+                duration: .zero
             )
 
             return chordCell

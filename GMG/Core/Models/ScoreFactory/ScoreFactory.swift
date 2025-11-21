@@ -10,7 +10,10 @@ enum ScoreFactoryError: Error {
     case failedToChordInference
 }
 
-enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible,
+enum ScoreFactoryState:
+    Int,
+    CaseIterable,
+    CustomStringConvertible,
     CustomLocalizedStringResourceConvertible
 {
     case hummingAnalysis
@@ -94,10 +97,21 @@ final class ScoreFactory {
             let newChordCell: ChordCell = ChordCell(
                 chord: firstChordCell.chord,
                 chordCandidates: firstChordCell.chordCandidates,
-                startTime: .zero
+                startTime: .zero,
+                duration: .zero
             )
             filteredChordCells = [newChordCell] + filteredChordCells[1...]
         }
+
+        /// 최소 코드 길이
+        let minimumChordDuration: TimeInterval = 5 * 0.03
+        let chordCellsWithDuration: [ChordCell] =
+            filteredChordCells
+            .calculateDuration(totalDuration)
+            .filter { chordCell in
+                chordCell.duration > minimumChordDuration
+            }
+            .calculateDuration(totalDuration)
 
         let audioLevels: [Float] = try AudioLevelMeter.calculateLevel(from: copiedAudioURL)
 
@@ -109,7 +123,7 @@ final class ScoreFactory {
             createdAt: Date(),
             updatedAt: Date(),
             notes: notes,
-            chordCells: filteredChordCells,
+            chordCells: chordCellsWithDuration,
             audioLevels: audioLevels,
             isDeleted: false
         )
@@ -185,5 +199,39 @@ extension SwiftF0.Note {
         )
 
         return note
+    }
+}
+
+extension Array where Element == ChordCell {
+    fileprivate func calculateDuration(_ totalDuration: TimeInterval) -> Self {
+        return
+            self
+            .sorted(by: { $0.startTime < $1.startTime })
+            .enumerated()
+            .compactMap { index, cell in
+                let nextStartTime: TimeInterval =
+                    if self.indices.contains(index + 1) {
+                        self[index + 1].startTime
+                    } else {
+                        totalDuration
+                    }
+
+                let currentCell: ChordCell = self[index]
+
+                guard currentCell.startTime <= nextStartTime, nextStartTime <= totalDuration else {
+                    return nil
+                }
+
+                let duration: TimeInterval = nextStartTime - currentCell.startTime
+
+                let newCell: ChordCell = .init(
+                    chord: currentCell.chord,
+                    chordCandidates: currentCell.chordCandidates,
+                    startTime: currentCell.startTime,
+                    duration: duration
+                )
+
+                return newCell
+            }
     }
 }
