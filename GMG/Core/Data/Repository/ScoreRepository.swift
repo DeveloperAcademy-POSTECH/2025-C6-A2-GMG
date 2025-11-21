@@ -23,7 +23,12 @@ final class SwiftDataScoreRepository: ScoreRepository {
     func fetch() throws -> [Score] {
         /// Soft Delete 되지 않은 Score만 가져오기
         let predicate: Predicate<ScoreSchema.Score> = #Predicate { $0.isDeleted == false }
-        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init(predicate: predicate)
+        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init(
+            predicate: predicate,
+            sortBy: [
+                .init(\.createdAt, order: .forward)
+            ]
+        )
         let scorePersitences: [ScoreSchema.Score] = try context.fetch(fetchDescriptor)
 
         let scores: [Score] = scorePersitences.map { $0.toDomain() }
@@ -118,8 +123,10 @@ extension ScoreSchema.Score {
             totalDuration: self.totalDuration,
             createdAt: self.createdAt,
             updatedAt: self.updatedAt,
-            notes: self.notes.map { $0.toDomain() },
-            chordCells: self.chordCells.map { $0.toDomain() },
+            notes: self.notes.map { $0.toDomain() }.sorted(by: { $0.startTime < $1.startTime }),
+            chordCells: self.chordCells.map { $0.toDomain() }.sorted(by: {
+                $0.startTime < $1.startTime
+            }),
             audioLevels: self.audioLevels,
             isDeleted: self.isDeleted
         )
@@ -206,16 +213,22 @@ extension ScoreSchema.Key {
 extension Note {
     fileprivate func toPersistence() -> ScoreSchema.Note {
         return .init(
-            name: self.name.toPersistence(), octave: self.octave, startTime: self.startTime,
-            duration: self.duration)
+            name: self.name.toPersistence(),
+            octave: self.octave,
+            startTime: self.startTime,
+            duration: self.duration
+        )
     }
 }
 
 extension ScoreSchema.Note {
     fileprivate func toDomain() -> Note {
         return .init(
-            name: self.name.toDomain(), octave: self.octave, startTime: self.startTime,
-            duration: self.duration)
+            name: self.name.toDomain(),
+            octave: self.octave,
+            startTime: self.startTime,
+            duration: self.duration
+        )
     }
 }
 
@@ -270,7 +283,8 @@ extension ChordCell {
         return .init(
             chord: self.chord?.toPersistence(),
             chordCandidates: self.chordCandidates.map { $0.toPersistence() },
-            startTime: self.startTime)
+            startTime: self.startTime
+        )
     }
 }
 
@@ -278,6 +292,8 @@ extension ScoreSchema.ChordCell {
     fileprivate func toDomain() -> ChordCell {
         return .init(
             chord: self.chord?.toDomain(),
-            chordCandidates: self.chordCandidates.map { $0.toDomain() }, startTime: self.startTime)
+            chordCandidates: self.chordCandidates.map { $0.toDomain() },
+            startTime: self.startTime
+        )
     }
 }
