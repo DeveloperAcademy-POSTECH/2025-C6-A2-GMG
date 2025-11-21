@@ -205,44 +205,6 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         }
     }
 
-    func pause() {
-        let pausedTime = currentPlaybackTime()
-
-        player.pause()
-        sequencer.stop()
-
-        self.pausedTime = pausedTime
-    }
-
-    func stop() {
-        player.stop()
-        sequencer.stop()
-        pausedTime = .zero
-    }
-
-    func seek(to time: TimeInterval) {
-        let wasPlaying: Bool = player.isPlaying
-
-        self.pausedTime = time
-
-        if wasPlaying {
-            play()
-        }
-    }
-
-    func seek(chordCell: ChordCell) {
-        let wasPlaying: Bool = player.isPlaying
-
-        self.pausedTime = chordCell.startTime
-
-        if wasPlaying {
-            play()
-        } else {
-            guard let chord: Chord = chordCell.chord else { return }
-            play(chord: chord)
-        }
-    }
-
     func setPlayerMuted(_ isMuted: Bool) {
         if isMuted {
             player.volume = 0.0
