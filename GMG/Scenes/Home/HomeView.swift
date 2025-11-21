@@ -187,17 +187,19 @@ extension HomeView {
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 10, height: 10)
+                            .frame(
+                                width: isPlaying ? 13 : 10,
+                                height: isPlaying ? 13 : 10
+                            )
                             .foregroundStyle(Color.black1)
-                            .padding(.vertical, 9)
-                            .padding(.leading, isPlaying ? 9 : 10)
-                            .padding(.trailing, 9)
+                            .padding(.all, isPlaying ? 7.5 : 9)
+                            .padding(.leading, isPlaying ? 0 : 2)
                             .background {
                                 let lineWidth: CGFloat = 3
                                 let isProgressPresented: Bool =
                                     isSelected && (isPlaying || progress > 0)
                                 Circle()
-                                    .inset(by: lineWidth / 2)
+                                    .inset(by: lineWidth / 2 + 0.2)
                                     .fill(Color.white2)
                                     .stroke(
                                         isProgressPresented ? Color.bg1 : Color.white2,
