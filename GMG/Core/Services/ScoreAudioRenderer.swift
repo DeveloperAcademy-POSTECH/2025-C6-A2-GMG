@@ -10,14 +10,14 @@ enum ScoreAudioRenderingServiceError: Error {
 }
 
 protocol ScoreAudioRenderer {
-    func renderToAudioFile(score: Score, fileName: String?) throws -> URL
+    func renderToAudioFile(fileName: String?) throws -> URL
 }
 
 final class DefaultScoreAudioRenderer: ScoreAudioEngineBase, ScoreAudioRenderer {
 
     // MARK: - Rendering
 
-    func renderToAudioFile(score: Score, fileName: String? = nil) throws -> URL {
+    func renderToAudioFile(fileName: String? = nil) throws -> URL {
 
         try prepareToExport()
 
