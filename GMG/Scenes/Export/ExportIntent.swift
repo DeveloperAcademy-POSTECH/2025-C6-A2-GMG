@@ -32,7 +32,7 @@ final class ExportIntent: ExportIntentProtocol {
                     try data.write(to: url)
                     model.updateSheetURL(url)
                 } catch {
-                    print("error")
+                    print("image render failed: \(error)")
                 }
             }
         }
