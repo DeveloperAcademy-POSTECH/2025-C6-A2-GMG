@@ -39,10 +39,7 @@ final class Score {
         self.updatedAt = updatedAt
         self.notes = notes
         self.audioLevels = audioLevels
-        self.chordCells = Score.assignDurations(
-            chordCells: chordCells,
-            totalDuration: totalDuration
-        )
+        self.chordCells = chordCells
         self.isDeleted = isDeleted
     }
 
@@ -134,35 +131,6 @@ extension Score: Hashable {
 }
 
 extension Score {
-    private static func assignDurations(
-        chordCells: [ChordCell],
-        totalDuration: TimeInterval
-    ) -> [ChordCell] {
-        guard !chordCells.isEmpty else { return [] }
-
-        let sorted = chordCells.sorted { $0.startTime < $1.startTime }
-
-        return sorted.enumerated().compactMap { index, cell in
-            let nextStart =
-                sorted.indices.contains(index + 1)
-                ? sorted[index + 1].startTime
-                : totalDuration
-
-            guard cell.startTime <= nextStart, nextStart <= totalDuration else { return nil }
-
-            let duration = max(0, nextStart - cell.startTime)
-
-            return ChordCell(
-                chord: cell.chord,
-                chordCandidates: cell.chordCandidates,
-                startTime: cell.startTime,
-                duration: duration
-            )
-        }
-    }
-}
-
-extension Score {
     static var mock: Score {
         Score(
             title: "Untitled",
@@ -176,47 +144,62 @@ extension Score {
                 ChordCell(
                     chord: Chord(root: .C, quality: .maj),
                     chordCandidates: [
-                        Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj),
-                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .C, quality: .maj),
+                        Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj),
+                        Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 0.0
+                    startTime: 0.0,
+                    duration: 2.5
                 ),
                 ChordCell(
                     chord: Chord(root: .D, quality: .min),
                     chordCandidates: [
-                        Chord(root: .D, quality: .min), Chord(root: .D, quality: .maj),
-                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .D, quality: .min),
+                        Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj),
+                        Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 2.5
+                    startTime: 2.5,
+                    duration: 2.5
                 ),
                 ChordCell(
                     chord: Chord(root: .E, quality: .dim),
                     chordCandidates: [
-                        Chord(root: .E, quality: .dim), Chord(root: .D, quality: .maj),
-                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .E, quality: .dim),
+                        Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj),
+                        Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 5.0
+                    startTime: 5.0,
+                    duration: 6.3
                 ),
                 ChordCell(
                     chord: Chord(root: .F, quality: .maj9),
                     chordCandidates: [
-                        Chord(root: .F, quality: .maj9), Chord(root: .D, quality: .maj),
-                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .F, quality: .maj9),
+                        Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj),
+                        Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 11.3
+                    startTime: 11.3,
+                    duration: 1.7
                 ),
                 ChordCell(
                     chord: Chord(root: .Bb, quality: .maj),
                     chordCandidates: [
-                        Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj),
-                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Bb, quality: .maj),
+                        Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj),
+                        Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 13.0
+                    startTime: 13.0,
+                    duration: 18.0
                 ),
             ],
             audioLevels: [
