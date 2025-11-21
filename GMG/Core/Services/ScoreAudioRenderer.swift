@@ -9,13 +9,17 @@ enum ScoreAudioRenderingServiceError: Error {
     case offlineRenderFailed
 }
 
-enum ScoreAudioRenderer {
+protocol ScoreAudioRenderer {
+    func renderToAudioFile(score: Score, fileName: String?) throws -> URL
+}
 
-    static func renderToAudioFile(score: Score, fileName: String? = nil) throws -> URL {
-        let scorePlayer = ScorePlayer(score: score)
-        try scorePlayer.prepareToExport()
+final class DefaultScoreAudioRenderer: ScoreAudioEngineBase, ScoreAudioRenderer {
 
-        let engine = scorePlayer.engine
+    // MARK: - Rendering
+
+    func renderToAudioFile(score: Score, fileName: String? = nil) throws -> URL {
+
+        try prepareToExport()
 
         // Offline rendering용 출력 포맷
         let outputFormat = engine.mainMixerNode.outputFormat(forBus: 0)
@@ -31,7 +35,8 @@ enum ScoreAudioRenderer {
         try engine.start()
 
         // 출력 파일 URL 설정
-        let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(fileName ?? score.title)")
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(fileName ?? score.title)
 
         let outputFile = try AVAudioFile(
             forWriting: outputURL,
@@ -39,11 +44,28 @@ enum ScoreAudioRenderer {
         )
 
         // Sequencer & PlayerNode 시작
-        scorePlayer.sequencer.prepareToPlay()
-        try scorePlayer.sequencer.start()
-        scorePlayer.player.play()
+        sequencer.prepareToPlay()
+        try sequencer.start()
+        player.play()
 
-        // 오디오 렌더링 버퍼
+        // 오디오 렌더링
+        try performRendering(
+            outputFile: outputFile,
+            outputFormat: outputFormat,
+            maxFrames: maxFrames
+        )
+
+        // 정리
+        cleanup()
+
+        return outputURL
+    }
+
+    private func performRendering(
+        outputFile: AVAudioFile,
+        outputFormat: AVAudioFormat,
+        maxFrames: AVAudioFrameCount
+    ) throws {
         guard
             let buffer = AVAudioPCMBuffer(
                 pcmFormat: outputFormat,
@@ -53,7 +75,7 @@ enum ScoreAudioRenderer {
             throw ScoreAudioRenderingServiceError.bufferAllocationFailed
         }
 
-        let totalDuration = score.totalDuration + 0.2
+        let totalDuration = score.totalDuration + 0.2  //첫 노트 잘림 방지 및 파일이 뚝 끊길 수도 있는 문제 방지용 TailTime 0.2 추가
         let totalFrames = AVAudioFrameCount(totalDuration * outputFormat.sampleRate)
 
         /// 렌더링 루프
@@ -72,7 +94,10 @@ enum ScoreAudioRenderer {
             case .insufficientDataFromInputNode:
                 buffer.frameLength = framesToRender
                 memset(
-                    buffer.int16ChannelData?[0], 0, Int(framesToRender) * MemoryLayout<Int16>.size)
+                    buffer.int16ChannelData?[0],
+                    0,
+                    Int(framesToRender) * MemoryLayout<Int16>.size
+                )
                 try outputFile.write(from: buffer)
 
             case .error:
@@ -85,10 +110,11 @@ enum ScoreAudioRenderer {
                 break
             }
         }
+    }
 
-        scorePlayer.stop()
+    private func cleanup() {
+        player.stop()
+        sequencer.stop()
         engine.stop()
-
-        return outputURL
     }
 }

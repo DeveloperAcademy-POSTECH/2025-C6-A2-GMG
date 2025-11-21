@@ -52,7 +52,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onAppear(_ score: Score) {
         do {
-            let scorePlayer = ScorePlayer(score: score)
+            let scorePlayer: ScorePlayer = DefaultScorePlayer(score: score)
 
             try scorePlayer.prepareToPlay()
 
