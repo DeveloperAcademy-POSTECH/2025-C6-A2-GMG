@@ -12,6 +12,7 @@ protocol ChordProgressModelStateProtocol {
     var selectedChordCell: ChordCell? { get }
     var canUndo: Bool { get }
     var canRedo: Bool { get }
+    var segmentSlices: [[ChordSegmentSlice]] { get }
 }
 
 protocol ChordProgressModelActionProtocol: AnyObject {
@@ -23,6 +24,15 @@ protocol ChordProgressModelActionProtocol: AnyObject {
     func updateTitle(_ title: String)
     func updateCanUndo(_ canUndo: Bool)
     func updateCanRedo(_ canRedo: Bool)
+}
+
+struct ChordSegmentSlice: Identifiable {
+    let chordCell: ChordCell
+    let durationInSegment: TimeInterval
+
+    var id: TimeInterval {
+        chordCell.startTime
+    }
 }
 
 @Observable
@@ -38,6 +48,7 @@ final class ChordProgressModel:
     private(set) var selectedChordCell: ChordCell?
     private(set) var canUndo: Bool
     private(set) var canRedo: Bool
+    private(set) var segmentSlices: [[ChordSegmentSlice]]
 
     init(score: Score) {
         self.score = score
@@ -48,6 +59,9 @@ final class ChordProgressModel:
         self.selectedChordCell = nil
         self.canUndo = false
         self.canRedo = false
+        self.segmentSlices = []
+
+        rebuildSegmentSlices()
     }
 
     func setEditMode(_ isEditMode: Bool) {
@@ -89,6 +103,7 @@ final class ChordProgressModel:
         }
 
         score.updateChordCellBy(cellIndex: cellIndex, chord: selectedCandidate)
+        rebuildSegmentSlices()
         updateSelectedCell(at: cellIndex)
     }
 
@@ -110,5 +125,73 @@ final class ChordProgressModel:
         }
 
         selectedChordCell = updatedCell
+    }
+
+    /// 스코어 전체에 대해 세그먼트별 코드 조각을 다시 계산한다.
+    private func rebuildSegmentSlices() {
+        let chordCells = score.retrieveAllChordCells()
+        let segmentCount = Int(ceil(score.totalDuration / ChordProgressConstants.segmentDuration))
+
+        guard segmentCount > 0 else {
+            segmentSlices = []
+            return
+        }
+
+        var newSlices: [[ChordSegmentSlice]] = []
+
+        for index in 0..<segmentCount {
+            newSlices.append(
+                buildChordSlices(
+                    index: index,
+                    chordCells: chordCells,
+                    totalDuration: score.totalDuration,
+                    segmentDuration: ChordProgressConstants.segmentDuration
+                ))
+        }
+
+        segmentSlices = newSlices
+    }
+
+    /// 특정 세그먼트 구간과 겹치는 코드 셀을 찾아,
+    /// UI에서 사용할 `ChordSegmentSlice` 배열로 변환한다.
+    private func buildChordSlices(
+        index: Int,
+        chordCells: [ChordCell],
+        totalDuration: TimeInterval,
+        segmentDuration: TimeInterval
+    ) -> [ChordSegmentSlice] {
+        let segmentStartTime = TimeInterval(index) * segmentDuration
+        let segmentEndTime = min(segmentStartTime + segmentDuration, totalDuration)
+
+        guard segmentStartTime < segmentEndTime else { return [] }
+
+        let overlapping = chordCells.filter { cell in
+            let cellEndTime = cell.startTime + cell.duration
+            return segmentStartTime < cellEndTime && cell.startTime < segmentEndTime
+        }
+
+        let targetCells: [ChordCell] =
+            if overlapping.isEmpty {
+                if let previous = chordCells.last(where: { $0.startTime <= segmentStartTime }) {
+                    [previous]
+                } else if let first = chordCells.first {
+                    [first]
+                } else {
+                    []
+                }
+            } else {
+                overlapping
+            }
+
+        return targetCells.compactMap { cell in
+            let overlapStart = max(cell.startTime, segmentStartTime)
+            let overlapEnd = min(cell.startTime + cell.duration, segmentEndTime)
+            let durationInSegment = max(0, overlapEnd - overlapStart)
+            let occupancyRatio = durationInSegment / max(1, segmentDuration)
+
+            guard occupancyRatio > 0.02 else { return nil }
+
+            return ChordSegmentSlice(chordCell: cell, durationInSegment: durationInSegment)
+        }
     }
 }

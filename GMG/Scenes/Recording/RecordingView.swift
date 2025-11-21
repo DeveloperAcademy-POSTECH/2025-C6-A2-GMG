@@ -70,12 +70,9 @@ struct RecordingView: View {
             Countdown(countdown: model.countdown, skipAction: intent.onTapSkipButton)
         }
         .overlay {
-            ZStack {
-                if let scoreFactoryState = model.scoreFactoryState {
-                    LoadingView(scoreFactoryState: scoreFactoryState)
-                }
+            if let scoreFactoryState = model.scoreFactoryState {
+                LoadingView(scoreFactoryState: scoreFactoryState)
             }
-            .animation(.default, value: model.scoreFactoryState)
         }
         .task {
             await intent.onAppear()
@@ -252,15 +249,15 @@ struct RecordingView: View {
         let stopPlayAction: () -> Void
         let nextAction: () -> Void
 
-        private var primaryButtonTitle: String {
+        private var primaryButtonTitle: LocalizedStringResource {
             if isRecording {
-                return String(localized: .stop)
+                return .stop
             } else if isPlaying {
-                return String(localized: .stop)
+                return .stop
             } else if recordingURL != nil {
-                return String(localized: .replay)
+                return .replay
             }
-            return String(localized: .record)
+            return .record
         }
 
         private var primaryButtonImage: ImageResource {

@@ -118,7 +118,7 @@ extension HomeView {
             HStack {
                 VStack(alignment: .leading, spacing: .zero) {
                     TextField(
-                        String(localized: .enterTitle),
+                        LocalizedStringKey(LocalizedStringResource.enterTitle.key),
                         text: isEditable ? $tempTitle : .constant(score.title)
                     )
                     .font(isSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5)
