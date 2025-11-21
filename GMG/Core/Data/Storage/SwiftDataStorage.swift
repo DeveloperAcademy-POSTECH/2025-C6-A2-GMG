@@ -14,7 +14,8 @@ final class SwiftDataStorage {
         isStoredInMemoryOnly: Bool = false
     ) throws {
         let configuration: ModelConfiguration = ModelConfiguration(
-            isStoredInMemoryOnly: isStoredInMemoryOnly)
+            isStoredInMemoryOnly: isStoredInMemoryOnly
+        )
 
         self.container = try ModelContainer(
             for: Schema(ScoreSchema.models),

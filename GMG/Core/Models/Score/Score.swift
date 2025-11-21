@@ -38,8 +38,11 @@ final class Score {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.notes = notes
-        self.chordCells = chordCells
         self.audioLevels = audioLevels
+        self.chordCells = Score.assignDurations(
+            chordCells: chordCells,
+            totalDuration: totalDuration
+        )
         self.isDeleted = isDeleted
     }
 
@@ -83,7 +86,8 @@ final class Score {
         let newChordCell: ChordCell = ChordCell(
             chord: chord,
             chordCandidates: chordCell.chordCandidates,
-            startTime: chordCell.startTime
+            startTime: chordCell.startTime,
+            duration: chordCell.duration
         )
 
         chordCells[cellIndex] = newChordCell
@@ -126,6 +130,35 @@ extension Score: Hashable {
         hasher.combine(updatedAt)
         hasher.combine(notes)
         hasher.combine(chordCells)
+    }
+}
+
+extension Score {
+    private static func assignDurations(
+        chordCells: [ChordCell],
+        totalDuration: TimeInterval
+    ) -> [ChordCell] {
+        guard !chordCells.isEmpty else { return [] }
+
+        let sorted = chordCells.sorted { $0.startTime < $1.startTime }
+
+        return sorted.enumerated().compactMap { index, cell in
+            let nextStart =
+                sorted.indices.contains(index + 1)
+                ? sorted[index + 1].startTime
+                : totalDuration
+
+            guard cell.startTime <= nextStart, nextStart <= totalDuration else { return nil }
+
+            let duration = max(0, nextStart - cell.startTime)
+
+            return ChordCell(
+                chord: cell.chord,
+                chordCandidates: cell.chordCandidates,
+                startTime: cell.startTime,
+                duration: duration
+            )
+        }
     }
 }
 

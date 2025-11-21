@@ -14,6 +14,9 @@ protocol ChordProgressIntentProtocol {
     func onTapMuteButton(_ isMuted: Bool)
     func onTapChordCell(_ chordCell: ChordCell)
     func onTapWaveform(_ time: TimeInterval)
+    func onDragWaveformStart(_ time: TimeInterval)
+    func onDragWaveformChange(_ time: TimeInterval)
+    func onDragWaveformEnd(_ time: TimeInterval)
     func onTapCandidateChordCell(
         _ candidate: Chord,
         in chordCell: ChordCell,
@@ -32,6 +35,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     private var scorePlayer: ScorePlayer?
 
     private var cancellables: Set<AnyCancellable>
+    private var wasPlayingBeforeDrag = false
 
     private let undoManager: UndoManager
 
@@ -105,8 +109,30 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     func onTapWaveform(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
 
+        scorePlayer.seek(to: time)
+    }
+
+    func onDragWaveformStart(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+        wasPlayingBeforeDrag = scorePlayer.playheadPublisher.value.isPlaying
         scorePlayer.pause()
         scorePlayer.seek(to: time)
+    }
+
+    func onDragWaveformChange(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+        scorePlayer.seek(to: time)
+    }
+
+    func onDragWaveformEnd(_ time: TimeInterval) {
+        guard let scorePlayer = self.scorePlayer else { return }
+        scorePlayer.seek(to: time)
+
+        if wasPlayingBeforeDrag {
+            scorePlayer.play()
+        }
+
+        wasPlayingBeforeDrag = false
     }
 
     func onTapCandidateChordCell(
