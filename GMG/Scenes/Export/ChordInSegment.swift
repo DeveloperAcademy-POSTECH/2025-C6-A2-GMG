@@ -50,43 +50,27 @@ extension ChordInSegment {
                 continue
             }
 
-            var segment: [ChordInSegment] = []
+            var segment: [ChordInSegment] = cellsInSegment.compactMap { cell in
+                guard cell.startTime >= startTime else {
+                    let duration: TimeInterval = cell.duration - (startTime - cell.startTime)
+                    let proportion: Double = duration / segmentDuration
 
-            for cellIndex in cellsInSegment.indices {
-                let currentCell: ChordCell = cellsInSegment[cellIndex]
-
-                guard cellsInSegment.indices.contains(cellIndex + 1) else {  // 마지막 셀
-                    if score.totalDuration < endTime {  // 마지막 세그먼트
-                        let duration: TimeInterval =
-                            score.totalDuration - max(startTime, currentCell.startTime)
-                        let proportion: Double = duration / segmentDuration
-
-                        segment.append(.init(chord: currentCell.chord, proportion: proportion))
-
-                        let remainProportion: Double =
-                            (endTime - score.totalDuration) / segmentDuration
-
-                        segment.append(.init(chord: nil, proportion: remainProportion))
-                    } else {
-                        let duration: TimeInterval = endTime - max(startTime, currentCell.startTime)
-                        let proportion: Double = duration / segmentDuration
-
-                        segment.append(.init(chord: currentCell.chord, proportion: proportion))
-                    }
-
-                    continue
+                    return .init(chord: cell.chord, proportion: proportion)
                 }
 
-                let nextCell: ChordCell = cellsInSegment[cellIndex + 1]
+                let proportion: Double = cell.duration / segmentDuration
 
-                let duration: TimeInterval =
-                    nextCell.startTime - max(startTime, currentCell.startTime)
-                let proportion: Double = duration / segmentDuration
-
-                if proportion < 0.01 {  // UI 상에 그려질 수 없는 크기일 경우
-                    continue
+                if proportion < 0.01 {
+                    return nil
                 }
-                segment.append(.init(chord: currentCell.chord, proportion: proportion))
+
+                return .init(chord: cell.chord, proportion: proportion)
+            }
+
+            if score.totalDuration < endTime {
+                let proportion: Double = (endTime - score.totalDuration) / segmentDuration
+
+                segment.append(.init(chord: nil, proportion: proportion))
             }
 
             segments.append(segment)
