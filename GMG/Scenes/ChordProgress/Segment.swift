@@ -223,7 +223,7 @@ struct Segment: View {
                 }
             } else {
                 if isCurrentChord {
-                    return Color.blue4
+                    return Color.blue6
                 } else {
                     return Color.white1
                 }
