@@ -176,7 +176,7 @@ extension Score {
                 ChordCell(
                     chord: Chord(root: .C, quality: .maj),
                     chordCandidates: [
-                        Chord(root: .C, quality: .maj), Chord(root: .D, quality: .maj),
+                        Chord(root: .C, quality: .maj), Chord(root: .Gs, quality: .halfDim7),
                         Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
