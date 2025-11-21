@@ -6,15 +6,15 @@ import Tonic
 
 /// ScorePlayer와 ScoreAudioRenderer의 공통 로직을 담당하는 베이스 클래스
 class ScoreAudioEngineBase {
-    private let score: Score
-    private let engine: AVAudioEngine
-    private let sampler: AVAudioUnitSampler
-    private let sequencer: AVAudioSequencer
-    private let player: AVAudioPlayerNode
+    let score: Score
+    let engine: AVAudioEngine
+    let sampler: AVAudioUnitSampler
+    let sequencer: AVAudioSequencer
+    let player: AVAudioPlayerNode
 
-    private var audioFile: AVAudioFile?
-    private var sampleRate: Double
-    private var totalFrames: AVAudioFramePosition
+    private(set) var audioFile: AVAudioFile?
+    private(set) var sampleRate: Double
+    private(set) var totalFrames: AVAudioFramePosition
 
     init(score: Score) {
         self.score = score
@@ -30,6 +30,71 @@ class ScoreAudioEngineBase {
 
         self.sampleRate = 48_000
         self.totalFrames = .zero
+    }
+
+    func prepareToExport() throws {
+        attachNodes()
+        try loadAudioFile(score.audioURL)
+        scheduleAudioFile(from: .zero)
+        try loadSoundBank()
+        prepareChordCells()
+    }
+
+    func attachNodes() {
+        engine.attach(sampler)
+        engine.connect(sampler, to: engine.mainMixerNode, format: nil)
+
+        engine.attach(player)
+        engine.connect(player, to: engine.mainMixerNode, format: nil)
+    }
+
+    func loadAudioFile(_ url: URL) throws {
+        let audioFile: AVAudioFile = try AVAudioFile(forReading: url)
+
+        let format: AVAudioFormat = audioFile.processingFormat
+
+        engine.connect(player, to: engine.mainMixerNode, format: format)
+
+        sampleRate = format.sampleRate
+        totalFrames = audioFile.length
+
+        self.audioFile = audioFile
+    }
+
+    func loadSoundBank() throws {
+        guard
+            let url = Bundle.main.url(
+                forResource: "KAWAI good piano",
+                withExtension: "sf2"
+            )
+        else { throw ScorePlayerError.soundBankNotFound }
+
+        try sampler.loadSoundBankInstrument(
+            at: url,
+            program: .zero,
+            bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
+            bankLSB: UInt8(kAUSampler_DefaultBankLSB)
+        )
+    }
+
+    func scheduleAudioFile(from startTime: TimeInterval) {
+        guard let audioFile = self.audioFile else { return }
+
+        player.stop()
+
+        let startFrame = AVAudioFramePosition(startTime * sampleRate)
+        let availableFrames = audioFile.length - startFrame
+        guard availableFrames > 0 else { return }
+
+        let frameCount = AVAudioFrameCount(availableFrames)
+
+        player.scheduleSegment(
+            audioFile,
+            startingFrame: startFrame,
+            frameCount: frameCount,
+            at: nil,
+            completionHandler: nil
+        )
     }
 
     func prepareChordCells() {
@@ -91,69 +156,12 @@ class ScoreAudioEngineBase {
             }
         }
     }
-
-    func attachNodes() {
-        engine.attach(sampler)
-        engine.connect(sampler, to: engine.mainMixerNode, format: nil)
-
-        engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: nil)
-    }
-
-    private func loadAudioFile(_ url: URL) throws {
-        let audioFile: AVAudioFile = try AVAudioFile(forReading: url)
-
-        let format: AVAudioFormat = audioFile.processingFormat
-
-        engine.connect(player, to: engine.mainMixerNode, format: format)
-
-        sampleRate = format.sampleRate
-        totalFrames = audioFile.length
-
-        self.audioFile = audioFile
-    }
-
-    private func loadSoundBank() throws {
-        guard
-            let url = Bundle.main.url(
-                forResource: "KAWAI good piano",
-                withExtension: "sf2"
-            )
-        else { throw ScorePlayerError.soundBankNotFound }
-
-        try sampler.loadSoundBankInstrument(
-            at: url,
-            program: .zero,
-            bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
-            bankLSB: UInt8(kAUSampler_DefaultBankLSB)
-        )
-    }
-
-    private func scheduleAudioFile(from startTime: TimeInterval) {
-        guard let audioFile = self.audioFile else { return }
-
-        player.stop()
-
-        let startFrame = AVAudioFramePosition(startTime * sampleRate)
-        let availableFrames = audioFile.length - startFrame
-        guard availableFrames > 0 else { return }
-
-        let frameCount = AVAudioFrameCount(availableFrames)
-
-        player.scheduleSegment(
-            audioFile,
-            startingFrame: startFrame,
-            frameCount: frameCount,
-            at: nil,
-            completionHandler: nil
-        )
-    }
 }
 
 // MARK: - Extensions
 
 extension Chord {
-    fileprivate var tonicChord: Tonic.Chord {
+    var tonicChord: Tonic.Chord {
         var root: NoteClass = .C
         switch self.root {
         case .C: root = .C
@@ -197,7 +205,7 @@ extension Chord {
 }
 
 extension Tonic.Chord {
-    fileprivate var midiNoteNumbers: [Int8] {
+    var midiNoteNumbers: [Int8] {
         let pitches: [Pitch] = self.pitches(octave: 3)
         let midiNoteNumbers: [Int8] = pitches.map { pitch in
             return pitch.midiNoteNumber
