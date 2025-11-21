@@ -205,10 +205,6 @@ final class ScorePlayer {
         }
     }
 
-    func isPlaying() -> Bool {
-        player.isPlaying
-    }
-
     func pause() {
         let pausedTime = currentPlaybackTime()
 

@@ -114,7 +114,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onDragWaveformStart(_ time: TimeInterval) {
         guard let scorePlayer = self.scorePlayer else { return }
-        wasPlayingBeforeDrag = scorePlayer.isPlaying()
+        wasPlayingBeforeDrag = scorePlayer.playheadPublisher.value.isPlaying
         scorePlayer.pause()
         scorePlayer.seek(to: time)
     }
