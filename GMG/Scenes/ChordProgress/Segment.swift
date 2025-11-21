@@ -198,8 +198,11 @@ struct Segment: View {
                     Text(chord.description)
                         .font(Typography.WantedSansStd.R5)
                         .foregroundStyle(.white1)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
-                .frame(minWidth: 60, minHeight: 40)
+                .padding(.horizontal, Spacing.xs)
+                .frame(minWidth: 60, maxWidth: 60, minHeight: 40, maxHeight: 40)
                 .background {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(backgroundColor)
