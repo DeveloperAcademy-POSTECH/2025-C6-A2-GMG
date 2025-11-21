@@ -156,25 +156,13 @@ struct Segment: View {
                     Spacer()
 
                     ForEach(Array(chordCell.chordCandidates.enumerated()), id: \.offset) {
-                        (_, chord) in
-                        Button {
-                            onTapAction(chord, chordCell)
-                        } label: {
-                            VStack {
-                                Text(chord.description)
-                                    .font(Typography.WantedSansStd.R5)
-                                    .foregroundStyle(.white1)
-                            }
-                            .frame(minWidth: 60, minHeight: 40)
-                            .background {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(
-                                        chord.description == chordCell.chord?.description
-                                            ? .blue6
-                                            : .blue3
-                                    )
-                            }
-                        }
+                        (index, chord) in
+                        ChordCandidateButton(
+                            index: index,
+                            chord: chord,
+                            selectedChord: chordCell.chord,
+                            onTap: { onTapAction(chord, chordCell) }
+                        )
                     }
 
                     Spacer()
@@ -183,6 +171,40 @@ struct Segment: View {
             }
             .frame(minHeight: 62)
             .padding(.horizontal, -Spacing.md)
+        }
+    }
+
+    struct ChordCandidateButton: View {
+        let index: Int
+        let chord: Chord
+        let selectedChord: Chord?
+        let onTap: () -> Void
+
+        private var backgroundColor: Color {
+            if chord.description == selectedChord?.description {
+                return .blue6
+            } else if index == 0 || index == 1 {
+                return .blue7
+            } else {
+                return .blue3
+            }
+        }
+
+        var body: some View {
+            Button {
+                onTap()
+            } label: {
+                VStack {
+                    Text(chord.description)
+                        .font(Typography.WantedSansStd.R5)
+                        .foregroundStyle(.white1)
+                }
+                .frame(minWidth: 60, minHeight: 40)
+                .background {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(backgroundColor)
+                }
+            }
         }
     }
 
