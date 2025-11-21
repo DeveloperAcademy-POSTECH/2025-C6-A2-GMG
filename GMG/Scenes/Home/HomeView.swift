@@ -183,17 +183,15 @@ extension HomeView {
                             playButtonAction()
                         }
                     } label: {
-                        Image(isPlaying ? .pause : .playButton)
+                        Image(isPlaying ? .pause : .smallPlay)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .frame(
-                                width: isPlaying ? 13 : 10,
-                                height: isPlaying ? 13 : 10
-                            )
                             .foregroundStyle(Color.black1)
-                            .padding(.all, isPlaying ? 7.5 : 9)
-                            .padding(.leading, isPlaying ? 0 : 2)
+                            .padding(isPlaying ? 0 : 1)
+                            .offset(x: isPlaying ? 0 : 1)
+                            .frame(width: 12, height: 12)
+                            .padding(Spacing.xs)
                             .background {
                                 let lineWidth: CGFloat = 3
                                 let isProgressPresented: Bool =
