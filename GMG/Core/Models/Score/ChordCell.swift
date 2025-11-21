@@ -6,6 +6,17 @@ struct ChordCell {
     let chord: Chord?
     let chordCandidates: [Chord]
     let startTime: TimeInterval
+    let duration: TimeInterval
+
+    init(
+        chord: Chord?, chordCandidates: [Chord], startTime: TimeInterval,
+        duration: TimeInterval = .zero
+    ) {
+        self.chord = chord
+        self.chordCandidates = chordCandidates
+        self.startTime = startTime
+        self.duration = duration
+    }
 }
 
 extension ChordCell {
