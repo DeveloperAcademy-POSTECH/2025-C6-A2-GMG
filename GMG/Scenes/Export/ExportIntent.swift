@@ -38,8 +38,8 @@ final class ExportIntent: ExportIntentProtocol {
         }
 
         do {
-            let renderedURL = try DefaultScoreAudioRenderer(score: score)
-                .renderToAudioFile(fileName: "\(score.title).m4a")
+            let renderer: ScoreAudioRenderer = DefaultScoreAudioRenderer(score: score)
+            let renderedURL: URL = try renderer.renderToAudioFile(fileName: "\(score.title).m4a")
             model.updateAudioURL(renderedURL)
         } catch {
             print("offline render failed: \(error)")
