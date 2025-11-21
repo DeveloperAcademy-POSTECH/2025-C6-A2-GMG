@@ -35,8 +35,8 @@ final class DefaultScoreAudioRenderer: ScoreAudioEngineBase, ScoreAudioRenderer 
         try engine.start()
 
         // 출력 파일 URL 설정
-        let outputURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(fileName ?? score.title)
+        let outputURL = URL.temporaryDirectory.appending(
+            component: "\(fileName ?? score.title).m4a")
 
         let outputFile = try AVAudioFile(
             forWriting: outputURL,
