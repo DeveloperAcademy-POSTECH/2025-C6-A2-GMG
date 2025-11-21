@@ -33,7 +33,7 @@ final class RecordManager {
                 .appending(component: "recording-\(Date().ISO8601Format()).m4a")
             let settings: [String: Any] = [
                 AVFormatIDKey: kAudioFormatMPEG4AAC,
-                AVSampleRateKey: 48_000,
+                AVSampleRateKey: Constants.sampleRate,
                 AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
             ]
 

@@ -28,7 +28,7 @@ class ScoreAudioEngineBase {
 
         self.audioFile = nil
 
-        self.sampleRate = 48_000
+        self.sampleRate = Constants.sampleRate
         self.totalFrames = .zero
     }
 
