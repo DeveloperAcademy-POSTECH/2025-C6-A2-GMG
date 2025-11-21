@@ -349,7 +349,11 @@ extension ChordProgressView {
                     isEditMode = true
                 }
             }
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .inset(by: isEditMode ? 0.2 : 0)
+                    .fill(.white1)
+            )
             .animation(.default, value: isEditMode)
         }
 
