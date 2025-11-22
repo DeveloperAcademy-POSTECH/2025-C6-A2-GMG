@@ -167,7 +167,7 @@ struct Waveform: View {
     }
 
     private var dragGesture: some Gesture {
-        DragGesture(minimumDistance: 20)
+        DragGesture(minimumDistance: 30)
             .onChanged { value in
                 let time = convertLocationToTime(value.location.x)
 
