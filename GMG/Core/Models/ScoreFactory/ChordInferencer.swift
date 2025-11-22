@@ -85,6 +85,7 @@ final class ChordInferencer {
 
             if startIndex >= endIndex { break }
 
+            var currentPosition: Int = 0
             let slicedTokens: [String] = notes[startIndex..<endIndex]
                 .map { note in
                     Note(
@@ -94,7 +95,16 @@ final class ChordInferencer {
                         duration: note.duration
                     )
                 }
-                .flatMap { $0.tokens }
+                .sorted { $0.startTime < $1.startTime }
+                .flatMap { note -> [String] in
+                    let notePosition = max(
+                        0,
+                        min(511, Int((note.startTime * 10.0).rounded()))
+                    )
+                    let delta = notePosition - currentPosition
+                    currentPosition = notePosition
+                    return note.tokens(delta: delta)
+                }
 
             let inferenceResults: [[InferenceResult]] = try await inference(
                 tokens: slicedTokens,
@@ -138,7 +148,15 @@ final class ChordInferencer {
                 )
             }
 
+            var prevChordPosition: Int = 0
             previousResults = slicedChordCells.flatMap { chordCell in
+                let chordPosition = max(
+                    0,
+                    min(511, Int(((chordCell.startTime - startTime) * 10.0).rounded()))
+                )
+                let delta = chordPosition - prevChordPosition
+                prevChordPosition = chordPosition
+
                 let chordCell: ChordCell = ChordCell(
                     chord: chordCell.chord,
                     chordCandidates: chordCell.chordCandidates,
@@ -146,7 +164,7 @@ final class ChordInferencer {
                 )
 
                 return [
-                    chordCell.tokens.map { token in
+                    chordCell.tokens(delta: delta).map { token in
                         let tokenId = vocab.chordId(token: token) ?? unkId
                         return InferenceResult(id: tokenId, probability: 1.0)
                     }
@@ -310,7 +328,7 @@ extension ChordInferencer {
 
     private func convertToChordCells(
         _ inferenceResults: [[InferenceResult]],
-        threshold: Float = 0.7
+        threshold: Float = 0.9
     ) -> [ChordCell] {
         func convertToChordCell(
             position: TimeInterval,
@@ -385,7 +403,7 @@ extension ChordInferencer {
                 continue
             }
 
-            if firstResultToken.hasPrefix("Position_") {
+            if firstResultToken.hasPrefix("TimeShift_") {
                 if let prevPosition = position,
                     let prevRoot = root,
                     let prevType = type,
@@ -403,15 +421,14 @@ extension ChordInferencer {
                         )
                     }
 
-                    position = nil
                     root = nil
                     type = nil
                 }
 
-                if let positionRawValue: TimeInterval = TimeInterval(
+                if let delta: TimeInterval = TimeInterval(
                     token: firstResultToken
                 ) {
-                    position = positionRawValue
+                    position = (position ?? 0) + delta
                 }
             } else if firstResultToken.hasPrefix("Root_") {
                 root = result
@@ -536,15 +553,15 @@ extension ChordQuality {
 
 extension TimeInterval {
     fileprivate init?(token: String) {
-        guard token.hasPrefix("Position_") else { return nil }
+        guard token.hasPrefix("TimeShift_") else { return nil }
 
         guard
-            let position = TimeInterval(
-                token.replacingOccurrences(of: "Position_", with: "")
+            let delta = TimeInterval(
+                token.replacingOccurrences(of: "TimeShift_", with: "")
             )
         else { return nil }
 
-        self = position * 0.1
+        self = delta * 0.1
     }
 }
 
@@ -574,24 +591,20 @@ extension NoteName {
 }
 
 extension Note {
-    fileprivate var tokens: [String] {
+    fileprivate func tokens(delta: Int) -> [String] {
         var tokens: [String] = []
 
-        let position = max(
-            0,
-            min(511, Int((self.startTime * 10.0).rounded()))
-        )  // 0..511
         let chromaIndex = self.name.chormaIndex  // 0..11
         let duration = max(
             1,
             min(81, Int((self.duration * 10.0).rounded()))
         )  // 1..81
 
-        let positionToken = "Position_\(position)"
+        let timeShiftToken = "TimeShift_\(delta)"
         let pitchToken = "Pitch_\(chromaIndex)"
         let durationToken = "Duration_\(duration)"
 
-        tokens.append(positionToken)
+        tokens.append(timeShiftToken)
         tokens.append(pitchToken)
         tokens.append(durationToken)
 
@@ -600,20 +613,19 @@ extension Note {
 }
 
 extension ChordCell {
-    fileprivate var tokens: [String] {
+    fileprivate func tokens(delta: Int) -> [String] {
         guard let chord else { return [] }
 
         var tokens: [String] = []
 
-        let position = max(0, min(511, Int((self.startTime * 10.0).rounded())))
         let root = chord.root.description
         let quality = chord.quality.description
 
-        let positionToken = "Position_\(position)"
+        let timeShiftToken = "TimeShift_\(delta)"
         let rootToken = "Root_\(root)"
         let qualityToken = "Type_\(quality)"
 
-        tokens.append(positionToken)
+        tokens.append(timeShiftToken)
         tokens.append(rootToken)
         tokens.append(qualityToken)
 
