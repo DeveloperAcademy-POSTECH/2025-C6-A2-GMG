@@ -117,11 +117,12 @@ extension ChordSheetView {
             ViewThatFits(in: .horizontal) {
                 Text(chord.description)
                 VStack(alignment: .center) {
-                    Text(chord.root.description)
-                    Text(chord.quality.description)
+                    Text(chord.root.description + "\n" + chord.quality.description)
+                        .multilineTextAlignment(.center)
                 }
                 .minimumScaleFactor(0.1)
             }
+            .padding(Spacing.xxs)
             .font(Typography.WantedSansStd.R7)
             .foregroundStyle(Color.black1)
             .frame(
