@@ -93,12 +93,19 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
                 guard let self else { return }
 
                 do {
+                    let wasPlaying = self.player.isPlaying
+                    self.pause()
+
                     try self.activateAudioSession()
                     try self.engine.start()
 
                     Task {
                         try? await Task.sleep(for: .seconds(0.1))
                         try? self.loadSoundBank()
+
+                        if wasPlaying {
+                            self.play()
+                        }
                     }
                 } catch {
                     Logger.error(String(describing: error))
