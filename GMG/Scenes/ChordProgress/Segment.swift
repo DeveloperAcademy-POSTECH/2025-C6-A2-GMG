@@ -77,6 +77,8 @@ struct Segment: View {
                         if let chord = slice.chordCell.chord {
                             ChordCellButton(
                                 chord: chord,
+                                isShowDescription: widthRatio
+                                    >= Constants.minimumChordCellWidthRatio,
                                 isCurrentChord: currentChordCell?.startTime
                                     == slice.chordCell.startTime,
                                 isSelected: selectedChordCell?.startTime
@@ -104,7 +106,7 @@ struct Segment: View {
 
             ChordCellCandidates(
                 chordCell: selectedChordCell ?? ChordCell.empty,
-                onTapAction: segmentHandlers.onTapChordCandidate
+                onTapChordCandidate: segmentHandlers.onTapChordCandidate
             )
             .frame(height: showCandidates ? 62 : 0)
             .scaleEffect(y: showCandidates ? 1.0 : 0.0)
@@ -146,7 +148,7 @@ struct Segment: View {
 
     struct ChordCellCandidates: View {
         let chordCell: ChordCell
-        let onTapAction: (Chord, ChordCell) -> Void
+        let onTapChordCandidate: (Chord, ChordCell) -> Void
 
         var body: some View {
             ZStack {
@@ -156,25 +158,13 @@ struct Segment: View {
                     Spacer()
 
                     ForEach(Array(chordCell.chordCandidates.enumerated()), id: \.offset) {
-                        (_, chord) in
-                        Button {
-                            onTapAction(chord, chordCell)
-                        } label: {
-                            VStack {
-                                Text(chord.description)
-                                    .font(Typography.WantedSansStd.R5)
-                                    .foregroundStyle(.white1)
-                            }
-                            .frame(minWidth: 60, minHeight: 40)
-                            .background {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(
-                                        chord.description == chordCell.chord?.description
-                                            ? .blue6
-                                            : .blue3
-                                    )
-                            }
-                        }
+                        (index, chord) in
+                        ChordCandidateButton(
+                            index: index,
+                            chord: chord,
+                            selectedChord: chordCell.chord,
+                            onTapButton: { onTapChordCandidate(chord, chordCell) }
+                        )
                     }
 
                     Spacer()
@@ -186,8 +176,46 @@ struct Segment: View {
         }
     }
 
+    struct ChordCandidateButton: View {
+        let index: Int
+        let chord: Chord
+        let selectedChord: Chord?
+        let onTapButton: () -> Void
+
+        private var backgroundColor: Color {
+            if selectedChord == chord {
+                return .blue6
+            } else if index == 0 || index == 1 {
+                return .blue7
+            } else {
+                return .blue3
+            }
+        }
+
+        var body: some View {
+            Button {
+                onTapButton()
+            } label: {
+                VStack {
+                    Text(chord.description)
+                        .font(Typography.WantedSansStd.R5)
+                        .foregroundStyle(.white1)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .padding(.horizontal, Spacing.xs)
+                .frame(minWidth: 60, maxWidth: 60, minHeight: 40, maxHeight: 40)
+                .background {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(backgroundColor)
+                }
+            }
+        }
+    }
+
     struct ChordCellButton: View {
         let chord: Chord
+        let isShowDescription: Bool
         let isCurrentChord: Bool
         let isSelected: Bool
         let action: () -> Void
@@ -234,50 +262,36 @@ struct Segment: View {
             Button {
                 action()
             } label: {
-                ViewThatFits(in: .horizontal) {
-                    /// CASE 1: one line
-                    Text(chord.description)
-                        .font(Typography.WantedSansStd.R7)
-                        .foregroundStyle(
-                            foregroundColor
-                        )
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity
-                        )
-                        .background(
-                            backgroundColor,
-                            in: RoundedRectangle(cornerRadius: 12)
-                        )
+                ZStack {
+                    if isShowDescription {
+                        ViewThatFits(in: .horizontal) {
+                            /// CASE 1: one line
+                            Text(chord.description)
+                                .font(Typography.WantedSansStd.R7)
 
-                    /// CASE 2: multi line
-                    VStack(alignment: .center) {
-                        Text(chord.root.description)
-                        Text(chord.quality.description)
+                            /// CASE 2: multi line (여유공간 있는 상태)
+                            Text("\(chord.root.description)\n\(chord.quality.description)")
+                                .multilineTextAlignment(.center)
+                                .font(Typography.WantedSansStd.R5)
+
+                            /// CASE 3: multi line (여유공간 없는 상태)
+                            Text("\(chord.root.description)\n\(chord.quality.description)")
+                                .multilineTextAlignment(.center)
+                                .font(Typography.WantedSansStd.R1)
+                        }
+                        .foregroundStyle(foregroundColor)
                     }
-                    .font(Typography.WantedSansStd.R7)
-                    .foregroundStyle(
-                        foregroundColor
-                    )
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
-                    .background(
-                        backgroundColor,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
-                    .minimumScaleFactor(0.1)
                 }
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity
+                )
+                .padding(.horizontal, Spacing.xxs)
+                .background(
+                    backgroundColor,
+                    in: RoundedRectangle(cornerRadius: 12)
+                )
             }
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity
-            )
-            .background(
-                backgroundColor,
-                in: RoundedRectangle(cornerRadius: 12)
-            )
             .buttonStyle(.bouncy)
         }
     }
