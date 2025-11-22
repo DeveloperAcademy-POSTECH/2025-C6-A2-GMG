@@ -5,5 +5,6 @@ import Foundation
 enum Constants {
     /// ChordProgress에서 사용
     static let segmentDuration: TimeInterval = 5.0
+    static let minimumChordCellWidthRatio: CGFloat = 0.08
     static let sampleRate: Double = 48_000
 }
