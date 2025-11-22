@@ -106,7 +106,7 @@ struct Segment: View {
 
             ChordCellCandidates(
                 chordCell: selectedChordCell ?? ChordCell.empty,
-                onTapAction: segmentHandlers.onTapChordCandidate
+                onTapChordCandidate: segmentHandlers.onTapChordCandidate
             )
             .frame(height: showCandidates ? 62 : 0)
             .scaleEffect(y: showCandidates ? 1.0 : 0.0)
@@ -148,7 +148,7 @@ struct Segment: View {
 
     struct ChordCellCandidates: View {
         let chordCell: ChordCell
-        let onTapAction: (Chord, ChordCell) -> Void
+        let onTapChordCandidate: (Chord, ChordCell) -> Void
 
         var body: some View {
             ZStack {
@@ -163,7 +163,7 @@ struct Segment: View {
                             index: index,
                             chord: chord,
                             selectedChord: chordCell.chord,
-                            onTap: { onTapAction(chord, chordCell) }
+                            onTapButton: { onTapChordCandidate(chord, chordCell) }
                         )
                     }
 
@@ -180,10 +180,10 @@ struct Segment: View {
         let index: Int
         let chord: Chord
         let selectedChord: Chord?
-        let onTap: () -> Void
+        let onTapButton: () -> Void
 
         private var backgroundColor: Color {
-            if chord.description == selectedChord?.description {
+            if selectedChord == chord {
                 return .blue6
             } else if index == 0 || index == 1 {
                 return .blue7
@@ -194,7 +194,7 @@ struct Segment: View {
 
         var body: some View {
             Button {
-                onTap()
+                onTapButton()
             } label: {
                 VStack {
                     Text(chord.description)
