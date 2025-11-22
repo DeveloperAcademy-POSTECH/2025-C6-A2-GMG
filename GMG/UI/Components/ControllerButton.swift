@@ -25,6 +25,7 @@ struct ControllerButton<Label: View>: View {
                 .foregroundStyle(
                     isDark ? Color.white1 : Color.black1
                 )
+                .geometryGroup()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(
                     isDark ? Color.black : Color.white,
