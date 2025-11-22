@@ -44,12 +44,21 @@ struct ExportView: View {
                             .english(Typography.WantedSansStd.R6),
                             .korean(Typography.Pretendard.M6)
                         )
+                        .foregroundStyle(Color.black1)
                 },
-                trailing: {}
+                trailing: {
+                    Button {
+                        router?.popToRoot()
+                    } label: {
+                        Image(.home)
+                            .renderingMode(.template)
+                            .foregroundStyle(Color.black1)
+                    }
+                }
             )
         }
         .onAppear {
-            intent.onAppear()
+            intent.onAppear(model.score)
         }
     }
 }
@@ -119,13 +128,13 @@ extension ExportView {
                 if let sheetURL {
                     ShareLink(item: sheetURL) {
                         HStack(spacing: 4) {
-                            Text("sheet")
+                            Text(.sheet)
                                 .font(
                                     .english(Typography.WantedSansStd.M2),
                                     .korean(Typography.Pretendard.M6)
                                 )
                                 .foregroundStyle(Color.white1)
-                            Image("Export")
+                            Image(.export)
                         }
                         .padding(.vertical, 20)
                         .frame(maxWidth: .infinity)
@@ -139,13 +148,13 @@ extension ExportView {
                 if let audioURL {
                     ShareLink(item: audioURL) {
                         HStack(spacing: 4) {
-                            Text("Audio")
+                            Text(.audio)
                                 .font(
                                     .english(Typography.WantedSansStd.M2),
                                     .korean(Typography.Pretendard.M6)
                                 )
                                 .foregroundStyle(Color.white1)
-                            Image("Export")
+                            Image(.export)
                         }
                         .padding(.vertical, 20)
                         .frame(maxWidth: .infinity)

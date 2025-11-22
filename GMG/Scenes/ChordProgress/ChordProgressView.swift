@@ -506,7 +506,7 @@ extension ChordProgressView {
                             index: index,
                             totalDuration: totalDuration,
                             chordSlices: slices,
-                            segmentDuration: ChordProgressConstants.segmentDuration,
+                            segmentDuration: Constants.segmentDuration,
                             currentChordCell: currentChordCell,
                             selectedChordCell: selectedChordCell,
                             audioLevels: audioLevels,

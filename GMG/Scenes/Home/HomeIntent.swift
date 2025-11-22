@@ -126,7 +126,7 @@ final class HomeIntent: HomeIntentProtocol {
         cleanupPlayer()
 
         do {
-            let scorePlayer = ScorePlayer(score: score)
+            let scorePlayer: ScorePlayer = DefaultScorePlayer(score: score)
             try scorePlayer.prepareToPlay()
             self.scorePlayer = scorePlayer
 
