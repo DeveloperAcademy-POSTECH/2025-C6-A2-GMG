@@ -32,7 +32,7 @@ struct RecordingView: View {
 
                 Spacer()
             }
-            .navigationBar(leading: {}, center: {}, trailing: {})
+            .navigationBar()
 
             WaveForm(audioLevels: model.audioLevels)
 
@@ -74,6 +74,7 @@ struct RecordingView: View {
                 LoadingView(scoreFactoryState: scoreFactoryState)
             }
         }
+        .animation(.default, value: model.scoreFactoryState)
         .task {
             await intent.onAppear()
         }

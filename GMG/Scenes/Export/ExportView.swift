@@ -5,8 +5,8 @@ internal import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
-    @State private var model: any ExportModelStateProtocol
-    @State private var intent: any ExportIntentProtocol
+    @State private var model: ExportModelStateProtocol
+    @State private var intent: ExportIntentProtocol
     private weak var router: Router?
 
     init(
@@ -21,23 +21,39 @@ struct ExportView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1.ignoresSafeArea()
-            VStack(spacing: 0) {
-                Title(title: model.score.title)
-                KeyDate(
-                    keyDescription: model.keyDescription,
-                    dateString: model.dateString
-                )
-                Image(model.imageName)
-                    .padding(.bottom, 69.5)
-                ExportButton(
-                    sheetURL: model.sheetURL,
-                    audioURL: model.audioURL
-                )
+            Color.bg1
+                .ignoresSafeArea()
+
+            VStack(spacing: .zero) {
+                VStack(spacing: .zero) {
+                    Title(title: model.score.title)
+                    KeyDate(
+                        keyDescription: model.keyDescription,
+                        dateString: model.dateString
+                    )
+                }
+
                 Spacer()
+
+                if let images = model.sheetImages {
+                    ImageCarousel(images: images)
+                        .padding(.horizontal, -Spacing.md)
+                }
+
+                Spacer()
+
+                HStack(spacing: Spacing.md) {
+                    if let sheetURLs = model.sheetImageURLs {
+                        ExportButton(items: sheetURLs, title: .sheet, image: .export)
+                    }
+                    if let audioURL = model.audioURL {
+                        ExportButton(item: audioURL, title: .audio, image: .export)
+                    }
+                }
             }
+            .padding(Spacing.md)
+            .padding(.bottom, Spacing.xxl)
             .navigationBar(
-                leading: {},
                 center: {
                     Text(.export)
                         .font(
@@ -57,33 +73,13 @@ struct ExportView: View {
                 }
             )
         }
-        .onAppear {
-            intent.onAppear(model.score)
+        .task {
+            intent.onAppear(score: model.score)
         }
     }
 }
 
 extension ExportView {
-    struct Header: View {
-        var body: some View {
-            HStack(spacing: 0) {
-                Image(systemName: "chevron.left")
-                    .frame(width: 15)
-                Spacer()
-                Text(.export)
-                    .font(Typography.WantedSansStd.R6)
-                    .foregroundStyle(Color.black1)
-                Spacer()
-                Image(.home)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 15)
-            }
-            .padding(.horizontal, 15)
-            .padding(.bottom, 46)
-        }
-    }
-
     struct Title: View {
         let title: String
 
@@ -94,8 +90,6 @@ extension ExportView {
                     .foregroundStyle(Color.black1)
                 Spacer()
             }
-            .padding(.leading, 17.55)
-            .padding(.bottom, 7)
         }
     }
 
@@ -113,59 +107,109 @@ extension ExportView {
                     .font(Typography.WantedSansStd.R4)
                     .foregroundStyle(Color.black5)
             }
-            .padding(.horizontal, 17.55)
-            .padding(.bottom, 34.5)
+        }
+    }
+
+    struct ImageCarousel: View {
+        let images: [UIImage]
+
+        @State private var focusedImageIndex: Int? = .zero
+        @State private var screenWidth: CGFloat = .zero
+
+        private let width: CGFloat = 178
+        private let height: CGFloat = 386
+
+        var body: some View {
+            VStack(spacing: Spacing.xl) {
+                ScrollView(.horizontal) {
+                    HStack(spacing: Spacing.lg) {
+                        ForEach(Array(images.enumerated()), id: \.offset) { index, image in
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                                .id(index)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: $focusedImageIndex, anchor: .center)
+                .scrollTargetBehavior(.viewAligned)
+                .scrollBounceBehavior(.basedOnSize)
+                .safeAreaPadding(.horizontal, (screenWidth - width) / 2)
+                .frame(height: height)
+                .onGeometryChange(for: CGFloat.self) { geometry in
+                    geometry.size.width
+                } action: { newValue in
+                    self.screenWidth = newValue
+                }
+
+                HStack {
+                    ForEach(images.indices, id: \.self) { index in
+                        Circle()
+                            .fill(focusedImageIndex == index ? Color.black1 : Color.black3)
+                            .frame(width: 8, height: 8)
+                            .onTapGesture {
+                                withAnimation {
+                                    focusedImageIndex = index
+                                }
+                            }
+                    }
+                }
+                .opacity(images.count > 1 ? 1.0 : 0.0)
+            }
         }
     }
 
     struct ExportButton: View {
-        let sheetURL: URL?
-        let audioURL: URL?
+        let items: [URL]
+        let title: Text
+        let image: ImageResource
+
+        init<S: StringProtocol>(item: URL, title: S, image: ImageResource) {
+            self.items = [item]
+            self.title = Text(title)
+            self.image = image
+        }
+
+        init(item: URL, title: LocalizedStringResource, image: ImageResource) {
+            self.items = [item]
+            self.title = Text(title)
+            self.image = image
+        }
+
+        init<S: StringProtocol>(items: [URL], title: S, image: ImageResource) {
+            self.items = items
+            self.title = Text(title)
+            self.image = image
+        }
+
+        init(items: [URL], title: LocalizedStringResource, image: ImageResource) {
+            self.items = items
+            self.title = Text(title)
+            self.image = image
+        }
 
         var body: some View {
-            HStack(spacing: 19) {
-
-                if let sheetURL {
-                    ShareLink(item: sheetURL) {
-                        HStack(spacing: 4) {
-                            Text(.sheet)
-                                .font(
-                                    .english(Typography.WantedSansStd.M2),
-                                    .korean(Typography.Pretendard.M6)
-                                )
-                                .foregroundStyle(Color.white1)
-                            Image(.export)
-                        }
-                        .padding(.vertical, 20)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18)
-                                .foregroundStyle(Color.black1)
+            ShareLink(items: items) {
+                HStack(spacing: Spacing.xxs) {
+                    title
+                        .font(
+                            .english(Typography.WantedSansStd.M2),
+                            .korean(Typography.Pretendard.M6)
                         )
-                    }
+                        .foregroundStyle(Color.white1)
+                    Image(image)
+                        .offset(y: -2)
                 }
-
-                if let audioURL {
-                    ShareLink(item: audioURL) {
-                        HStack(spacing: 4) {
-                            Text(.audio)
-                                .font(
-                                    .english(Typography.WantedSansStd.M2),
-                                    .korean(Typography.Pretendard.M6)
-                                )
-                                .foregroundStyle(Color.white1)
-                            Image(.export)
-                        }
-                        .padding(.vertical, 20)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18)
-                                .foregroundStyle(Color.black1)
-                        )
-                    }
-                }
+                .padding(.vertical, 20)
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .foregroundStyle(Color.black1)
+                )
             }
-            .padding(.horizontal, 16)
         }
     }
 }
