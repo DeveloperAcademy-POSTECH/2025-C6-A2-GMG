@@ -262,70 +262,40 @@ struct Segment: View {
             Button {
                 action()
             } label: {
-                if isShowDescription {
-                    ViewThatFits(in: .horizontal) {
-                        /// CASE 1: one line
-                        Text(chord.description)
-                            .font(Typography.WantedSansStd.R7)
-                            .foregroundStyle(
-                                foregroundColor
-                            )
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: .infinity
-                            )
-                            .background(
-                                backgroundColor,
-                                in: RoundedRectangle(cornerRadius: 12)
-                            )
+                ZStack {
+                    if isShowDescription {
+                        ViewThatFits(in: .horizontal) {
+                            /// CASE 1: one line
+                            Text(chord.description)
+                                .font(Typography.WantedSansStd.R7)
 
-                        /// CASE 2: multi line (여유공간 있는 상태)
-                        VStack(alignment: .center) {
-                            Text("\(chord.root.description)\n\(chord.quality.description)")
-                                .multilineTextAlignment(.center)
-                        }
-                        .font(Typography.WantedSansStd.R5)
-                        .foregroundStyle(
-                            foregroundColor
-                        )
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity
-                        )
-                        .background(
-                            backgroundColor,
-                            in: RoundedRectangle(cornerRadius: 12)
-                        )
+                            /// CASE 2: multi line (여유공간 있는 상태)
+                            VStack(alignment: .center) {
+                                Text("\(chord.root.description)\n\(chord.quality.description)")
+                                    .multilineTextAlignment(.center)
+                            }
+                            .font(Typography.WantedSansStd.R5)
 
-                        /// CASE 3: multi line (여유공간 없는 상태)
-                        VStack(alignment: .center) {
-                            Text("\(chord.root.description)\n\(chord.quality.description)")
-                                .multilineTextAlignment(.center)
+                            /// CASE 3: multi line (여유공간 없는 상태)
+                            VStack(alignment: .center) {
+                                Text("\(chord.root.description)\n\(chord.quality.description)")
+                                    .multilineTextAlignment(.center)
+                            }
+                            .font(Typography.WantedSansStd.R1)
                         }
-                        .font(Typography.WantedSansStd.R1)
-                        .foregroundStyle(
-                            foregroundColor
-                        )
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity
-                        )
-                        .background(
-                            backgroundColor,
-                            in: RoundedRectangle(cornerRadius: 12)
-                        )
+                        .foregroundStyle(foregroundColor)
                     }
                 }
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity
+                )
+                .padding(.horizontal, Spacing.xxs)
+                .background(
+                    backgroundColor,
+                    in: RoundedRectangle(cornerRadius: 12)
+                )
             }
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity
-            )
-            .padding(.horizontal, Spacing.xxs)
-            .background(
-                backgroundColor,
-                in: RoundedRectangle(cornerRadius: 12)
-            )
             .buttonStyle(.bouncy)
         }
     }
