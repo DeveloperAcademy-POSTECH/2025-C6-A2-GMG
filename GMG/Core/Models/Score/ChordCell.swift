@@ -9,8 +9,10 @@ struct ChordCell {
     let duration: TimeInterval
 
     init(
-        chord: Chord?, chordCandidates: [Chord], startTime: TimeInterval,
-        duration: TimeInterval = .zero
+        chord: Chord?,
+        chordCandidates: [Chord],
+        startTime: TimeInterval,
+        duration: TimeInterval
     ) {
         self.chord = chord
         self.chordCandidates = chordCandidates
@@ -21,7 +23,7 @@ struct ChordCell {
 
 extension ChordCell {
     static var empty: ChordCell {
-        ChordCell(chord: nil, chordCandidates: [], startTime: 0.0)
+        ChordCell(chord: nil, chordCandidates: [], startTime: .zero, duration: .zero)
     }
 }
 

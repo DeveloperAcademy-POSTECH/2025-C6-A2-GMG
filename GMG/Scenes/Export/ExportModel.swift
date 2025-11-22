@@ -4,21 +4,17 @@ import Foundation
 import SwiftUI
 
 protocol ExportModelStateProtocol {
-
     var score: Score { get }
-    var sheetImage: UIImage? { get }
+    var sheetImages: [UIImage]? { get }
+    var sheetImageURLs: [URL]? { get }
     var audioURL: URL? { get }
-    var sheetURL: URL? { get }
     var keyDescription: String { get }
     var dateString: String { get }
-    var imageName: String { get }
 }
 
 protocol ExportModelActionProtocol: AnyObject {
-    func updateSheetImage(_ image: UIImage?)
+    func updateSheetImages(_ images: [UIImage]?, _ urls: [URL]?)
     func updateAudioURL(_ url: URL?)
-    func updateSheetURL(_ url: URL?)
-    func readScore(_ perform: (Score) -> Void)
 }
 
 @Observable
@@ -26,11 +22,10 @@ final class ExportModel:
     ExportModelStateProtocol,
     ExportModelActionProtocol
 {
-
     private(set) var score: Score
-    private(set) var sheetImage: UIImage?
+    private(set) var sheetImages: [UIImage]?
+    private(set) var sheetImageURLs: [URL]?
     private(set) var audioURL: URL?
-    private(set) var sheetURL: URL?
 
     var keyDescription: String {
         "\(score.key.description) Key"
@@ -40,31 +35,20 @@ final class ExportModel:
         Self.dateFormatter.string(from: .now)
     }
 
-    var imageName: String {
-        "DummyScore"
-    }
-
     init(score: Score) {
         self.score = score
-        self.sheetImage = nil
+        self.sheetImages = nil
+        self.sheetImageURLs = nil
         self.audioURL = nil
-        self.sheetURL = nil
     }
 
-    func updateSheetImage(_ image: UIImage?) {
-        self.sheetImage = image
+    func updateSheetImages(_ images: [UIImage]?, _ urls: [URL]?) {
+        self.sheetImages = images
+        self.sheetImageURLs = urls
     }
 
     func updateAudioURL(_ url: URL?) {
         self.audioURL = url
-    }
-
-    func updateSheetURL(_ url: URL?) {
-        self.sheetURL = url
-    }
-
-    func readScore(_ perform: (Score) -> Void) {
-        perform(score)
     }
 }
 

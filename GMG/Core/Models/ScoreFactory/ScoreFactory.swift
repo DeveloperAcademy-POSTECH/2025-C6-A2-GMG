@@ -10,7 +10,10 @@ enum ScoreFactoryError: Error {
     case failedToChordInference
 }
 
-enum ScoreFactoryState: Int, CaseIterable, CustomStringConvertible,
+enum ScoreFactoryState:
+    Int,
+    CaseIterable,
+    CustomStringConvertible,
     CustomLocalizedStringResourceConvertible
 {
     case hummingAnalysis
@@ -76,28 +79,23 @@ final class ScoreFactory {
 
         scoreFactoryStatePublisher.send(.sheetMusicExtraction)
 
-        let mergedChordCells: [ChordCell] = mergeConsecutiveChordCells(chordCells)
-
         let file: AVAudioFile = try AVAudioFile(forReading: copiedAudioURL)
         let totalDuration: TimeInterval =
             TimeInterval(file.length) / file.fileFormat.sampleRate
 
-        var filteredChordCells: [ChordCell] = mergedChordCells.filter {
-            chordCell in
-            chordCell.startTime <= totalDuration
-        }
-
-        /// 첫 번째 코드를 0초에 재생되도록 변경
-        if let firstChordCell: ChordCell = filteredChordCells.first,
-            firstChordCell.startTime > TimeInterval.zero
-        {
-            let newChordCell: ChordCell = ChordCell(
-                chord: firstChordCell.chord,
-                chordCandidates: firstChordCell.chordCandidates,
-                startTime: .zero
-            )
-            filteredChordCells = [newChordCell] + filteredChordCells[1...]
-        }
+        let minimumChordDuration: TimeInterval = Constants.segmentDuration * 0.08
+        let processedChordCells: [ChordCell] =
+            chordCells
+            .filter { chordCell in
+                chordCell.startTime <= totalDuration
+            }
+            .mergeConsecutive()
+            .alignFirstStartTimeToZero()
+            .calculateDuration(totalDuration)
+            .filter { chordCell in
+                chordCell.duration > minimumChordDuration
+            }
+            .calculateDuration(totalDuration)
 
         let audioLevels: [Float] = try AudioLevelMeter.calculateLevel(from: copiedAudioURL)
 
@@ -109,7 +107,7 @@ final class ScoreFactory {
             createdAt: Date(),
             updatedAt: Date(),
             notes: notes,
-            chordCells: filteredChordCells,
+            chordCells: processedChordCells,
             audioLevels: audioLevels,
             isDeleted: false
         )
@@ -136,22 +134,6 @@ final class ScoreFactory {
         }
 
         return notes
-    }
-
-    private func mergeConsecutiveChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
-        var mergedChordCells: [ChordCell] = []
-
-        for chordCell in chordCells {
-            if let lastMergedChordCell = mergedChordCells.last,
-                lastMergedChordCell.chord == chordCell.chord
-            {
-                continue
-            } else {
-                mergedChordCells.append(chordCell)
-            }
-        }
-
-        return mergedChordCells
     }
 }
 
@@ -185,5 +167,66 @@ extension SwiftF0.Note {
         )
 
         return note
+    }
+}
+
+extension Array where Element == ChordCell {
+    fileprivate func mergeConsecutive() -> Self {
+        return
+            self
+            .reduce(into: []) { merged, cell in
+                if merged.last?.chord != cell.chord {
+                    merged.append(cell)
+                }
+            }
+    }
+}
+
+extension Array where Element == ChordCell {
+    fileprivate func alignFirstStartTimeToZero() -> Self {
+        return
+            self
+            .enumerated()
+            .map { index, cell in
+                guard index == 0, cell.startTime > 0 else { return cell }
+
+                return ChordCell(
+                    chord: cell.chord, chordCandidates: cell.chordCandidates, startTime: 0.0,
+                    duration: cell.duration)
+            }
+    }
+}
+
+extension Array where Element == ChordCell {
+    fileprivate func calculateDuration(_ totalDuration: TimeInterval) -> Self {
+        return
+            self
+            .sorted(by: { $0.startTime < $1.startTime })
+            .enumerated()
+            .compactMap { index, cell in
+                let nextStartTime: TimeInterval =
+                    if self.indices.contains(index + 1) {
+                        self[index + 1].startTime
+                    } else {
+                        totalDuration
+                    }
+
+                let currentCell: ChordCell = self[index]
+
+                guard currentCell.startTime <= nextStartTime, nextStartTime <= totalDuration else {
+                    return nil
+                }
+
+                let duration: TimeInterval = nextStartTime - currentCell.startTime
+
+                let newCell: ChordCell = .init(
+                    chord: currentCell.chord,
+                    chordCandidates: currentCell.chordCandidates,
+                    startTime: currentCell.startTime,
+                    duration: duration
+                )
+
+                return newCell
+            }
     }
 }

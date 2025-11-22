@@ -13,11 +13,17 @@ protocol ScoreAudioRenderer {
     func renderToAudioFile(fileName: String?) throws -> URL
 }
 
+extension ScoreAudioRenderer {
+    func renderToAudioFile() throws -> URL {
+        try renderToAudioFile(fileName: nil)
+    }
+}
+
 final class DefaultScoreAudioRenderer: ScoreAudioEngineBase, ScoreAudioRenderer {
 
     // MARK: - Rendering
 
-    func renderToAudioFile(fileName: String? = nil) throws -> URL {
+    func renderToAudioFile(fileName: String?) throws -> URL {
 
         try prepareToExport()
 

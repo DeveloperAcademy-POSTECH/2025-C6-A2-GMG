@@ -58,15 +58,18 @@ enum ScoreSchemaV1: VersionedSchema {
         @Relationship(deleteRule: .cascade) var chord: Chord? = nil
         @Relationship(deleteRule: .cascade) var chordCandidates: [Chord] = []
         var startTime: TimeInterval = TimeInterval.zero
+        var duration: TimeInterval = TimeInterval.zero
 
         init(
             chord: Chord?,
             chordCandidates: [Chord],
-            startTime: TimeInterval
+            startTime: TimeInterval,
+            duration: TimeInterval
         ) {
             self.chord = chord
             self.chordCandidates = chordCandidates
             self.startTime = startTime
+            self.duration = duration
         }
     }
 
