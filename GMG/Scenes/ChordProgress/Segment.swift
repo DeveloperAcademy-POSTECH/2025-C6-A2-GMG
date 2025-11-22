@@ -77,6 +77,8 @@ struct Segment: View {
                         if let chord = slice.chordCell.chord {
                             ChordCellButton(
                                 chord: chord,
+                                isShowDescription: widthRatio
+                                    >= Constants.minimumChordCellWidthRatio,
                                 isCurrentChord: currentChordCell?.startTime
                                     == slice.chordCell.startTime,
                                 isSelected: selectedChordCell?.startTime
@@ -213,6 +215,7 @@ struct Segment: View {
 
     struct ChordCellButton: View {
         let chord: Chord
+        let isShowDescription: Bool
         let isCurrentChord: Bool
         let isSelected: Bool
         let action: () -> Void
@@ -259,10 +262,29 @@ struct Segment: View {
             Button {
                 action()
             } label: {
-                ViewThatFits(in: .horizontal) {
-                    /// CASE 1: one line
-                    Text(chord.description)
-                        .font(Typography.WantedSansStd.R7)
+                if isShowDescription {
+                    ViewThatFits(in: .horizontal) {
+                        /// CASE 1: one line
+                        Text(chord.description)
+                            .font(Typography.WantedSansStd.R7)
+                            .foregroundStyle(
+                                foregroundColor
+                            )
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: .infinity
+                            )
+                            .background(
+                                backgroundColor,
+                                in: RoundedRectangle(cornerRadius: 12)
+                            )
+
+                        /// CASE 2: multi line (여유공간 있는 상태)
+                        VStack(alignment: .center) {
+                            Text("\(chord.root.description)\n\(chord.quality.description)")
+                                .multilineTextAlignment(.center)
+                        }
+                        .font(Typography.WantedSansStd.R5)
                         .foregroundStyle(
                             foregroundColor
                         )
@@ -275,41 +297,24 @@ struct Segment: View {
                             in: RoundedRectangle(cornerRadius: 12)
                         )
 
-                    /// CASE 2: multi line (여유공간 있는 상태)
-                    VStack(alignment: .center) {
-                        Text("\(chord.root.description)\n\(chord.quality.description)")
-                            .multilineTextAlignment(.center)
+                        /// CASE 3: multi line (여유공간 없는 상태)
+                        VStack(alignment: .center) {
+                            Text("\(chord.root.description)\n\(chord.quality.description)")
+                                .multilineTextAlignment(.center)
+                        }
+                        .font(Typography.WantedSansStd.R1)
+                        .foregroundStyle(
+                            foregroundColor
+                        )
+                        .frame(
+                            maxWidth: .infinity,
+                            maxHeight: .infinity
+                        )
+                        .background(
+                            backgroundColor,
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
                     }
-                    .font(Typography.WantedSansStd.R5)
-                    .foregroundStyle(
-                        foregroundColor
-                    )
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
-                    .background(
-                        backgroundColor,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
-
-                    /// CASE 3: multi line (여유공간 없는 상태)
-                    VStack(alignment: .center) {
-                        Text("\(chord.root.description)\n\(chord.quality.description)")
-                            .multilineTextAlignment(.center)
-                    }
-                    .font(Typography.WantedSansStd.R1)
-                    .foregroundStyle(
-                        foregroundColor
-                    )
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
-                    .background(
-                        backgroundColor,
-                        in: RoundedRectangle(cornerRadius: 12)
-                    )
                 }
             }
             .frame(

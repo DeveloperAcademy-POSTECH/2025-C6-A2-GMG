@@ -207,7 +207,7 @@ extension Score {
                         Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 11.3
+                    startTime: 10.3
                 ),
                 ChordCell(
                     chord: Chord(root: .Bb, quality: .maj),
@@ -216,7 +216,16 @@ extension Score {
                         Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 13.0
+                    startTime: 14.8
+                ),
+                ChordCell(
+                    chord: Chord(root: .Gs, quality: .halfDim7),
+                    chordCandidates: [
+                        Chord(root: .Bb, quality: .maj), Chord(root: .D, quality: .maj),
+                        Chord(root: .Ab, quality: .maj), Chord(root: .Gb, quality: .maj),
+                        Chord(root: .Eb, quality: .maj),
+                    ],
+                    startTime: 19.5
                 ),
             ],
             audioLevels: [
