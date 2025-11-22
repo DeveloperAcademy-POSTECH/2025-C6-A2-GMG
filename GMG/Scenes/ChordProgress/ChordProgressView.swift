@@ -349,7 +349,11 @@ extension ChordProgressView {
                     isEditMode = true
                 }
             }
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .inset(by: isEditMode ? 0.2 : 0)
+                    .fill(.white1)
+            )
             .animation(.default, value: isEditMode)
         }
 
@@ -403,7 +407,7 @@ extension ChordProgressView {
                         .background {
                             if isSelected {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.blue4)
+                                    .fill(Color.blue6)
                                     .matchedGeometryEffect(
                                         id: "Background",
                                         in: namespace
@@ -439,6 +443,14 @@ extension ChordProgressView {
             }
         }
 
+        private var muteIcon: Image {
+            if isMuted {
+                return Image(systemName: "music.note")
+            } else {
+                return Image(.waveform)
+            }
+        }
+
         var body: some View {
             Grid {
                 GridRow {
@@ -462,9 +474,10 @@ extension ChordProgressView {
                     ControllerButton {
                         muteAction(!isMuted)
                     } label: {
-                        Image(isMuted ? .waveform : .piano)
+                        muteIcon
                             .renderingMode(.template)
                             .frame(width: 24, height: 24)
+                            .font(.system(size: 22, weight: .semibold))
                     }
                     .gridCellColumns(1)
                 }
