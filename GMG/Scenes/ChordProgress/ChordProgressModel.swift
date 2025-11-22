@@ -130,7 +130,7 @@ final class ChordProgressModel:
     /// 스코어 전체에 대해 세그먼트별 코드 조각을 다시 계산한다.
     private func rebuildSegmentSlices() {
         let chordCells = score.retrieveAllChordCells()
-        let segmentCount = Int(ceil(score.totalDuration / ChordProgressConstants.segmentDuration))
+        let segmentCount = Int(ceil(score.totalDuration / Constants.segmentDuration))
 
         guard segmentCount > 0 else {
             segmentSlices = []
@@ -145,7 +145,7 @@ final class ChordProgressModel:
                     index: index,
                     chordCells: chordCells,
                     totalDuration: score.totalDuration,
-                    segmentDuration: ChordProgressConstants.segmentDuration
+                    segmentDuration: Constants.segmentDuration
                 ))
         }
 
