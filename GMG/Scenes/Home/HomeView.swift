@@ -422,10 +422,7 @@ extension HomeView {
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette
                             )
-                            .matchedTransitionSource(id: score.id, in: namespace) { config in
-                                config
-                                    .clipShape(RoundedRectangle(cornerRadius: 32))
-                            }
+                            .matchedTransitionSource(id: score.id, in: namespace)
                         }
                     }
                 }
@@ -589,10 +586,7 @@ extension HomeView {
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette
                             )
-                            .matchedTransitionSource(id: score.id, in: namespace) { config in
-                                config
-                                    .clipShape(RoundedRectangle(cornerRadius: 32))
-                            }
+                            .matchedTransitionSource(id: score.id, in: namespace)
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
                     }
