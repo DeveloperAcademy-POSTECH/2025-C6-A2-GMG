@@ -54,13 +54,14 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
 
     /// onAppear 시 실행될 메서드
     func prepareToPlay() throws {
-        try activateAudioSession()
-
         attachNodes()
-        try loadAudioFile(score.audioURL)
+
+        try activateAudioSession()
         try engine.start()
 
-        scheduleAudioFile(from: .zero)
+        try loadAudioFile(score.audioURL)
+
+        // 코드 재생 준비
         try loadSoundBank()
         prepareChordCells()
 
@@ -94,6 +95,11 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
                 do {
                     try self.activateAudioSession()
                     try self.engine.start()
+
+                    Task {
+                        try? await Task.sleep(for: .seconds(0.1))
+                        try? self.loadSoundBank()
+                    }
                 } catch {
                     Logger.error(String(describing: error))
                 }
@@ -110,7 +116,6 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
     }
 
     func play() {
-
         if engine.isRunning == false {
             try? engine.start()
         }
