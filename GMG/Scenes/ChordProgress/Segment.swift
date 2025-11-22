@@ -79,10 +79,8 @@ struct Segment: View {
                                 chord: chord,
                                 isShowDescription: widthRatio
                                     >= Constants.minimumChordCellWidthRatio,
-                                isCurrentChord: currentChordCell?.startTime
-                                    == slice.chordCell.startTime,
-                                isSelected: selectedChordCell?.startTime
-                                    == slice.chordCell.startTime,
+                                isCurrentChord: currentChordCell == slice.chordCell,
+                                isSelected: selectedChordCell == slice.chordCell,
                                 onTapButton: {
                                     segmentHandlers.onTapChordCell(
                                         slice.chordCell,
