@@ -79,34 +79,18 @@ final class ScoreFactory {
 
         scoreFactoryStatePublisher.send(.sheetMusicExtraction)
 
-        let mergedChordCells: [ChordCell] = mergeConsecutiveChordCells(chordCells)
-
         let file: AVAudioFile = try AVAudioFile(forReading: copiedAudioURL)
         let totalDuration: TimeInterval =
             TimeInterval(file.length) / file.fileFormat.sampleRate
 
-        var filteredChordCells: [ChordCell] = mergedChordCells.filter {
-            chordCell in
-            chordCell.startTime <= totalDuration
-        }
-
-        /// 첫 번째 코드를 0초에 재생되도록 변경
-        if let firstChordCell: ChordCell = filteredChordCells.first,
-            firstChordCell.startTime > TimeInterval.zero
-        {
-            let newChordCell: ChordCell = ChordCell(
-                chord: firstChordCell.chord,
-                chordCandidates: firstChordCell.chordCandidates,
-                startTime: .zero,
-                duration: .zero
-            )
-            filteredChordCells = [newChordCell] + filteredChordCells[1...]
-        }
-
-        /// 최소 코드 길이
-        let minimumChordDuration: TimeInterval = 5 * 0.03
-        let chordCellsWithDuration: [ChordCell] =
-            filteredChordCells
+        let minimumChordDuration: TimeInterval = 5 * 0.08
+        let processedChordCells: [ChordCell] =
+            chordCells
+            .filter { chordCell in
+                chordCell.startTime <= totalDuration
+            }
+            .mergeConsecutive()
+            .alignFirstStartTimeToZero()
             .calculateDuration(totalDuration)
             .filter { chordCell in
                 chordCell.duration > minimumChordDuration
@@ -123,7 +107,7 @@ final class ScoreFactory {
             createdAt: Date(),
             updatedAt: Date(),
             notes: notes,
-            chordCells: chordCellsWithDuration,
+            chordCells: processedChordCells,
             audioLevels: audioLevels,
             isDeleted: false
         )
@@ -150,22 +134,6 @@ final class ScoreFactory {
         }
 
         return notes
-    }
-
-    private func mergeConsecutiveChordCells(_ chordCells: [ChordCell]) -> [ChordCell] {
-        var mergedChordCells: [ChordCell] = []
-
-        for chordCell in chordCells {
-            if let lastMergedChordCell = mergedChordCells.last,
-                lastMergedChordCell.chord == chordCell.chord
-            {
-                continue
-            } else {
-                mergedChordCells.append(chordCell)
-            }
-        }
-
-        return mergedChordCells
     }
 }
 
@@ -199,6 +167,33 @@ extension SwiftF0.Note {
         )
 
         return note
+    }
+}
+
+extension Array where Element == ChordCell {
+    fileprivate func mergeConsecutive() -> Self {
+        return
+            self
+            .reduce(into: []) { merged, cell in
+                if merged.last?.chord != cell.chord {
+                    merged.append(cell)
+                }
+            }
+    }
+}
+
+extension Array where Element == ChordCell {
+    fileprivate func alignFirstStartTimeToZero() -> Self {
+        return
+            self
+            .enumerated()
+            .map { index, cell in
+                guard index == 0, cell.startTime > 0 else { return cell }
+
+                return ChordCell(
+                    chord: cell.chord, chordCandidates: cell.chordCandidates, startTime: 0.0,
+                    duration: cell.duration)
+            }
     }
 }
 
