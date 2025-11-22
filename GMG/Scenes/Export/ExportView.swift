@@ -35,16 +35,10 @@ struct ExportView: View {
 
                 Spacer()
 
-                Group {
-                    if let sheetImage = model.sheetImages?.first {
-                        Image(uiImage: sheetImage)
-                            .resizable()
-                    } else {
-                        Color.white1
-                    }
+                if let images = model.sheetImages {
+                    ImageCarousel(images: images)
+                        .padding(.horizontal, -Spacing.md)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .frame(width: 178, height: 386)
 
                 Spacer()
 
@@ -112,6 +106,58 @@ extension ExportView {
                 Text(dateString)
                     .font(Typography.WantedSansStd.R4)
                     .foregroundStyle(Color.black5)
+            }
+        }
+    }
+
+    struct ImageCarousel: View {
+        let images: [UIImage]
+
+        @State private var focusedImageIndex: Int? = .zero
+        @State private var screenWidth: CGFloat = .zero
+
+        private let width: CGFloat = 178
+        private let height: CGFloat = 386
+
+        var body: some View {
+            VStack(spacing: Spacing.xl) {
+                ScrollView(.horizontal) {
+                    HStack(spacing: Spacing.lg) {
+                        ForEach(Array(images.enumerated()), id: \.offset) { index, image in
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                                .id(index)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: $focusedImageIndex, anchor: .center)
+                .scrollTargetBehavior(.viewAligned)
+                .scrollBounceBehavior(.basedOnSize)
+                .safeAreaPadding(.horizontal, (screenWidth - width) / 2)
+                .frame(height: height)
+                .onGeometryChange(for: CGFloat.self) { geometry in
+                    geometry.size.width
+                } action: { newValue in
+                    self.screenWidth = newValue
+                }
+
+                HStack {
+                    ForEach(images.indices, id: \.self) { index in
+                        Circle()
+                            .fill(focusedImageIndex == index ? Color.black1 : Color.black3)
+                            .frame(width: 8, height: 8)
+                            .onTapGesture {
+                                withAnimation {
+                                    focusedImageIndex = index
+                                }
+                            }
+                    }
+                }
+                .opacity(images.count > 1 ? 1.0 : 0.0)
             }
         }
     }
