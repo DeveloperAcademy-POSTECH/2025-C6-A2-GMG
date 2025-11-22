@@ -71,22 +71,6 @@ struct HomeView: View {
         } message: {
             Text(.deleteScoreAlertDescription)
         }
-        .alert(
-            .deleteScoreAlertTitle(title: model.scoreToDelete?.title ?? ""),
-            isPresented: .constant(model.scoreToDelete != nil)
-        ) {
-            Button(.delete, role: .destructive) {
-                if let scoreToDelete = model.scoreToDelete {
-                    intent.deleteScore(scoreToDelete)
-                }
-                intent.requestDeleteScoreConfirmation(nil)
-            }
-            Button(.cancel, role: .cancel) {
-                intent.requestDeleteScoreConfirmation(nil)
-            }
-        } message: {
-            Text(.deleteScoreAlertDescription)
-        }
     }
 }
 
