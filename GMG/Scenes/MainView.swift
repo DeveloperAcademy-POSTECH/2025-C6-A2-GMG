@@ -16,8 +16,8 @@ struct MainView: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             router.view(.home)
-                .navigationDestination(for: Route.self) { route in
-                    router.view(route)
+                .navigationDestination(for: RouteWrapper.self) { route in
+                    router.view(route.route, id: route.id, in: route.namespace)
                 }
         }
     }

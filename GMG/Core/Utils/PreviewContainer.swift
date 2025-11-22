@@ -24,8 +24,8 @@ struct PreviewContainer<Content: View>: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             content
-                .navigationDestination(for: Route.self) { route in
-                    router.view(route)
+                .navigationDestination(for: RouteWrapper.self) { route in
+                    router.view(route.route, id: route.id, in: route.namespace)
                 }
         }
     }

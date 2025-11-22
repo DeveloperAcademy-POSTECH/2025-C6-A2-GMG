@@ -52,3 +52,15 @@ extension View {
             .modifier(CompatibleGlassEffect(shape: shape))
     }
 }
+
+extension View {
+    @ViewBuilder
+    func zoomTransition(id: (any Hashable)?, in namespace: Namespace.ID?) -> some View {
+        if let id, let namespace {
+            self
+                .navigationTransition(.zoom(sourceID: id, in: namespace))
+        } else {
+            self
+        }
+    }
+}

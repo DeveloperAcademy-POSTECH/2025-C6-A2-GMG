@@ -21,7 +21,10 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1.ignoresSafeArea()
+            Color.bg1
+                .padding(-Spacing.xxl)
+                .ignoresSafeArea()
+
             VStack {
                 ScrollView {
                     LazyVStack(spacing: Spacing.xl) {
@@ -31,12 +34,12 @@ struct HomeView: View {
                     .safeAreaPadding(Spacing.md)
                 }
                 .scrollIndicators(.hidden)
-                .task {
-                    intent.onAppear()
-                    if let lastScore = model.sortedScores.last {
-                        intent.selectScore(lastScore)
-                    }
-                }
+            }
+        }
+        .task {
+            intent.onAppear()
+            if model.selectedScore == nil, let lastScore = model.sortedScores.last {
+                intent.selectScore(lastScore)
             }
         }
         .onDisappear {
@@ -342,6 +345,9 @@ extension HomeView {
 
     //MARK: - recentFileSection
     struct RecentFileSection: View {
+        @Namespace private var namespace: Namespace.ID
+        private let recordButtonID: String = "RecordButton"
+
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
         let router: Router?
@@ -362,10 +368,11 @@ extension HomeView {
                     LazyHStack(spacing: Spacing.md) {
                         AddScoreButton(
                             action: {
-                                router?.push(.recording)
+                                router?.push(.recording, id: recordButtonID, in: namespace)
                             },
                             isExpanded: model.isScoresEmpty
                         )
+                        .matchedTransitionSource(id: recordButtonID, in: namespace)
 
                         ForEach(
                             Array(model.recentScores.prefix(3).enumerated()),
@@ -388,7 +395,9 @@ extension HomeView {
                                 tapAction: {
                                     intent.onTapScore(score)
                                     router?.push(
-                                        .chordProgress(score: score)
+                                        .chordProgress(score: score),
+                                        id: score.id,
+                                        in: namespace
                                     )
                                 },
                                 playButtonAction: {
@@ -410,7 +419,12 @@ extension HomeView {
                                     intent.requestDeleteScoreConfirmation(score)
                                 },
                                 latestPalette: latestPalette,
-                                earliestPalette: earliestPalette)
+                                earliestPalette: earliestPalette
+                            )
+                            .matchedTransitionSource(id: score.id, in: namespace) { config in
+                                config
+                                    .clipShape(RoundedRectangle(cornerRadius: 32))
+                            }
                         }
                     }
                 }
@@ -441,6 +455,8 @@ extension HomeView {
 
     //MARK: - AllFilesSection
     struct AllFilesSection: View {
+        @Namespace private var namespace: Namespace.ID
+
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
         let router: Router?
@@ -540,7 +556,9 @@ extension HomeView {
                                     if isSelected {
                                         intent.onTapScore(score)
                                         router?.push(
-                                            .chordProgress(score: score)
+                                            .chordProgress(score: score),
+                                            id: score.id,
+                                            in: namespace
                                         )
                                     } else {
                                         intent.selectScore(score)
@@ -570,6 +588,10 @@ extension HomeView {
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette
                             )
+                            .matchedTransitionSource(id: score.id, in: namespace) { config in
+                                config
+                                    .clipShape(RoundedRectangle(cornerRadius: 32))
+                            }
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
                     }
