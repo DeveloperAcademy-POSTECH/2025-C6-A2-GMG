@@ -270,18 +270,14 @@ struct Segment: View {
                                 .font(Typography.WantedSansStd.R7)
 
                             /// CASE 2: multi line (여유공간 있는 상태)
-                            VStack(alignment: .center) {
-                                Text("\(chord.root.description)\n\(chord.quality.description)")
-                                    .multilineTextAlignment(.center)
-                            }
-                            .font(Typography.WantedSansStd.R5)
+                            Text("\(chord.root.description)\n\(chord.quality.description)")
+                                .multilineTextAlignment(.center)
+                                .font(Typography.WantedSansStd.R5)
 
                             /// CASE 3: multi line (여유공간 없는 상태)
-                            VStack(alignment: .center) {
-                                Text("\(chord.root.description)\n\(chord.quality.description)")
-                                    .multilineTextAlignment(.center)
-                            }
-                            .font(Typography.WantedSansStd.R1)
+                            Text("\(chord.root.description)\n\(chord.quality.description)")
+                                .multilineTextAlignment(.center)
+                                .font(Typography.WantedSansStd.R1)
                         }
                         .foregroundStyle(foregroundColor)
                     }
