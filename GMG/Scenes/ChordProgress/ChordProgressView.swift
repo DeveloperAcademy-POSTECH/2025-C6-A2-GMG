@@ -4,6 +4,8 @@ import Foundation
 import SwiftUI
 
 struct ChordProgressView: View {
+    @Namespace private var namespace: Namespace.ID
+
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
     private weak var router: Router?
