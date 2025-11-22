@@ -83,7 +83,7 @@ final class ScoreFactory {
         let totalDuration: TimeInterval =
             TimeInterval(file.length) / file.fileFormat.sampleRate
 
-        let minimumChordDuration: TimeInterval = 5 * 0.08
+        let minimumChordDuration: TimeInterval = Constants.segmentDuration * 0.08
         let processedChordCells: [ChordCell] =
             chordCells
             .filter { chordCell in
