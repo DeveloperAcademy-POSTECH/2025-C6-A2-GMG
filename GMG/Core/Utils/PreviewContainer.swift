@@ -25,7 +25,8 @@ struct PreviewContainer<Content: View>: View {
         NavigationStack(path: $router.path) {
             content
                 .navigationDestination(for: RouteWrapper.self) { route in
-                    router.view(route.route, id: route.id, in: route.namespace)
+                    router.view(route.route)
+                        .zoomTransition(id: route.id, in: route.namespace)
                 }
         }
     }
