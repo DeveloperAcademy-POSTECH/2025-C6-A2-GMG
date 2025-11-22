@@ -50,7 +50,8 @@ struct HomeView: View {
                     BlurUIKitView(
                         maximumBlurRadius: 4,
                         dimmingTintColor: UIColor.bg1,
-                        dimmingAlpha: .constant(alpha: 1)
+                        dimmingAlpha: .constant(alpha: 0.8),
+                        dimmingOvershoot: .relative(fraction: 0.5)
                     )
                     .ignoresSafeArea()
                 }
