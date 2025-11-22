@@ -114,7 +114,7 @@ struct Segment: View {
                 let segmentWidth =
                     proxy.size.width
                     * ((clampedSegmentEndTime - segmentStartTime)
-                        / ChordProgressConstants.segmentDuration)
+                        / Constants.segmentDuration)
 
                 VStack(spacing: Spacing.xs) {
 

@@ -70,20 +70,18 @@ struct CompatibleGlassEffect<S: InsettableShape>: ViewModifier {
     }
 }
 
-extension CompatibleGlassEffect {
-    private class UIBackdropView: UIView {
-        override class var layerClass: AnyClass {
-            NSClassFromString("CABackdropLayer") ?? CALayer.self
-        }
+private class UIBackdropView: UIView {
+    override class var layerClass: AnyClass {
+        NSClassFromString("CABackdropLayer") ?? CALayer.self
+    }
+}
+
+private struct BackdropView: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIBackdropView {
+        UIBackdropView()
     }
 
-    private struct BackdropView: UIViewRepresentable {
-        func makeUIView(context: Context) -> UIBackdropView {
-            UIBackdropView()
-        }
-
-        func updateUIView(_ uiView: UIBackdropView, context: Context) {}
-    }
+    func updateUIView(_ uiView: UIBackdropView, context: Context) {}
 }
 
 #Preview {

@@ -5,7 +5,7 @@ import SwiftUI
 internal import UIKit
 
 protocol ExportIntentProtocol {
-    func onAppear()
+    func onAppear(_ score: Score)
 }
 
 final class ExportIntent: ExportIntentProtocol {
@@ -15,29 +15,34 @@ final class ExportIntent: ExportIntentProtocol {
         self.model = model
     }
 
-    func onAppear() {
-        model.readScore { score in
-            let renderer = ImageRenderer(content: ChordSheetView(score: score))
+    func onAppear(_ score: Score) {
 
-            if let uiImage = renderer.uiImage {
-                model.updateSheetImage(uiImage)
+        let renderer = ImageRenderer(content: ChordSheetView(score: score))
 
-                if let data = uiImage.pngData() {
-                    let fileName = "sheet-\(score.id.uuidString).png"
-                    let url = FileManager.default
-                        .temporaryDirectory
-                        .appendingPathComponent(fileName)
+        if let uiImage = renderer.uiImage {
+            model.updateSheetImage(uiImage)
 
-                    do {
-                        try data.write(to: url)
-                        model.updateSheetURL(url)
-                    } catch {
-                        print("error")
-                    }
+            if let data = uiImage.pngData() {
+                let fileName = "sheet-\(score.id.uuidString).png"
+                let url = FileManager.default
+                    .temporaryDirectory
+                    .appendingPathComponent(fileName)
+
+                do {
+                    try data.write(to: url)
+                    model.updateSheetURL(url)
+                } catch {
+                    print("image render failed: \(error)")
                 }
             }
+        }
 
-            model.updateAudioURL(score.audioURL)
+        do {
+            let renderer: ScoreAudioRenderer = DefaultScoreAudioRenderer(score: score)
+            let renderedURL: URL = try renderer.renderToAudioFile(fileName: "\(score.title).m4a")
+            model.updateAudioURL(renderedURL)
+        } catch {
+            print("offline render failed: \(error)")
         }
     }
 }
