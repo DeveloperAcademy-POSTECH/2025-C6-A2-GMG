@@ -27,9 +27,9 @@ extension View {
 extension View {
     func navigationBar<Leading: View, Center: View, Trailing: View>(
         isBackButtonHidden: Bool = false,
-        @ViewBuilder leading: () -> Leading,
-        @ViewBuilder center: () -> Center,
-        @ViewBuilder trailing: () -> Trailing
+        @ViewBuilder leading: () -> Leading = { EmptyView() },
+        @ViewBuilder center: () -> Center = { EmptyView() },
+        @ViewBuilder trailing: () -> Trailing = { EmptyView() }
     ) -> some View {
         VStack {
             NavigationBar<Leading, Center, Trailing>(

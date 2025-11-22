@@ -283,7 +283,8 @@ extension ChordCell {
         return .init(
             chord: self.chord?.toPersistence(),
             chordCandidates: self.chordCandidates.map { $0.toPersistence() },
-            startTime: self.startTime
+            startTime: self.startTime,
+            duration: self.duration
         )
     }
 }
@@ -293,7 +294,8 @@ extension ScoreSchema.ChordCell {
         return .init(
             chord: self.chord?.toDomain(),
             chordCandidates: self.chordCandidates.map { $0.toDomain() },
-            startTime: self.startTime
+            startTime: self.startTime,
+            duration: self.duration
         )
     }
 }

@@ -144,6 +144,8 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             chordCell.chordCandidates.contains(where: { $0 == candidate })
         else { return }
 
+        scorePlayer.pause()
+
         scorePlayer.play(chord: candidate)
 
         let previousChord: Chord? = chordCell.chord
