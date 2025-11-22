@@ -17,10 +17,10 @@ struct Waveform: View {
     @State private var draggingTime: TimeInterval?
 
     private let capsuleWidth: CGFloat = 3
-    private let capsuleSpacing: CGFloat = 4
-    private let horizontalPadding: CGFloat = 11
-    private let minCapsuleHeight: CGFloat = 6
-    private let maxCapsuleHeight: CGFloat = 21
+    private let capsuleSpacing: CGFloat = 5
+    private let horizontalPadding: CGFloat = 15
+    private let minCapsuleHeight: CGFloat = 4
+    private let maxCapsuleHeight: CGFloat = 15
     private var capsuleUnitWidth: CGFloat {
         capsuleWidth + capsuleSpacing
     }
@@ -50,13 +50,11 @@ struct Waveform: View {
     }
 
     private var capsuleCount: Int {
-        let contentWidth = max(0, width - (horizontalPadding * 2))
-        let unit = capsuleWidth + capsuleSpacing
-        guard unit > 0 else { return max(1, amplitudes.count) }
+        let widthWithoutPadding = max(0, width - (horizontalPadding * 2))
 
-        let count = Int(floor((contentWidth + capsuleSpacing) / unit))
+        let count = Int(floor((widthWithoutPadding + capsuleSpacing) / capsuleUnitWidth))
 
-        return max(1, count)
+        return count
     }
 
     private var preparedAmplitudes: [Float] {
@@ -96,17 +94,10 @@ struct Waveform: View {
             return Array(repeating: value, count: targetCount)
         }
 
-        let paddingOffsetIndex: Float
-        if capsuleUnitWidth > 0 {
-            paddingOffsetIndex = Float(horizontalPadding / capsuleUnitWidth)
-        } else {
-            paddingOffsetIndex = 0
-        }
-
         let maxIndex = max(1, targetCount - 1)
 
         return (0..<targetCount).map { index in
-            let position = (Float(index) + paddingOffsetIndex) / Float(maxIndex)
+            let position = (Float(index)) / Float(maxIndex)
             let normalizedPosition = min(max(position, 0), 1)
             let scaled = normalizedPosition * Float(source.count - 1)
             let lower = Int(floor(scaled))
@@ -118,51 +109,6 @@ struct Waveform: View {
 
             let interpolationFactor = scaled - Float(lower)
             return source[lower] * (1 - interpolationFactor) + source[upper] * interpolationFactor
-        }
-    }
-
-    var body: some View {
-        HStack {
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(backgroundColor)
-
-                CapsuleStack(
-                    amplitudes: preparedAmplitudes,
-                    color: unFilledCapsuleColor,
-                    capsuleWidth: capsuleWidth,
-                    capsuleSpacing: capsuleSpacing,
-                    horizontalPadding: horizontalPadding,
-                    minCapsuleHeight: minCapsuleHeight,
-                    maxCapsuleHeight: maxCapsuleHeight
-                )
-
-                CapsuleStack(
-                    amplitudes: preparedAmplitudes,
-                    color: filledCapsuleColor,
-                    capsuleWidth: capsuleWidth,
-                    capsuleSpacing: capsuleSpacing,
-                    horizontalPadding: horizontalPadding,
-                    minCapsuleHeight: minCapsuleHeight,
-                    maxCapsuleHeight: maxCapsuleHeight
-                )
-                .mask(
-                    HStack(spacing: 0) {
-                        RoundedRectangle(cornerRadius: 12)
-                            .frame(width: progressWidth)
-                        Spacer(minLength: 0)
-                    }
-                )
-            }
-            .frame(width: width)
-            .contentShape(Rectangle())
-            .gesture(dragGesture)
-            .onTapGesture { location in
-                let tappedTime = convertLocationToTime(location.x)
-                onTap(tappedTime)
-            }
-
-            Spacer()
         }
     }
 
@@ -192,6 +138,51 @@ struct Waveform: View {
         let clampedX = min(max(locationX, 0), width)
         let ratio = clampedX / width
         return startTime + ((endTime - startTime) * TimeInterval(ratio))
+    }
+
+    var body: some View {
+        HStack {
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(backgroundColor)
+
+                CapsuleStack(
+                    amplitudes: preparedAmplitudes,
+                    color: unFilledCapsuleColor,
+                    capsuleWidth: capsuleWidth,
+                    capsuleSpacing: capsuleSpacing,
+                    horizontalPadding: horizontalPadding,
+                    minCapsuleHeight: minCapsuleHeight,
+                    maxCapsuleHeight: maxCapsuleHeight
+                )
+
+                CapsuleStack(
+                    amplitudes: preparedAmplitudes,
+                    color: filledCapsuleColor,
+                    capsuleWidth: capsuleWidth,
+                    capsuleSpacing: capsuleSpacing,
+                    horizontalPadding: horizontalPadding,
+                    minCapsuleHeight: minCapsuleHeight,
+                    maxCapsuleHeight: maxCapsuleHeight
+                )
+                .mask(
+                    HStack(spacing: 0) {
+                        RoundedRectangle(cornerRadius: 8)
+                            .frame(width: progressWidth)
+                        Spacer(minLength: 0)
+                    }
+                )
+            }
+            .frame(width: width)
+            .contentShape(Rectangle())
+            .gesture(dragGesture)
+            .onTapGesture { location in
+                let tappedTime = convertLocationToTime(location.x)
+                onTap(tappedTime)
+            }
+
+            Spacer()
+        }
     }
 }
 
@@ -233,7 +224,7 @@ extension Waveform {
         var body: some View {
             HStack(alignment: .center, spacing: capsuleSpacing) {
                 ForEach(Array(amplitudes.enumerated()), id: \.offset) { (index, amplitude) in
-                    Capsule()
+                    RoundedRectangle(cornerRadius: 6)
                         .fill(color)
                         .frame(
                             width: capsuleWidth,
@@ -243,7 +234,6 @@ extension Waveform {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, horizontalPadding)
-
         }
     }
 }
