@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 
 struct SegmentHandlers {
-    let onTapChordCell: (ChordCell) -> Void
+    let onTapChordCell: (ChordCell, TimeInterval) -> Void
     let onTapChordCandidate: (Chord, ChordCell) -> Void
 }
 
@@ -79,13 +79,15 @@ struct Segment: View {
                                 chord: chord,
                                 isShowDescription: widthRatio
                                     >= Constants.minimumChordCellWidthRatio,
-                                isCurrentChord: currentChordCell?.startTime
-                                    == slice.chordCell.startTime,
-                                isSelected: selectedChordCell?.startTime
-                                    == slice.chordCell.startTime
-                            ) {
-                                segmentHandlers.onTapChordCell(slice.chordCell)
-                            }
+                                isCurrentChord: currentChordCell == slice.chordCell,
+                                isSelected: selectedChordCell == slice.chordCell,
+                                onTapButton: {
+                                    segmentHandlers.onTapChordCell(
+                                        slice.chordCell,
+                                        max(slice.chordCell.startTime, segmentStartTime)
+                                    )
+                                }
+                            )
                             .frame(width: cellWidth, height: 62)
                         } else {
                             Rectangle()
@@ -218,7 +220,7 @@ struct Segment: View {
         let isShowDescription: Bool
         let isCurrentChord: Bool
         let isSelected: Bool
-        let action: () -> Void
+        let onTapButton: () -> Void
 
         @Environment(\.editMode) private var editMode
 
@@ -260,7 +262,7 @@ struct Segment: View {
 
         var body: some View {
             Button {
-                action()
+                onTapButton()
             } label: {
                 ZStack {
                     if isShowDescription {
