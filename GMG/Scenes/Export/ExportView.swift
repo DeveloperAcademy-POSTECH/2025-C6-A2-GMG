@@ -148,8 +148,8 @@ extension ExportView {
                 HStack {
                     ForEach(images.indices, id: \.self) { index in
                         Circle()
-                            .fill(focusedImageIndex == index ? Color.black1 : Color.black3)
-                            .frame(width: 8, height: 8)
+                            .fill(focusedImageIndex == index ? Color.black1 : Color.black8)
+                            .frame(width: 6, height: 6)
                             .onTapGesture {
                                 withAnimation {
                                     focusedImageIndex = index
