@@ -151,13 +151,13 @@ extension HomeView {
                     }
 
                     HStack {
-                        Text(Self.dateConverter(score.createdAt))
+                        Text(score.createdAt.formattedDate())
                             .font(Typography.WantedSansStd.R2)
                             .foregroundStyle(Color.white1)
 
                         Spacer()
 
-                        Text(Self.formatDuration(score.totalDuration))
+                        Text(score.totalDuration.formattedTime())
                             .font(Typography.WantedSansStd.R2)
                             .foregroundStyle(Color.white1)
                     }
@@ -258,20 +258,6 @@ extension HomeView {
 
             isTitleFocused = false
             isTitleEditing = false
-        }
-
-        // MARK: - data Helpers
-        private static func dateConverter(_ date: Date) -> String {
-            let formatted = DateFormatter()
-            formatted.dateFormat = "yy. MM. dd"
-            return formatted.string(from: date)
-        }
-
-        private static func formatDuration(_ seconds: Double) -> String {
-            let totalSeconds = Int(seconds.rounded())
-            let minutes = totalSeconds / 60
-            let seconds = totalSeconds % 60
-            return String(format: "%02d:%02d", minutes, seconds)
         }
     }
 
@@ -587,5 +573,25 @@ extension Color {
 
     fileprivate static func earliestColor(index: Int) -> Self {
         return earliestColors[index % earliestColors.count]
+    }
+}
+
+extension Date {
+    fileprivate func formattedDate() -> String {
+        return
+            self
+            .formatted(
+                .dateTime
+                    .year(.twoDigits)
+                    .month(.twoDigits)
+                    .day(.twoDigits)
+            )
+    }
+}
+
+extension TimeInterval {
+    fileprivate func formattedTime() -> String {
+        let duration: Duration = Duration.seconds(self)
+        return duration.formatted(.time(pattern: .minuteSecond(padMinuteToLength: 2)))
     }
 }
