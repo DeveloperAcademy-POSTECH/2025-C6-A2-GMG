@@ -83,9 +83,11 @@ extension HomeView {
         @FocusState private var isTitleFocused: Bool
         @State private var titleDraft: String = ""
 
+        /// 1. index, isSmall, isLatest, latestPalette, earlistPalette 빼기
+        /// 2. 외부에서 크기를 제한, 색상을 주입 받도록 변경
+
         let score: Score
         let index: Int
-        let isSmall: Bool
         let isLatest: Bool
         let isSelected: Bool
         let isPlaying: Bool
@@ -98,6 +100,8 @@ extension HomeView {
         let deleteScoreAction: (Score) -> Void
         let latestPalette: [Color]
         let earliestPalette: [Color]
+
+        var isTitleSmall: Bool = false
 
         var body: some View {
             Button {
@@ -114,7 +118,9 @@ extension HomeView {
                             text: isEditable ? $titleDraft : .constant(score.title)
                         )
                         .multilineTextAlignment(.leading)
-                        .font(isSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5)
+                        .font(
+                            isTitleSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
+                        )
                         .foregroundStyle(Color.white1)
                         .autocorrectionDisabled()
                         .focused($isTitleFocused)
@@ -215,18 +221,19 @@ extension HomeView {
                     }
                 }
                 .padding(Spacing.lg)
-                .frame(
-                    minWidth: isSmall ? 156 : nil,
-                    maxWidth: isSmall ? 156 : .infinity,
-                    minHeight: 128,
-                    maxHeight: 128
-                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(
                     backgroundColor,
                     in: RoundedRectangle(cornerRadius: 32)
                 )
             }
             .buttonStyle(.bouncy)
+        }
+
+        func smallTitleStyle() -> Self {
+            var card = self
+            card.isTitleSmall = true
+            return card
         }
 
         // MARK: - Rename Helpers
@@ -248,7 +255,7 @@ extension HomeView {
 
         // MARK: - Color Helpers
         private var backgroundColor: Color {
-            if isSmall {
+            if isTitleSmall {
                 return latestPalette[index % latestPalette.count]
             } else {
                 return isLatest
@@ -366,7 +373,6 @@ extension HomeView {
                             ScoreCard(
                                 score: score,
                                 index: index,
-                                isSmall: true,
                                 isLatest: model.isLatest,
                                 isSelected: true,
                                 isPlaying: isPlayingForThisScore,
@@ -396,10 +402,14 @@ extension HomeView {
                                     intent.requestDeleteScoreConfirmation(score)
                                 },
                                 latestPalette: latestPalette,
-                                earliestPalette: earliestPalette)
+                                earliestPalette: earliestPalette
+                            )
+                            .smallTitleStyle()
+                            .frame(minWidth: 156)
                         }
                     }
                 }
+                .scrollClipDisabled()
                 .frame(minHeight: 128)
             }
         }
@@ -517,7 +527,6 @@ extension HomeView {
                             ScoreCard(
                                 score: score,
                                 index: index,
-                                isSmall: false,
                                 isLatest: model.isLatest,
                                 isSelected: isSelected,
                                 isPlaying: isPlayingForThisScore,
@@ -556,6 +565,7 @@ extension HomeView {
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette
                             )
+                            .frame(minHeight: 128)
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
                     }
