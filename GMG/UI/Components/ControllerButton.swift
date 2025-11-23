@@ -33,12 +33,27 @@ struct ControllerButton<Label: View>: View {
         }
         .buttonStyle(.bouncy)
     }
+
+    func columns(_ columns: Int) -> some View {
+        self
+            .gridCellColumns(max(1, columns))
+    }
 }
 
 #Preview {
-    ControllerButton {
+    HStack {
+        ControllerButton {
 
-    } label: {
-        Text("Test")
+        } label: {
+            Text("Light")
+        }
+        ControllerButton(isDark: true) {
+
+        } label: {
+            Text("Dark")
+        }
     }
+    .padding()
+    .frame(maxWidth: 320, maxHeight: 160)
+    .background(.gray, in: RoundedRectangle(cornerRadius: 18))
 }

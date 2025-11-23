@@ -310,69 +310,65 @@ struct RecordingView: View {
         }
 
         var body: some View {
-            Grid {
-                GridRow {
-                    if recordingURL != nil {
-                        ControllerButton {
-                            resetAction()
-                        } label: {
-                            VStack(spacing: Spacing.xs) {
-                                Image(.reset)
-                                    .renderingMode(.template)
-                                Text(.reset)
-                                    .font(
-                                        .english(Typography.WantedSansStd.M2),
-                                        .korean(Typography.Pretendard.M5)
-                                    )
-                            }
-                        }
-                        .transition(
-                            .scale(scale: 0.0, anchor: .leading)
-                                .combined(with: .opacity)
-                        )
-                        .gridCellColumns(1)
-                    }
-
-                    ControllerButton(isDark: true) {
-                        primaryButtonAction()
+            ControllerContainer {
+                if recordingURL != nil {
+                    ControllerButton {
+                        resetAction()
                     } label: {
                         VStack(spacing: Spacing.xs) {
-                            Image(primaryButtonImage)
+                            Image(.reset)
                                 .renderingMode(.template)
-                            Text(primaryButtonTitle)
+                            Text(.reset)
                                 .font(
                                     .english(Typography.WantedSansStd.M2),
                                     .korean(Typography.Pretendard.M5)
                                 )
                         }
                     }
-                    .gridCellColumns(2)
+                    .columns(1)
+                    .transition(
+                        .scale(scale: 0.0, anchor: .leading)
+                            .combined(with: .opacity)
+                    )
+                }
 
-                    if recordingURL != nil {
-                        ControllerButton {
-                            nextAction()
-                        } label: {
-                            VStack(spacing: Spacing.xs) {
-                                Image(.next)
-                                    .renderingMode(.template)
-                                Text(.next)
-                                    .font(
-                                        .english(Typography.WantedSansStd.M2),
-                                        .korean(Typography.Pretendard.M5)
-                                    )
-                            }
-                        }
-                        .transition(
-                            .scale(scale: 0.0, anchor: .trailing)
-                                .combined(with: .opacity)
-                        )
-                        .gridCellColumns(1)
+                ControllerButton(isDark: true) {
+                    primaryButtonAction()
+                } label: {
+                    VStack(spacing: Spacing.xs) {
+                        Image(primaryButtonImage)
+                            .renderingMode(.template)
+                        Text(primaryButtonTitle)
+                            .font(
+                                .english(Typography.WantedSansStd.M2),
+                                .korean(Typography.Pretendard.M5)
+                            )
                     }
                 }
+                .columns(2)
+
+                if recordingURL != nil {
+                    ControllerButton {
+                        nextAction()
+                    } label: {
+                        VStack(spacing: Spacing.xs) {
+                            Image(.next)
+                                .renderingMode(.template)
+                            Text(.next)
+                                .font(
+                                    .english(Typography.WantedSansStd.M2),
+                                    .korean(Typography.Pretendard.M5)
+                                )
+                        }
+                    }
+                    .columns(1)
+                    .transition(
+                        .scale(scale: 0.0, anchor: .trailing)
+                            .combined(with: .opacity)
+                    )
+                }
             }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: 140)
-            .compatibleGlassEffect(in: RoundedRectangle(cornerRadius: 18))
+            .frame(height: 140)
             .animation(.default, value: recordingURL)
         }
     }
