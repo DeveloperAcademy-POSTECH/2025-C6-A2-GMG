@@ -452,39 +452,35 @@ extension ChordProgressView {
         }
 
         var body: some View {
-            Grid {
-                GridRow {
-                    ControllerButton {
-                        stopAction()
-                    } label: {
-                        Image(.stop)
-                            .renderingMode(.template)
-                            .frame(width: 24, height: 24)
-                    }
-                    .gridCellColumns(1)
-
-                    ControllerButton(isDark: true) {
-                        primaryButtonAction()
-                    } label: {
-                        Image(primaryButtonImage)
-                            .renderingMode(.template)
-                    }
-                    .gridCellColumns(3)
-
-                    ControllerButton {
-                        muteAction(!isMuted)
-                    } label: {
-                        muteIcon
-                            .renderingMode(.template)
-                            .frame(width: 24, height: 24)
-                            .font(.system(size: 22, weight: .semibold))
-                    }
-                    .gridCellColumns(1)
+            ControllerContainer {
+                ControllerButton {
+                    stopAction()
+                } label: {
+                    Image(.stop)
+                        .renderingMode(.template)
+                        .frame(width: 24, height: 24)
                 }
+                .columns(1)
+
+                ControllerButton(isDark: true) {
+                    primaryButtonAction()
+                } label: {
+                    Image(primaryButtonImage)
+                        .renderingMode(.template)
+                }
+                .columns(3)
+
+                ControllerButton {
+                    muteAction(!isMuted)
+                } label: {
+                    muteIcon
+                        .renderingMode(.template)
+                        .frame(width: 24, height: 24)
+                        .font(.system(size: 22, weight: .semibold))
+                }
+                .columns(1)
             }
-            .padding()
-            .frame(maxHeight: 96)
-            .compatibleGlassEffect(in: RoundedRectangle(cornerRadius: 18))
+            .frame(height: 92)
         }
     }
 
