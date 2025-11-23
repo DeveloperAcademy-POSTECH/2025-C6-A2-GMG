@@ -61,6 +61,11 @@ final class ChordProgressModel:
         self.canRedo = false
         self.segmentSlices = []
 
+        self.currentChordCell =
+            score
+            .retrieveCellIndexBy(time: playhead.elapsedTime)
+            .flatMap { score.retrieveChordCellBy(cellIndex: $0) }
+
         rebuildSegmentSlices()
     }
 
@@ -72,13 +77,10 @@ final class ChordProgressModel:
         if self.playhead != playhead {
             self.playhead = playhead
 
-            if let currentChordCellIndex: Int =
-                score.retrieveCellIndexBy(time: playhead.elapsedTime + 0.01),
-                let currentChordCell: ChordCell =
-                    score.retrieveChordCellBy(cellIndex: currentChordCellIndex)
-            {
-                self.currentChordCell = currentChordCell
-            }
+            self.currentChordCell =
+                score
+                .retrieveCellIndexBy(time: playhead.elapsedTime)
+                .flatMap { score.retrieveChordCellBy(cellIndex: $0) }
         }
     }
 
