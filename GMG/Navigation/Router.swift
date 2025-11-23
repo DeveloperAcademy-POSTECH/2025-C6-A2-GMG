@@ -9,6 +9,18 @@ enum Route: Hashable {
     case export(score: Score)
 }
 
+struct RouteWrapper: Hashable {
+    let route: Route
+    let id: AnyHashable?
+    let namespace: Namespace.ID?
+
+    init(route: Route, id: (any Hashable)? = nil, namespace: Namespace.ID? = nil) {
+        self.route = route
+        self.id = if let id { AnyHashable(id) } else { nil }
+        self.namespace = namespace
+    }
+}
+
 @Observable
 final class Router {
     var path: NavigationPath
@@ -22,7 +34,11 @@ final class Router {
     }
 
     func push(_ route: Route) {
-        path.append(route)
+        path.append(RouteWrapper(route: route, id: nil, namespace: nil))
+    }
+
+    func push(_ route: Route, id: any Hashable, in namespace: Namespace.ID) {
+        path.append(RouteWrapper(route: route, id: id, namespace: namespace))
     }
 
     func pop() {

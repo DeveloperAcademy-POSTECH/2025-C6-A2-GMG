@@ -212,30 +212,56 @@ struct RecordingView: View {
     struct WaveForm: View {
         let audioLevels: [Float]
 
-        private var paddedAudioLevels: [Float] {
-            Array(
-                repeating: .zero,
-                count: max(0, 34 - audioLevels.count)
-            ) + Array(audioLevels.suffix(34))
-        }
+        private let spacing: CGFloat = 7
+        private let capsuleWidth: CGFloat = 3
+        private let capsuleMinHeight: CGFloat = 6
+        private let capsuleMaxHeight: CGFloat = 80
 
         var body: some View {
-            HStack(spacing: Spacing.xs) {
-                ForEach(
-                    Array(paddedAudioLevels.enumerated()),
-                    id: \.offset
-                ) { _, audioLevel in
-                    let height: CGFloat = CGFloat(80 * audioLevel + 10)
+            GeometryReader { geometry in
+                let width: CGFloat = geometry.size.width
 
-                    Capsule()
-                        .foregroundStyle(Color.gray)
-                        .frame(width: 3, height: height)
+                let capsuleCount: Int = Int(width / (capsuleWidth + spacing))
+                let levelsToDraw: [Float] = processLevels(count: capsuleCount)
+
+                Canvas { context, size in
+                    let startX: CGFloat =
+                        (width - CGFloat(capsuleCount) * (capsuleWidth + spacing) + spacing) / 2
+
+                    for (index, level) in levelsToDraw.enumerated() {
+                        let safeLevel: CGFloat = min(max(CGFloat(level), 0.0), 1.0)
+
+                        let barHeight: CGFloat =
+                            safeLevel * (capsuleMaxHeight - capsuleMinHeight) + capsuleMinHeight
+
+                        let xPosition: CGFloat = startX + CGFloat(index) * (capsuleWidth + spacing)
+                        let yPosition: CGFloat = (size.height - barHeight) / 2
+
+                        let rect: CGRect = CGRect(
+                            x: xPosition,
+                            y: yPosition,
+                            width: capsuleWidth,
+                            height: barHeight
+                        )
+
+                        let path: Path = Path(roundedRect: rect, cornerRadius: capsuleWidth / 2)
+                        context.fill(path, with: .color(Color.black4))
+                    }
                 }
             }
+            .frame(height: capsuleMaxHeight)
+            .padding(.horizontal, Spacing.sm)
         }
 
-        private func clampHeight(_ height: CGFloat) -> CGFloat {
-            return min(90, max(10, height))
+        private func processLevels(count: Int) -> [Float] {
+            guard count > 0 else { return [] }
+
+            if audioLevels.count >= count {
+                return Array(audioLevels.suffix(count))
+            } else {
+                let paddingCount = count - audioLevels.count
+                return Array(repeating: 0.0, count: paddingCount) + audioLevels
+            }
         }
     }
 
