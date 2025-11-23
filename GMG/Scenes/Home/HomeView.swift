@@ -85,11 +85,11 @@ extension HomeView {
 
         /// 1. index, isSmall, isLatest, latestPalette, earlistPalette 빼기
         /// 2. 외부에서 크기를 제한, 색상을 주입 받도록 변경
+        /// 3. Playbutton visibility를 외부에서 선택 (isSelected 빼기)
 
         let score: Score
         let index: Int
         let isLatest: Bool
-        let isSelected: Bool
         let isPlaying: Bool
         let progress: Double
         let tapAction: () -> Void
@@ -102,6 +102,7 @@ extension HomeView {
         let earliestPalette: [Color]
 
         var isTitleSmall: Bool = false
+        var playButtonVisibility: Visibility = .visible
 
         var body: some View {
             Button {
@@ -194,8 +195,8 @@ extension HomeView {
                                 .frame(width: 30, height: 30)
                                 .background {
                                     let lineWidth: CGFloat = 3
-                                    let isProgressPresented: Bool =
-                                        isSelected && (isPlaying || progress > 0)
+                                    let isProgressPresented: Bool = isPlaying || progress > 0
+
                                     Circle()
                                         .inset(by: lineWidth / 2)
                                         .fill(Color.white2)
@@ -217,7 +218,8 @@ extension HomeView {
                                 }
                         }
                         .buttonStyle(.bouncy)
-                        .opacity(isSelected ? 1 : 0)
+                        .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
+                        .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
                     }
                 }
                 .padding(Spacing.lg)
@@ -233,6 +235,12 @@ extension HomeView {
         func smallTitleStyle() -> Self {
             var card = self
             card.isTitleSmall = true
+            return card
+        }
+
+        func playButtonVisibility(_ visibility: Visibility) -> Self {
+            var card = self
+            card.playButtonVisibility = visibility
             return card
         }
 
@@ -374,7 +382,6 @@ extension HomeView {
                                 score: score,
                                 index: index,
                                 isLatest: model.isLatest,
-                                isSelected: true,
                                 isPlaying: isPlayingForThisScore,
                                 progress: progressForThisScore,
                                 tapAction: {
@@ -528,7 +535,6 @@ extension HomeView {
                                 score: score,
                                 index: index,
                                 isLatest: model.isLatest,
-                                isSelected: isSelected,
                                 isPlaying: isPlayingForThisScore,
                                 progress: progressForThisScore,
                                 tapAction: {
@@ -565,6 +571,7 @@ extension HomeView {
                                 latestPalette: latestPalette,
                                 earliestPalette: earliestPalette
                             )
+                            .playButtonVisibility(isSelected ? .visible : .hidden)
                             .frame(minHeight: 128)
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
