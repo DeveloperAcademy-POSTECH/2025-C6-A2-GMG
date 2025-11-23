@@ -7,13 +7,13 @@ import SwiftData
 protocol HomeIntentProtocol {
     func onAppear()
     func onDisappear()
-    func setIsLatest(_ isLatest: Bool)
+    func setLatest(_ isLatest: Bool)
     func selectScore(_ score: Score)
-    func renameScore(_ score: Score, newTitle: String)
+    func renameScore(_ score: Score, title: String)
     func requestDeleteScoreConfirmation(_ score: Score?)
     func deleteScore(_ score: Score)
     func onTapScore(_ score: Score)
-    func onTapPlayButton(score: Score, selectedScore: Score?)
+    func onTapPlayButton(_ score: Score)
     func onTapStopButton()
 }
 
@@ -43,27 +43,27 @@ final class HomeIntent: HomeIntentProtocol {
         cleanupPlayer()
     }
 
-    func setIsLatest(_ isLatest: Bool) {
+    func setLatest(_ isLatest: Bool) {
         guard let model else { return }
 
-        model.setIsLatest(isLatest)
+        model.setLatest(isLatest)
     }
 
     func selectScore(_ score: Score) {
+        cleanupPlayer()
+
         guard let model else { return }
 
-        scorePlayer?.stop()
-
-        model.setSelectedScore(score)
+        model.selectScore(score)
     }
 
-    func renameScore(_ score: Score, newTitle: String) {
+    func renameScore(_ score: Score, title: String) {
         do {
-            score.updateTitle(newTitle)
+            guard let model else { return }
+
+            model.updateTitle(score, title: title)
 
             try scoreRepository.update(score)
-
-            model?.updateScore(score)
         } catch {
             Logger.error(String(describing: error))
         }
@@ -86,29 +86,31 @@ final class HomeIntent: HomeIntentProtocol {
     }
 
     func onTapScore(_ score: Score) {
-        guard let model else { return }
-
         do {
-            score.setUpdatedAt(.now)
+            guard let model else { return }
+
+            model.setUpdatedAt(score, updatedAt: .now)
+
             try scoreRepository.update(score)
-            model.updateScore(score)
+
+            model.selectScore(score)
         } catch {
             Logger.error(String(describing: error))
         }
-
-        model.setSelectedScore(score)
     }
 
-    func onTapPlayButton(score: Score, selectedScore: Score?) {
-        if selectedScore?.id != score.id {
-            model?.setSelectedScore(score)
-        }
+    func onTapPlayButton(_ score: Score) {
+        guard let model else { return }
+        model.selectScore(score)
+
         setupPlayer(for: score)
-        scorePlayer?.play()
+
+        guard let scorePlayer else { return }
+        scorePlayer.play()
     }
 
     func onTapStopButton() {
-        scorePlayer?.stop()
+        cleanupPlayer()
     }
 
     private func fetchScores() {
@@ -116,7 +118,8 @@ final class HomeIntent: HomeIntentProtocol {
 
         do {
             let scores: [Score] = try scoreRepository.fetch()
-            model.setAllScores(scores)
+
+            model.setScores(scores)
         } catch {
             Logger.error(String(describing: error))
         }
@@ -127,14 +130,16 @@ final class HomeIntent: HomeIntentProtocol {
 
         do {
             let scorePlayer: ScorePlayer = DefaultScorePlayer(score: score)
+
             try scorePlayer.prepareToPlay()
-            self.scorePlayer = scorePlayer
 
             scorePlayer.playheadPublisher
                 .sink { [weak self] playhead in
                     self?.model?.updatePlayhead(playhead)
                 }
                 .store(in: &cancellables)
+
+            self.scorePlayer = scorePlayer
         } catch {
             Logger.error(String(describing: error))
         }

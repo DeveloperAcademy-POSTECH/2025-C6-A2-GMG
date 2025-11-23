@@ -84,7 +84,7 @@ struct ChordProgressView: View {
                     Button {
                         router?.popToRoot()
                     } label: {
-                        Image("Home")
+                        Image(.home)
                             .renderingMode(.template)
                             .foregroundStyle(
                                 model.isEditMode == false
@@ -161,7 +161,7 @@ extension ChordProgressView {
         private func startTitleEditing() {
             titleDraft = title
             isTitleEditing = true
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 isTitleFieldFocused = true
             }
         }
@@ -186,6 +186,11 @@ extension ChordProgressView {
                 )
                 .focused($isTitleFieldFocused)
                 .submitLabel(.done)
+                .onChange(of: titleDraft) {
+                    if titleDraft.count > Constants.scoreTitleMaxLength {
+                        titleDraft = String(titleDraft.prefix(Constants.scoreTitleMaxLength))
+                    }
+                }
                 .onSubmit {
                     finishEditingTitle()
                 }
