@@ -88,8 +88,6 @@ extension HomeView {
         /// 3. Playbutton visibility를 외부에서 선택 (isSelected 빼기)
 
         let score: Score
-        let index: Int
-        let isLatest: Bool
         let isPlaying: Bool
         let progress: Double
         let tapAction: () -> Void
@@ -98,11 +96,10 @@ extension HomeView {
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
-        let latestPalette: [Color]
-        let earliestPalette: [Color]
 
         var isTitleSmall: Bool = false
         var playButtonVisibility: Visibility = .visible
+        var backgroundColor: Color = .black1
 
         var body: some View {
             Button {
@@ -244,6 +241,12 @@ extension HomeView {
             return card
         }
 
+        func backgroundColor(_ color: Color) -> Self {
+            var card = self
+            card.backgroundColor = color
+            return card
+        }
+
         // MARK: - Rename Helpers
         private func startRename() {
             titleDraft = score.title
@@ -259,17 +262,6 @@ extension HomeView {
 
             isTitleFocused = false
             isEditable = false
-        }
-
-        // MARK: - Color Helpers
-        private var backgroundColor: Color {
-            if isTitleSmall {
-                return latestPalette[index % latestPalette.count]
-            } else {
-                return isLatest
-                    ? latestPalette[index % latestPalette.count]
-                    : earliestPalette[index % earliestPalette.count]
-            }
         }
 
         // MARK: - data Helpers
@@ -380,8 +372,6 @@ extension HomeView {
                                 : 0
                             ScoreCard(
                                 score: score,
-                                index: index,
-                                isLatest: model.isLatest,
                                 isPlaying: isPlayingForThisScore,
                                 progress: progressForThisScore,
                                 tapAction: {
@@ -408,10 +398,9 @@ extension HomeView {
                                 deleteScoreAction: { score in
                                     intent.requestDeleteScoreConfirmation(score)
                                 },
-                                latestPalette: latestPalette,
-                                earliestPalette: earliestPalette
                             )
                             .smallTitleStyle()
+                            .backgroundColor(.latestColor(index: index))
                             .frame(minWidth: 156)
                         }
                     }
@@ -533,8 +522,6 @@ extension HomeView {
 
                             ScoreCard(
                                 score: score,
-                                index: index,
-                                isLatest: model.isLatest,
                                 isPlaying: isPlayingForThisScore,
                                 progress: progressForThisScore,
                                 tapAction: {
@@ -567,11 +554,13 @@ extension HomeView {
                                     if let last = model.sortedScores.last {
                                         intent.selectScore(last)
                                     }
-                                },
-                                latestPalette: latestPalette,
-                                earliestPalette: earliestPalette
+                                }
                             )
                             .playButtonVisibility(isSelected ? .visible : .hidden)
+                            .backgroundColor(
+                                model.isLatest
+                                    ? .latestColor(index: index) : .earliestColor(index: index)
+                            )
                             .frame(minHeight: 128)
                             .padding(.bottom, isSelected ? 60.0 : .zero)
                         }
@@ -583,9 +572,6 @@ extension HomeView {
 
         }
     }
-
-    static let latestPalette: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
-    static let earliestPalette: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
 }
 
 #Preview {
@@ -593,4 +579,17 @@ extension HomeView {
         router.view(.home)
     }
     .environment(\.locale, .init(languageCode: .english))
+}
+
+extension Color {
+    private static let latestColors: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
+    private static let earliestColors: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
+
+    fileprivate static func latestColor(index: Int) -> Self {
+        return latestColors[index % latestColors.count]
+    }
+
+    fileprivate static func earliestColor(index: Int) -> Self {
+        return earliestColors[index % earliestColors.count]
+    }
 }
