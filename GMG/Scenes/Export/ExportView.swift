@@ -114,36 +114,39 @@ extension ExportView {
         let images: [UIImage]
 
         @State private var focusedImageIndex: Int? = .zero
-        @State private var screenWidth: CGFloat = .zero
 
         private let width: CGFloat = 178
         private let height: CGFloat = 386
 
         var body: some View {
             VStack(spacing: Spacing.xl) {
-                ScrollView(.horizontal) {
-                    HStack(spacing: Spacing.lg) {
-                        ForEach(Array(images.enumerated()), id: \.offset) { index, image in
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                GeometryReader { geometry in
+                    let screenWidth: CGFloat = geometry.size.width
+                    ScrollView(.horizontal) {
+                        HStack(spacing: Spacing.lg) {
+                            ForEach(Array(images.enumerated()), id: \.offset) { index, image in
+                                Button {
+                                    focusedImageIndex = index
+                                } label: {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                                }
+                                .buttonStyle(.bouncy)
                                 .id(index)
+                            }
                         }
+                        .scrollTargetLayout()
                     }
-                    .scrollTargetLayout()
+                    .scrollClipDisabled()
+                    .scrollIndicators(.hidden)
+                    .scrollPosition(id: $focusedImageIndex, anchor: .center)
+                    .scrollTargetBehavior(.viewAligned)
+                    .scrollBounceBehavior(.basedOnSize)
+                    .safeAreaPadding(.horizontal, (screenWidth - width) / 2)
                 }
-                .scrollIndicators(.hidden)
-                .scrollPosition(id: $focusedImageIndex, anchor: .center)
-                .scrollTargetBehavior(.viewAligned)
-                .scrollBounceBehavior(.basedOnSize)
-                .safeAreaPadding(.horizontal, (screenWidth - width) / 2)
                 .frame(height: height)
-                .onGeometryChange(for: CGFloat.self) { geometry in
-                    geometry.size.width
-                } action: { newValue in
-                    self.screenWidth = newValue
-                }
 
                 HStack {
                     ForEach(images.indices, id: \.self) { index in
@@ -151,14 +154,13 @@ extension ExportView {
                             .fill(focusedImageIndex == index ? Color.black1 : Color.black8)
                             .frame(width: 6, height: 6)
                             .onTapGesture {
-                                withAnimation {
-                                    focusedImageIndex = index
-                                }
+                                focusedImageIndex = index
                             }
                     }
                 }
                 .opacity(images.count > 1 ? 1.0 : 0.0)
             }
+            .animation(.snappy, value: focusedImageIndex)
         }
     }
 
@@ -210,6 +212,7 @@ extension ExportView {
                         .foregroundStyle(Color.black1)
                 )
             }
+            .buttonStyle(.bouncy)
         }
     }
 }
