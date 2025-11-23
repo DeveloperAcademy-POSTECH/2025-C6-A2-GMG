@@ -184,6 +184,11 @@ extension ChordProgressView {
                 )
                 .focused($isTitleFieldFocused)
                 .submitLabel(.done)
+                .onChange(of: titleDraft) {
+                    if titleDraft.count > Constants.scoreTitleMaxLength {
+                        titleDraft = String(titleDraft.prefix(Constants.scoreTitleMaxLength))
+                    }
+                }
                 .onSubmit {
                     finishEditingTitle()
                 }
