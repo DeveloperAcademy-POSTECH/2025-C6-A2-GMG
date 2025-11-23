@@ -7,4 +7,5 @@ enum Constants {
     static let segmentDuration: TimeInterval = 5.0
     static let minimumChordCellWidthRatio: CGFloat = 0.08
     static let sampleRate: Double = 48_000
+    static let scoreTitleMaxLength: Int = 15
 }

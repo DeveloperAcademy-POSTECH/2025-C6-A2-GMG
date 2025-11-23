@@ -81,7 +81,7 @@ extension HomeView {
     struct ScoreCard: View {
         @State private var isEditable: Bool = false
         @FocusState private var isTitleFocused: Bool
-        @State private var tempTitle: String = ""
+        @State private var titleDraft: String = ""
 
         let score: Score
         let index: Int
@@ -100,148 +100,148 @@ extension HomeView {
         let earliestPalette: [Color]
 
         var body: some View {
-            HStack {
-                VStack(alignment: .leading, spacing: .zero) {
-                    TextField(
-                        LocalizedStringKey(LocalizedStringResource.enterTitle.key),
-                        text: isEditable ? $tempTitle : .constant(score.title)
-                    )
-                    .font(isSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5)
-                    .foregroundStyle(Color.white1)
-                    .autocorrectionDisabled()
-                    .focused($isTitleFocused)
-                    .onSubmit { endRename(commit: true) }
-                    .submitLabel(.done)
-                    .disabled(isEditable == false)
-                    .onChange(of: tempTitle) {
-                        if tempTitle.count > 15 {
-                            tempTitle = String(tempTitle.prefix(15))
-                        }
-                    }
-
-                    Text(Self.dateConverter(score.createdAt))
-                        .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white2)
-
-                    Spacer()
-
-                    Text("\(score.key.description) Key")
-                        .font(Typography.WantedSansStd.R4)
-                        .foregroundStyle(Color.white2)
-                }
-
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: .zero) {
-
-                    Menu {
-                        Button(.rename, systemImage: "pencil") {
-                            startRename()
-                        }
-
-                        Button(.export, systemImage: "square.and.arrow.up") {
-                            exportScoreAction(score)
-                        }
-
-                        Button(.delete, systemImage: "trash", role: .destructive) {
-                            deleteScoreAction(score)
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .foregroundStyle(Color.white1)
-                            .frame(width: 30, height: 30, alignment: .top)
-                            .contentShape(Rectangle())
-                    }
-                    .menuIndicator(.hidden)
-
-                    Text(Self.formatDuration(score.totalDuration))
-                        .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
-                        .padding(.bottom, 9.5)
-                        .padding(.trailing, 1)
-                        .padding(.top, -6)
-
-                    Button {
-                        if isPlaying {
-                            stopButtonAction()
-                        } else {
-                            playButtonAction()
-                        }
-                    } label: {
-                        Image(isPlaying ? .pause : .smallPlay)
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(Color.black1)
-                            .padding(isPlaying ? 0 : 1)
-                            .offset(x: isPlaying ? 0 : 1)
-                            .frame(width: 12, height: 12)
-                            .padding(Spacing.xs)
-                            .background {
-                                let lineWidth: CGFloat = 3
-                                let isProgressPresented: Bool =
-                                    isSelected && (isPlaying || progress > 0)
-                                Circle()
-                                    .inset(by: lineWidth / 2 + 0.2)
-                                    .fill(Color.white2)
-                                    .stroke(
-                                        isProgressPresented ? Color.bg1 : Color.white2,
-                                        lineWidth: lineWidth
-                                    )
-                                    .drawingGroup()
-                                Circle()
-                                    .inset(by: lineWidth / 2)
-                                    .trim(from: 0, to: progress)
-                                    .stroke(
-                                        Color.bg2,
-                                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
-                                    )
-                                    .rotationEffect(.degrees(-90))
-                                    .opacity(isProgressPresented ? 1 : 0)
-                            }
-                    }
-                    .buttonStyle(.bouncy)
-                    .opacity(isSelected ? 1 : 0)
-                }
-            }
-            .padding(Spacing.lg)
-            .frame(
-                minWidth: isSmall ? 156 : nil,
-                maxWidth: isSmall ? 156 : .infinity,
-                minHeight: 128,
-                maxHeight: 128
-            )
-            .background(
-                backgroundColor,
-                in: RoundedRectangle(cornerRadius: 32)
-            )
-            .contentShape(RoundedRectangle(cornerRadius: 32))
-            .onTapGesture {
+            Button {
                 if isEditable {
-                    endRename(commit: true)
+                    endRename()
                 } else {
                     tapAction()
                 }
+            } label: {
+                VStack(spacing: Spacing.xxs) {
+                    HStack {
+                        TextField(
+                            LocalizedStringKey(LocalizedStringResource.enterTitle.key),
+                            text: isEditable ? $titleDraft : .constant(score.title)
+                        )
+                        .multilineTextAlignment(.leading)
+                        .font(isSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5)
+                        .foregroundStyle(Color.white1)
+                        .autocorrectionDisabled()
+                        .focused($isTitleFocused)
+                        .onSubmit { endRename() }
+                        .submitLabel(.done)
+                        .disabled(isEditable == false)
+                        .onChange(of: titleDraft) {
+                            if titleDraft.count > Constants.scoreTitleMaxLength {
+                                titleDraft = String(
+                                    titleDraft.prefix(Constants.scoreTitleMaxLength))
+                            }
+                        }
+
+                        Spacer()
+
+                        Menu {
+                            Button(.rename, systemImage: "pencil") {
+                                startRename()
+                            }
+
+                            Button(.export, systemImage: "square.and.arrow.up") {
+                                exportScoreAction(score)
+                            }
+
+                            Button(.delete, systemImage: "trash", role: .destructive) {
+                                deleteScoreAction(score)
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .foregroundStyle(Color.white1)
+                                .frame(maxWidth: 30, maxHeight: 30)
+                        }
+                        .menuIndicator(.hidden)
+                    }
+
+                    HStack {
+                        Text(Self.dateConverter(score.createdAt))
+                            .font(Typography.WantedSansStd.R2)
+                            .foregroundStyle(Color.white1)
+
+                        Spacer()
+
+                        Text(Self.formatDuration(score.totalDuration))
+                            .font(Typography.WantedSansStd.R2)
+                            .foregroundStyle(Color.white1)
+                    }
+
+                    Spacer()
+
+                    HStack(alignment: .bottom) {
+                        Text("\(score.key.description) Key")
+                            .font(Typography.WantedSansStd.R2)
+                            .foregroundStyle(Color.black6)
+
+                        Spacer()
+
+                        Button {
+                            if isPlaying {
+                                stopButtonAction()
+                            } else {
+                                playButtonAction()
+                            }
+                        } label: {
+                            Image(isPlaying ? .pause : .play)
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 14, height: 14)
+                                .padding(.leading, isPlaying ? 0 : 2)
+                                .foregroundStyle(Color.black1)
+                                .frame(width: 30, height: 30)
+                                .background {
+                                    let lineWidth: CGFloat = 3
+                                    let isProgressPresented: Bool =
+                                        isSelected && (isPlaying || progress > 0)
+                                    Circle()
+                                        .inset(by: lineWidth / 2)
+                                        .fill(Color.white2)
+                                        .stroke(
+                                            isProgressPresented ? Color.bg1 : Color.white2,
+                                            lineWidth: lineWidth
+                                        )
+                                        .drawingGroup()
+                                    Circle()
+                                        .inset(by: lineWidth / 2)
+                                        .trim(from: 0, to: progress)
+                                        .stroke(
+                                            Color.bg2,
+                                            style: StrokeStyle(
+                                                lineWidth: lineWidth, lineCap: .round)
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                        .opacity(isProgressPresented ? 1 : 0)
+                                }
+                        }
+                        .buttonStyle(.bouncy)
+                        .opacity(isSelected ? 1 : 0)
+                    }
+                }
+                .padding(Spacing.lg)
+                .frame(
+                    minWidth: isSmall ? 156 : nil,
+                    maxWidth: isSmall ? 156 : .infinity,
+                    minHeight: 128,
+                    maxHeight: 128
+                )
+                .background(
+                    backgroundColor,
+                    in: RoundedRectangle(cornerRadius: 32)
+                )
             }
+            .buttonStyle(.bouncy)
         }
 
         // MARK: - Rename Helpers
         private func startRename() {
-            tempTitle = score.title
+            titleDraft = score.title
+
             isEditable = true
             Task { @MainActor in
                 isTitleFocused = true
             }
         }
 
-        private func endRename(commit: Bool) {
-            if commit {
-                let newTitle = tempTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                // 빈 문자열로 저장되는 것 방지 + 변경 시에만 저장
-                if !newTitle.isEmpty, newTitle != score.title {
-                    renameScoreAction(newTitle)
-                }
-            }
+        private func endRename() {
+            renameScoreAction(titleDraft)
+
             isTitleFocused = false
             isEditable = false
         }
