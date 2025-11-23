@@ -104,9 +104,7 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
             let chord = chordCell.chord
         else { return }
 
-        // 0초 시킹 시 Playhead가 변하지 않아 선택 상태 갱신이 스킵되는 것을 방지
-        let minSeekTime: TimeInterval = 0.001
-        scorePlayer.seek(to: max(seekTime, minSeekTime))
+        scorePlayer.seek(to: seekTime)
         scorePlayer.play(chord: chord)
         model.selectChordCell(chordCell)
     }
