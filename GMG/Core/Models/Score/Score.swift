@@ -91,7 +91,14 @@ final class Score {
     }
 
     func updateTitle(_ title: String) {
-        self.title = title
+        let trimmedTitle: String = title.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard trimmedTitle.isEmpty == false,
+            trimmedTitle.count <= Constants.scoreTitleMaxLength,
+            self.title != trimmedTitle
+        else { return }
+
+        self.title = trimmedTitle
     }
 
     func setUpdatedAt(_ updatedAt: Date) {
