@@ -57,17 +57,13 @@ struct ChordProgressView: View {
                     intent.onTapCandidateChordCell(chord, in: chordCell, for: model.score)
                 }
 
-                let onTapChordCell: (ChordCell, TimeInterval) -> Void = { chordCell, seekTime in
-                    intent.onTapChordCell(chordCell, seekTime: seekTime)
-                }
-
                 SegmentsScrollView(
                     totalDuration: model.score.totalDuration,
                     segmentSlices: model.segmentSlices,
                     currentChordCell: model.currentChordCell,
                     selectedChordCell: model.selectedChordCell,
                     segmentHandlers: SegmentHandlers(
-                        onTapChordCell: onTapChordCell,
+                        onTapChordCell: intent.onTapChordCell,
                         onTapChordCandidate: onTapChordCandidate
                     ),
                     waveformHandlers: WaveformHandlers(
