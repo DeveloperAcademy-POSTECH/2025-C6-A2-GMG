@@ -88,10 +88,10 @@ extension HomeView {
 
         let score: Score
         let isPlaying: Bool
-        let progress: Double
+        let elapsedTime: Double
         let tapAction: () -> Void
-        let playButtonAction: () -> Void
-        let stopButtonAction: () -> Void
+        let playAction: () -> Void
+        let stopAction: () -> Void
         let renameScoreAction: (String) -> Void
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
@@ -174,46 +174,15 @@ extension HomeView {
 
                         Spacer()
 
-                        Button {
-                            if isPlaying {
-                                stopButtonAction()
-                            } else {
-                                playButtonAction()
-                            }
-                        } label: {
-                            Image(isPlaying ? .pause : .play)
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 14, height: 14)
-                                .padding(.leading, isPlaying ? 0 : 2)
-                                .foregroundStyle(Color.black1)
-                                .frame(width: 30, height: 30)
-                                .background {
-                                    let lineWidth: CGFloat = 3
-                                    let isProgressPresented: Bool = isPlaying || progress > 0
+                        let progress: Double =
+                            score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
 
-                                    Circle()
-                                        .inset(by: lineWidth / 2)
-                                        .fill(Color.white2)
-                                        .stroke(
-                                            isProgressPresented ? Color.bg1 : Color.white2,
-                                            lineWidth: lineWidth
-                                        )
-                                        .drawingGroup()
-                                    Circle()
-                                        .inset(by: lineWidth / 2)
-                                        .trim(from: 0, to: progress)
-                                        .stroke(
-                                            Color.bg2,
-                                            style: StrokeStyle(
-                                                lineWidth: lineWidth, lineCap: .round)
-                                        )
-                                        .rotationEffect(.degrees(-90))
-                                        .opacity(isProgressPresented ? 1 : 0)
-                                }
-                        }
-                        .buttonStyle(.bouncy)
+                        PlaybackButton(
+                            isPlaying: isPlaying,
+                            progress: progress,
+                            playAction: playAction,
+                            stopAction: stopAction
+                        )
                         .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
                         .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
                     }
@@ -262,6 +231,56 @@ extension HomeView {
 
             isTitleFocused = false
             isTitleEditing = false
+        }
+
+        struct PlaybackButton: View {
+            let isPlaying: Bool
+            let progress: Double
+            let playAction: () -> Void
+            let stopAction: () -> Void
+
+            var body: some View {
+                Button {
+                    if isPlaying {
+                        stopAction()
+                    } else {
+                        playAction()
+                    }
+                } label: {
+                    Image(isPlaying ? .pause : .play)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 14, height: 14)
+                        .padding(.leading, isPlaying ? 0 : 2)
+                        .foregroundStyle(Color.black1)
+                        .frame(width: 30, height: 30)
+                        .background {
+                            let lineWidth: CGFloat = 3
+                            let isProgressPresented: Bool = isPlaying || progress > 0
+
+                            Circle()
+                                .inset(by: lineWidth / 2)
+                                .fill(Color.white2)
+                                .stroke(
+                                    isProgressPresented ? Color.bg1 : Color.white2,
+                                    lineWidth: lineWidth
+                                )
+                                .drawingGroup()
+                            Circle()
+                                .inset(by: lineWidth / 2)
+                                .trim(from: 0, to: progress)
+                                .stroke(
+                                    Color.bg2,
+                                    style: StrokeStyle(
+                                        lineWidth: lineWidth, lineCap: .round)
+                                )
+                                .rotationEffect(.degrees(-90))
+                                .opacity(isProgressPresented ? 1 : 0)
+                        }
+                }
+                .buttonStyle(.bouncy)
+            }
         }
     }
 }
@@ -388,29 +407,28 @@ extension HomeView {
                     Array(model.recentScores.prefix(3).enumerated()),
                     id: \.element.id
                 ) { (index, score) in
-                    let isSelected = model.selectedScore == score
-                    let isPlayingForThisScore = isSelected && model.playhead.isPlaying
-                    let progressForThisScore =
-                        (isSelected && score.totalDuration > 0)
-                        ? model.playhead.elapsedTime / score.totalDuration
-                        : 0
+                    let isSelected: Bool = model.selectedScore?.id == score.id
+                    let isPlaying: Bool = isSelected && model.playhead.isPlaying
+                    let elapsedTime: TimeInterval =
+                        isSelected ? model.playhead.elapsedTime : 0.0
+
                     ScoreCard(
                         score: score,
-                        isPlaying: isPlayingForThisScore,
-                        progress: progressForThisScore,
+                        isPlaying: isPlaying,
+                        elapsedTime: elapsedTime,
                         tapAction: {
                             intent.onTapScore(score)
                             router?.push(
                                 .chordProgress(score: score)
                             )
                         },
-                        playButtonAction: {
+                        playAction: {
                             intent.onTapPlayButton(
                                 score: score,
                                 selectedScore: model.selectedScore
                             )
                         },
-                        stopButtonAction: {
+                        stopAction: {
                             intent.onTapStopButton()
                         },
                         renameScoreAction: { newTitle in
@@ -543,18 +561,15 @@ extension HomeView {
                         Array(model.sortedScores.enumerated()),
                         id: \.element.id
                     ) { (index, score) in
-                        let isSelected: Bool =
-                            model.selectedScore?.id == score.id
-                        let isPlayingForThisScore = isSelected && model.playhead.isPlaying
-                        let progressForThisScore =
-                            (isSelected && score.totalDuration > 0)
-                            ? model.playhead.elapsedTime / score.totalDuration
-                            : 0
+                        let isSelected: Bool = model.selectedScore?.id == score.id
+                        let isPlaying: Bool = isSelected && model.playhead.isPlaying
+                        let elapsedTime: TimeInterval =
+                            isSelected ? model.playhead.elapsedTime : 0.0
 
                         ScoreCard(
                             score: score,
-                            isPlaying: isPlayingForThisScore,
-                            progress: progressForThisScore,
+                            isPlaying: isPlaying,
+                            elapsedTime: elapsedTime,
                             tapAction: {
                                 if isSelected {
                                     intent.onTapScore(score)
@@ -565,13 +580,13 @@ extension HomeView {
                                     intent.selectScore(score)
                                 }
                             },
-                            playButtonAction: {
+                            playAction: {
                                 intent.onTapPlayButton(
                                     score: score,
                                     selectedScore: model.selectedScore
                                 )
                             },
-                            stopButtonAction: {
+                            stopAction: {
                                 intent.onTapStopButton()
                             },
                             renameScoreAction: { newTitle in
