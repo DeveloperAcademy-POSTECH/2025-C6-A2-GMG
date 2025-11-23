@@ -25,7 +25,7 @@ struct HomeView: View {
             VStack {
                 ScrollView {
                     LazyVStack(spacing: Spacing.xl) {
-                        RecentFileSection(model: model, intent: intent, router: router)
+                        RecentFilesSection(model: model, intent: intent, router: router)
                         AllFilesSection(model: model, intent: intent, router: router)
                     }
                     .safeAreaPadding(Spacing.md)
@@ -63,6 +63,9 @@ struct HomeView: View {
             Button(.delete, role: .destructive) {
                 if let scoreToDelete = model.scoreToDelete {
                     intent.deleteScore(scoreToDelete)
+                    if let last = model.sortedScores.last {
+                        intent.selectScore(last)
+                    }
                 }
                 intent.requestDeleteScoreConfirmation(nil)
             }
@@ -243,7 +246,8 @@ extension HomeView {
             return card
         }
 
-        // MARK: - Rename Helpers
+        // MARK: - Rename Actions
+
         private func startRename() {
             titleDraft = score.title
 
@@ -260,8 +264,11 @@ extension HomeView {
             isTitleEditing = false
         }
     }
+}
 
-    //MARK: - HeaderSection
+// MARK: - Header Section
+
+extension HomeView {
     struct HeaderSection: View {
         var count: Int
 
@@ -273,53 +280,56 @@ extension HomeView {
                     .padding(.top, 60)
             }
         }
+
+        struct Logo: View {
+            private var reString: AttributedString {
+                var string: AttributedString = AttributedString("Re:")
+                string.foregroundColor = Color.black3
+                return string
+            }
+
+            private var chordString: AttributedString {
+                var string: AttributedString = AttributedString("chord")
+                string.foregroundColor = Color.black1
+                return string
+            }
+
+            var body: some View {
+                Text("\(reString)\n\(chordString)")
+                    .font(Typography.WantedSansStd.B16)
+            }
+        }
+
+        struct SongCount: View {
+            let count: Int
+
+            private var countString: AttributedString {
+                var string: AttributedString = AttributedString("\(count)")
+                string.font = Typography.WantedSansStd.R10.font
+                return string
+            }
+
+            private var unitString: AttributedString {
+                var string: AttributedString = AttributedString("songs")
+                string.font = Typography.WantedSansStd.R7.font
+                return string
+            }
+
+            var body: some View {
+                Text("\(countString) \(unitString)")
+                    .foregroundStyle(Color.black1)
+            }
+        }
     }
+}
 
-    struct Logo: View {
-        private var reString: AttributedString {
-            var string: AttributedString = AttributedString("Re:")
-            string.foregroundColor = Color.black3
-            return string
-        }
+// MARK: - Recent Files Section
 
-        private var chordString: AttributedString {
-            var string: AttributedString = AttributedString("chord")
-            string.foregroundColor = Color.black1
-            return string
-        }
-
-        var body: some View {
-            Text("\(reString)\n\(chordString)")
-                .font(Typography.WantedSansStd.B16)
-        }
-    }
-
-    struct SongCount: View {
-        let count: Int
-
-        private var countString: AttributedString {
-            var string: AttributedString = AttributedString("\(count)")
-            string.font = Typography.WantedSansStd.R10.font
-            return string
-        }
-
-        private var unitString: AttributedString {
-            var string: AttributedString = AttributedString("songs")
-            string.font = Typography.WantedSansStd.R7.font
-            return string
-        }
-
-        var body: some View {
-            Text("\(countString) \(unitString)")
-                .foregroundStyle(Color.black1)
-        }
-    }
-
-    //MARK: - recentFileSection
-    struct RecentFileSection: View {
+extension HomeView {
+    struct RecentFilesSection: View {
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
-        let router: Router?
+        weak var router: Router?
 
         var body: some View {
             VStack(spacing: Spacing.md) {
@@ -330,228 +340,262 @@ extension HomeView {
                             .korean(Typography.Pretendard.SB7)
                         )
                         .foregroundStyle(Color.black1)
+
                     Spacer()
                 }
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Spacing.md) {
-                        AddScoreButton(
-                            action: {
-                                router?.push(.recording)
-                            },
-                            isExpanded: model.isScoresEmpty
-                        )
-
-                        ForEach(
-                            Array(model.recentScores.prefix(3).enumerated()),
-                            id: \.element.id
-                        ) { (index, score) in
-                            let isSelected = model.selectedScore == score
-                            let isPlayingForThisScore = isSelected && model.playhead.isPlaying
-                            let progressForThisScore =
-                                (isSelected && score.totalDuration > 0)
-                                ? model.playhead.elapsedTime / score.totalDuration
-                                : 0
-                            ScoreCard(
-                                score: score,
-                                isPlaying: isPlayingForThisScore,
-                                progress: progressForThisScore,
-                                tapAction: {
-                                    intent.onTapScore(score)
-                                    router?.push(
-                                        .chordProgress(score: score)
-                                    )
-                                },
-                                playButtonAction: {
-                                    intent.onTapPlayButton(
-                                        score: score,
-                                        selectedScore: model.selectedScore
-                                    )
-                                },
-                                stopButtonAction: {
-                                    intent.onTapStopButton()
-                                },
-                                renameScoreAction: { newTitle in
-                                    intent.renameScore(score, newTitle: newTitle)
-                                },
-                                exportScoreAction: { score in
-                                    router?.push(.export(score: score))
-                                },
-                                deleteScoreAction: { score in
-                                    intent.requestDeleteScoreConfirmation(score)
-                                },
-                            )
-                            .smallTitleStyle()
-                            .backgroundColor(.latestColor(index: index))
-                            .frame(minWidth: 156)
+                        AddScoreButton(isExpanded: model.isScoresEmpty) {
+                            router?.push(.recording)
                         }
+
+                        ScoreList(model: model, intent: intent, router: router)
                     }
                 }
                 .scrollClipDisabled()
                 .frame(minHeight: 128)
             }
         }
-    }
 
-    struct AddScoreButton: View {
-        let action: () -> Void
-        let isExpanded: Bool
+        struct AddScoreButton: View {
+            let isExpanded: Bool
+            let action: () -> Void
 
-        var body: some View {
-            Button {
-                action()
-            } label: {
-                Image(systemName: "plus")
-                    .foregroundStyle(Color.black1)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(
-                        Color.white,
-                        in: RoundedRectangle(cornerRadius: 32)
-                    )
+            var body: some View {
+                Button {
+                    action()
+                } label: {
+                    Image(systemName: "plus")
+                        .foregroundStyle(Color.black1)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(
+                            Color.white,
+                            in: RoundedRectangle(cornerRadius: 32)
+                        )
+                }
+                .frame(width: isExpanded ? 156 : 124)
             }
-            .frame(width: isExpanded ? 156 : 124)
+        }
+
+        struct ScoreList: View {
+            let model: HomeModelStateProtocol
+            let intent: HomeIntentProtocol
+            let router: Router?
+
+            var body: some View {
+                ForEach(
+                    Array(model.recentScores.prefix(3).enumerated()),
+                    id: \.element.id
+                ) { (index, score) in
+                    let isSelected = model.selectedScore == score
+                    let isPlayingForThisScore = isSelected && model.playhead.isPlaying
+                    let progressForThisScore =
+                        (isSelected && score.totalDuration > 0)
+                        ? model.playhead.elapsedTime / score.totalDuration
+                        : 0
+                    ScoreCard(
+                        score: score,
+                        isPlaying: isPlayingForThisScore,
+                        progress: progressForThisScore,
+                        tapAction: {
+                            intent.onTapScore(score)
+                            router?.push(
+                                .chordProgress(score: score)
+                            )
+                        },
+                        playButtonAction: {
+                            intent.onTapPlayButton(
+                                score: score,
+                                selectedScore: model.selectedScore
+                            )
+                        },
+                        stopButtonAction: {
+                            intent.onTapStopButton()
+                        },
+                        renameScoreAction: { newTitle in
+                            intent.renameScore(score, newTitle: newTitle)
+                        },
+                        exportScoreAction: { score in
+                            router?.push(.export(score: score))
+                        },
+                        deleteScoreAction: { score in
+                            intent.requestDeleteScoreConfirmation(score)
+                        }
+                    )
+                    .smallTitleStyle()
+                    .backgroundColor(.latestColor(index: index))
+                    .frame(minWidth: 156)
+                }
+            }
         }
     }
+}
 
-    //MARK: - AllFilesSection
+// MARK: - All Files Section
+
+extension HomeView {
     struct AllFilesSection: View {
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
-        let router: Router?
+        weak var router: Router?
 
         var body: some View {
             VStack(spacing: Spacing.md) {
-                HStack(alignment: .lastTextBaseline, spacing: 0) {
+                HStack(alignment: .lastTextBaseline, spacing: 20) {
                     Text(.allFiles)
                         .font(
                             .english(Typography.WantedSansStd.R7),
                             .korean(Typography.Pretendard.SB7)
                         )
                         .foregroundStyle(Color.black1)
-                        .padding(.trailing, 20)
 
-                    Text(.latest)
-                        .font(
-                            .english(Typography.WantedSansStd.R5),
-                            .korean(Typography.Pretendard.M5)
-                        )
-                        .foregroundStyle(
-                            model.isLatest ? Color.black5 : Color.black3
-                        )
-                        .padding(.trailing, 12)
-                        .onTapGesture {
-                            if model.isLatest == false {
-                                intent.setIsLatest(true)
-                                if let last = model.sortedScores.last {
-                                    intent.selectScore(last)
-                                }
+                    HStack(alignment: .lastTextBaseline, spacing: Spacing.sm) {
+                        SortButton(.latest) {
+                            intent.setIsLatest(true)
+                            if let lastScore = model.sortedScores.last {
+                                intent.selectScore(lastScore)
                             }
                         }
+                        .disabled(model.isLatest == true)
 
-                    Text(.earliest)
-                        .font(
-                            .english(Typography.WantedSansStd.R5),
-                            .korean(Typography.Pretendard.M5)
-                        )
-                        .foregroundStyle(
-                            model.isLatest ? Color.black3 : Color.black5
-                        )
-                        .padding(.trailing, 12)
-                        .onTapGesture {
-                            if model.isLatest == true {
-                                intent.setIsLatest(false)
-                                if let last = model.sortedScores.last {
-                                    intent.selectScore(last)
-                                }
+                        SortButton(.earliest) {
+                            intent.setIsLatest(false)
+                            if let lastScore = model.sortedScores.last {
+                                intent.selectScore(lastScore)
                             }
                         }
+                        .disabled(model.isLatest == false)
+                    }
 
                     Spacer()
                 }
 
                 if model.songCount == 0 {
-                    VStack(alignment: .leading, spacing: Spacing.xs) {
-                        Text("An experience")
-                            .foregroundStyle(Color.white3.opacity(0.55))
-                        Text("where humming")
-                            .foregroundStyle(Color.black8.opacity(0.3))
-                        Text("becomes the")
-                            .foregroundStyle(Color.black4.opacity(0.3))
-                        Text("start of a song")
-                            .foregroundStyle(Color.black4.opacity(0.35))
-                    }
-                    .font(
-                        .custom(
-                            Typography.WantedSansStd.Bold,
-                            size: 42
-                        )
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 48)
+                    EmptyScoreBackground()
                 } else {
-                    VStack(spacing: -60) {
-                        ForEach(
-                            Array(model.sortedScores.enumerated()),
-                            id: \.element.id
-                        ) { (index, score) in
-                            let isSelected: Bool =
-                                model.selectedScore?.id == score.id
-                            let isPlayingForThisScore = isSelected && model.playhead.isPlaying
-                            let progressForThisScore =
-                                (isSelected && score.totalDuration > 0)
-                                ? model.playhead.elapsedTime / score.totalDuration
-                                : 0
-
-                            ScoreCard(
-                                score: score,
-                                isPlaying: isPlayingForThisScore,
-                                progress: progressForThisScore,
-                                tapAction: {
-                                    if isSelected {
-                                        intent.onTapScore(score)
-                                        router?.push(
-                                            .chordProgress(score: score)
-                                        )
-                                    } else {
-                                        intent.selectScore(score)
-                                    }
-                                },
-                                playButtonAction: {
-                                    intent.onTapPlayButton(
-                                        score: score,
-                                        selectedScore: model.selectedScore
-                                    )
-                                },
-                                stopButtonAction: {
-                                    intent.onTapStopButton()
-                                },
-                                renameScoreAction: { newTitle in
-                                    intent.renameScore(score, newTitle: newTitle)
-                                },
-                                exportScoreAction: { score in
-                                    router?.push(.export(score: score))
-                                },
-                                deleteScoreAction: { score in
-                                    intent.requestDeleteScoreConfirmation(score)
-                                    if let last = model.sortedScores.last {
-                                        intent.selectScore(last)
-                                    }
-                                }
-                            )
-                            .playButtonVisibility(isSelected ? .visible : .hidden)
-                            .backgroundColor(
-                                model.isLatest
-                                    ? .latestColor(index: index) : .earliestColor(index: index)
-                            )
-                            .frame(minHeight: 128)
-                            .padding(.bottom, isSelected ? 60.0 : .zero)
-                        }
-                    }
-                    .animation(.smooth, value: model.sortedScores)
-                    .animation(.default, value: model.selectedScore)
+                    ScoreList(model: model, intent: intent, router: router)
                 }
             }
+        }
 
+        struct SortButton: View {
+            @Environment(\.isEnabled) private var isEnabled: Bool
+
+            let title: Text
+            let action: () -> Void
+
+            init<S: StringProtocol>(_ title: S, action: @escaping () -> Void) {
+                self.title = Text(title)
+                self.action = action
+            }
+
+            init(_ title: LocalizedStringResource, action: @escaping () -> Void) {
+                self.title = Text(title)
+                self.action = action
+            }
+
+            var body: some View {
+                Button {
+                    action()
+                } label: {
+                    title
+                        .font(
+                            .english(Typography.WantedSansStd.R5),
+                            .korean(Typography.Pretendard.M5)
+                        )
+                        .foregroundStyle(
+                            isEnabled == false ? Color.black5 : Color.black3
+                        )
+                }
+                .buttonStyle(.bouncy)
+            }
+        }
+
+        struct EmptyScoreBackground: View {
+            var body: some View {
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text("An experience")
+                        .foregroundStyle(Color.white3.opacity(0.55))
+                    Text("where humming")
+                        .foregroundStyle(Color.black8.opacity(0.3))
+                    Text("becomes the")
+                        .foregroundStyle(Color.black4.opacity(0.3))
+                    Text("start of a song")
+                        .foregroundStyle(Color.black4.opacity(0.35))
+                }
+                .font(
+                    .custom(Typography.WantedSansStd.Bold, size: 42)
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 48)
+            }
+        }
+
+        struct ScoreList: View {
+            let model: HomeModelStateProtocol
+            let intent: HomeIntentProtocol
+            weak var router: Router?
+
+            var body: some View {
+                VStack(spacing: -60) {
+                    ForEach(
+                        Array(model.sortedScores.enumerated()),
+                        id: \.element.id
+                    ) { (index, score) in
+                        let isSelected: Bool =
+                            model.selectedScore?.id == score.id
+                        let isPlayingForThisScore = isSelected && model.playhead.isPlaying
+                        let progressForThisScore =
+                            (isSelected && score.totalDuration > 0)
+                            ? model.playhead.elapsedTime / score.totalDuration
+                            : 0
+
+                        ScoreCard(
+                            score: score,
+                            isPlaying: isPlayingForThisScore,
+                            progress: progressForThisScore,
+                            tapAction: {
+                                if isSelected {
+                                    intent.onTapScore(score)
+                                    router?.push(
+                                        .chordProgress(score: score)
+                                    )
+                                } else {
+                                    intent.selectScore(score)
+                                }
+                            },
+                            playButtonAction: {
+                                intent.onTapPlayButton(
+                                    score: score,
+                                    selectedScore: model.selectedScore
+                                )
+                            },
+                            stopButtonAction: {
+                                intent.onTapStopButton()
+                            },
+                            renameScoreAction: { newTitle in
+                                intent.renameScore(score, newTitle: newTitle)
+                            },
+                            exportScoreAction: { score in
+                                router?.push(.export(score: score))
+                            },
+                            deleteScoreAction: { score in
+                                intent.requestDeleteScoreConfirmation(score)
+                            }
+                        )
+                        .playButtonVisibility(isSelected ? .visible : .hidden)
+                        .backgroundColor(
+                            model.isLatest
+                                ? .latestColor(index: index) : .earliestColor(index: index)
+                        )
+                        .frame(minHeight: 128)
+                        .padding(.bottom, isSelected ? 60.0 : .zero)
+                    }
+                }
+                .animation(.smooth, value: model.sortedScores)
+                .animation(.default, value: model.selectedScore)
+            }
         }
     }
 }
