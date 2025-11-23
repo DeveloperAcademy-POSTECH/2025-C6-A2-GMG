@@ -21,22 +21,22 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1.ignoresSafeArea()
-            VStack {
-                ScrollView {
-                    LazyVStack(spacing: Spacing.xl) {
-                        RecentFilesSection(model: model, intent: intent, router: router)
-                        AllFilesSection(model: model, intent: intent, router: router)
-                    }
-                    .safeAreaPadding(Spacing.md)
+            Color.bg1
+                .ignoresSafeArea()
+
+            ScrollView {
+                LazyVStack(spacing: Spacing.xl) {
+                    RecentFilesSection(model: model, intent: intent, router: router)
+                    AllFilesSection(model: model, intent: intent, router: router)
                 }
-                .scrollIndicators(.hidden)
-                .task {
-                    intent.onAppear()
-                    if let lastScore = model.sortedScores.last {
-                        intent.selectScore(lastScore)
-                    }
-                }
+                .safeAreaPadding(Spacing.md)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .task {
+            intent.onAppear()
+            if model.selectedScore == nil {
+                selectLastScore()
             }
         }
         .onDisappear {
@@ -63,9 +63,7 @@ struct HomeView: View {
             Button(.delete, role: .destructive) {
                 if let scoreToDelete = model.scoreToDelete {
                     intent.deleteScore(scoreToDelete)
-                    if let last = model.sortedScores.last {
-                        intent.selectScore(last)
-                    }
+                    selectLastScore()
                 }
                 intent.requestDeleteScoreConfirmation(nil)
             }
@@ -76,212 +74,10 @@ struct HomeView: View {
             Text(.deleteScoreAlertDescription)
         }
     }
-}
 
-extension HomeView {
-
-    //MARK: - ScoreCard
-    struct ScoreCard: View {
-        @State private var isTitleEditing: Bool = false
-        @FocusState private var isTitleFocused: Bool
-        @State private var titleDraft: String = ""
-
-        let score: Score
-        let isPlaying: Bool
-        let elapsedTime: Double
-        let tapAction: () -> Void
-        let playAction: () -> Void
-        let stopAction: () -> Void
-        let renameScoreAction: (String) -> Void
-        let exportScoreAction: (Score) -> Void
-        let deleteScoreAction: (Score) -> Void
-
-        var isTitleSmall: Bool = false
-        var playButtonVisibility: Visibility = .visible
-        var backgroundColor: Color = .black1
-
-        var body: some View {
-            Button {
-                if isTitleEditing {
-                    endRename()
-                } else {
-                    tapAction()
-                }
-            } label: {
-                VStack(spacing: Spacing.xxs) {
-                    HStack {
-                        TextField(
-                            LocalizedStringKey(LocalizedStringResource.enterTitle.key),
-                            text: isTitleEditing ? $titleDraft : .constant(score.title)
-                        )
-                        .multilineTextAlignment(.leading)
-                        .font(
-                            isTitleSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
-                        )
-                        .foregroundStyle(Color.white1)
-                        .autocorrectionDisabled()
-                        .focused($isTitleFocused)
-                        .onSubmit { endRename() }
-                        .submitLabel(.done)
-                        .disabled(isTitleEditing == false)
-                        .onChange(of: titleDraft) {
-                            if titleDraft.count > Constants.scoreTitleMaxLength {
-                                titleDraft = String(
-                                    titleDraft.prefix(Constants.scoreTitleMaxLength))
-                            }
-                        }
-
-                        Spacer()
-
-                        Menu {
-                            Button(.rename, systemImage: "pencil") {
-                                startRename()
-                            }
-
-                            Button(.export, systemImage: "square.and.arrow.up") {
-                                exportScoreAction(score)
-                            }
-
-                            Button(.delete, systemImage: "trash", role: .destructive) {
-                                deleteScoreAction(score)
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .foregroundStyle(Color.white1)
-                                .frame(maxWidth: 30, maxHeight: 30)
-                        }
-                        .menuIndicator(.hidden)
-                    }
-
-                    HStack {
-                        Text(score.createdAt.formattedDate())
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.white1)
-
-                        Spacer()
-
-                        Text(score.totalDuration.formattedTime())
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.white1)
-                    }
-
-                    Spacer()
-
-                    HStack(alignment: .bottom) {
-                        Text("\(score.key.description) Key")
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.black6)
-
-                        Spacer()
-
-                        let progress: Double =
-                            score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
-
-                        PlaybackButton(
-                            isPlaying: isPlaying,
-                            progress: progress,
-                            playAction: playAction,
-                            stopAction: stopAction
-                        )
-                        .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
-                        .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
-                    }
-                }
-                .padding(Spacing.lg)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(
-                    backgroundColor,
-                    in: RoundedRectangle(cornerRadius: 32)
-                )
-            }
-            .buttonStyle(.bouncy)
-        }
-
-        func smallTitleStyle() -> Self {
-            var card = self
-            card.isTitleSmall = true
-            return card
-        }
-
-        func playButtonVisibility(_ visibility: Visibility) -> Self {
-            var card = self
-            card.playButtonVisibility = visibility
-            return card
-        }
-
-        func backgroundColor(_ color: Color) -> Self {
-            var card = self
-            card.backgroundColor = color
-            return card
-        }
-
-        // MARK: - Rename Actions
-
-        private func startRename() {
-            titleDraft = score.title
-
-            isTitleEditing = true
-            Task { @MainActor in
-                isTitleFocused = true
-            }
-        }
-
-        private func endRename() {
-            renameScoreAction(titleDraft)
-
-            isTitleFocused = false
-            isTitleEditing = false
-        }
-
-        struct PlaybackButton: View {
-            let isPlaying: Bool
-            let progress: Double
-            let playAction: () -> Void
-            let stopAction: () -> Void
-
-            var body: some View {
-                Button {
-                    if isPlaying {
-                        stopAction()
-                    } else {
-                        playAction()
-                    }
-                } label: {
-                    Image(isPlaying ? .pause : .play)
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 14, height: 14)
-                        .padding(.leading, isPlaying ? 0 : 2)
-                        .foregroundStyle(Color.black1)
-                        .frame(width: 30, height: 30)
-                        .background {
-                            let lineWidth: CGFloat = 3
-                            let isProgressPresented: Bool = isPlaying || progress > 0
-
-                            Circle()
-                                .inset(by: lineWidth / 2)
-                                .fill(Color.white2)
-                                .stroke(
-                                    isProgressPresented ? Color.bg1 : Color.white2,
-                                    lineWidth: lineWidth
-                                )
-                                .drawingGroup()
-                            Circle()
-                                .inset(by: lineWidth / 2)
-                                .trim(from: 0, to: progress)
-                                .stroke(
-                                    Color.bg2,
-                                    style: StrokeStyle(
-                                        lineWidth: lineWidth, lineCap: .round)
-                                )
-                                .rotationEffect(.degrees(-90))
-                                .opacity(isProgressPresented ? 1 : 0)
-                        }
-                }
-                .buttonStyle(.bouncy)
-            }
-        }
+    private func selectLastScore() {
+        guard let last = model.sortedScores.last else { return }
+        intent.selectScore(last)
     }
 }
 
@@ -365,9 +161,10 @@ extension HomeView {
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Spacing.md) {
-                        AddScoreButton(isExpanded: model.isScoresEmpty) {
+                        AddScoreButton {
                             router?.push(.recording)
                         }
+                        .frame(width: model.songCount == 0 ? 156 : 124)
 
                         ScoreList(model: model, intent: intent, router: router)
                     }
@@ -378,7 +175,6 @@ extension HomeView {
         }
 
         struct AddScoreButton: View {
-            let isExpanded: Bool
             let action: () -> Void
 
             var body: some View {
@@ -393,7 +189,7 @@ extension HomeView {
                             in: RoundedRectangle(cornerRadius: 32)
                         )
                 }
-                .frame(width: isExpanded ? 156 : 124)
+                .buttonStyle(.bouncy)
             }
         }
 
@@ -404,7 +200,7 @@ extension HomeView {
 
             var body: some View {
                 ForEach(
-                    Array(model.recentScores.prefix(3).enumerated()),
+                    Array(model.recentScores.enumerated()),
                     id: \.element.id
                 ) { (index, score) in
                     let isSelected: Bool = model.selectedScore?.id == score.id
@@ -416,30 +212,15 @@ extension HomeView {
                         score: score,
                         isPlaying: isPlaying,
                         elapsedTime: elapsedTime,
-                        tapAction: {
+                        tapAction: { score in
                             intent.onTapScore(score)
-                            router?.push(
-                                .chordProgress(score: score)
-                            )
+                            router?.push(.chordProgress(score: score))
                         },
-                        playAction: {
-                            intent.onTapPlayButton(
-                                score: score,
-                                selectedScore: model.selectedScore
-                            )
-                        },
-                        stopAction: {
-                            intent.onTapStopButton()
-                        },
-                        renameScoreAction: { newTitle in
-                            intent.renameScore(score, newTitle: newTitle)
-                        },
-                        exportScoreAction: { score in
-                            router?.push(.export(score: score))
-                        },
-                        deleteScoreAction: { score in
-                            intent.requestDeleteScoreConfirmation(score)
-                        }
+                        playAction: intent.onTapPlayButton,
+                        stopAction: intent.onTapStopButton,
+                        renameScoreAction: intent.renameScore,
+                        exportScoreAction: { router?.push(.export(score: $0)) },
+                        deleteScoreAction: intent.requestDeleteScoreConfirmation
                     )
                     .smallTitleStyle()
                     .backgroundColor(.latestColor(index: index))
@@ -470,7 +251,7 @@ extension HomeView {
 
                     HStack(alignment: .lastTextBaseline, spacing: Spacing.sm) {
                         SortButton(.latest) {
-                            intent.setIsLatest(true)
+                            intent.setLatest(true)
                             if let lastScore = model.sortedScores.last {
                                 intent.selectScore(lastScore)
                             }
@@ -478,7 +259,7 @@ extension HomeView {
                         .disabled(model.isLatest == true)
 
                         SortButton(.earliest) {
-                            intent.setIsLatest(false)
+                            intent.setLatest(false)
                             if let lastScore = model.sortedScores.last {
                                 intent.selectScore(lastScore)
                             }
@@ -570,34 +351,19 @@ extension HomeView {
                             score: score,
                             isPlaying: isPlaying,
                             elapsedTime: elapsedTime,
-                            tapAction: {
+                            tapAction: { score in
                                 if isSelected {
                                     intent.onTapScore(score)
-                                    router?.push(
-                                        .chordProgress(score: score)
-                                    )
+                                    router?.push(.chordProgress(score: score))
                                 } else {
                                     intent.selectScore(score)
                                 }
                             },
-                            playAction: {
-                                intent.onTapPlayButton(
-                                    score: score,
-                                    selectedScore: model.selectedScore
-                                )
-                            },
-                            stopAction: {
-                                intent.onTapStopButton()
-                            },
-                            renameScoreAction: { newTitle in
-                                intent.renameScore(score, newTitle: newTitle)
-                            },
-                            exportScoreAction: { score in
-                                router?.push(.export(score: score))
-                            },
-                            deleteScoreAction: { score in
-                                intent.requestDeleteScoreConfirmation(score)
-                            }
+                            playAction: intent.onTapPlayButton,
+                            stopAction: intent.onTapStopButton,
+                            renameScoreAction: intent.renameScore,
+                            exportScoreAction: { router?.push(.export(score: $0)) },
+                            deleteScoreAction: intent.requestDeleteScoreConfirmation
                         )
                         .playButtonVisibility(isSelected ? .visible : .hidden)
                         .backgroundColor(
@@ -610,6 +376,214 @@ extension HomeView {
                 }
                 .animation(.smooth, value: model.sortedScores)
                 .animation(.default, value: model.selectedScore)
+            }
+        }
+    }
+}
+
+// MARK: - ScoreCard
+
+extension HomeView {
+    struct ScoreCard: View {
+        @State private var isTitleEditing: Bool = false
+        @FocusState private var isTitleFocused: Bool
+        @State private var titleDraft: String = ""
+
+        let score: Score
+        let isPlaying: Bool
+        let elapsedTime: Double
+        let tapAction: (Score) -> Void
+        let playAction: (Score) -> Void
+        let stopAction: () -> Void
+        let renameScoreAction: (Score, String) -> Void
+        let exportScoreAction: (Score) -> Void
+        let deleteScoreAction: (Score) -> Void
+
+        var isTitleSmall: Bool = false
+        var playButtonVisibility: Visibility = .visible
+        var backgroundColor: Color = .black1
+
+        var body: some View {
+            Button {
+                if isTitleEditing {
+                    endRename()
+                } else {
+                    tapAction(score)
+                }
+            } label: {
+                VStack(spacing: Spacing.xxs) {
+                    HStack {
+                        TextField(
+                            LocalizedStringKey(LocalizedStringResource.enterTitle.key),
+                            text: isTitleEditing ? $titleDraft : .constant(score.title)
+                        )
+                        .multilineTextAlignment(.leading)
+                        .font(
+                            isTitleSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
+                        )
+                        .foregroundStyle(Color.white1)
+                        .autocorrectionDisabled()
+                        .focused($isTitleFocused)
+                        .onSubmit { endRename() }
+                        .submitLabel(.done)
+                        .disabled(isTitleEditing == false)
+                        .onChange(of: titleDraft) {
+                            if titleDraft.count > Constants.scoreTitleMaxLength {
+                                titleDraft = String(
+                                    titleDraft.prefix(Constants.scoreTitleMaxLength))
+                            }
+                        }
+
+                        Spacer()
+
+                        Menu {
+                            Button(.rename, systemImage: "pencil") {
+                                startRename()
+                            }
+
+                            Button(.export, systemImage: "square.and.arrow.up") {
+                                exportScoreAction(score)
+                            }
+
+                            Button(.delete, systemImage: "trash", role: .destructive) {
+                                deleteScoreAction(score)
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .foregroundStyle(Color.white1)
+                                .frame(maxWidth: 30, maxHeight: 30)
+                        }
+                        .menuIndicator(.hidden)
+                    }
+
+                    HStack {
+                        Text(score.createdAt.formattedDate())
+                            .font(Typography.WantedSansStd.R2)
+                            .foregroundStyle(Color.white1)
+
+                        Spacer()
+
+                        Text(score.totalDuration.formattedTime())
+                            .font(Typography.WantedSansStd.R2)
+                            .foregroundStyle(Color.white1)
+                    }
+
+                    Spacer()
+
+                    HStack(alignment: .bottom) {
+                        Text("\(score.key.description) Key")
+                            .font(Typography.WantedSansStd.R2)
+                            .foregroundStyle(Color.black6)
+
+                        Spacer()
+
+                        let progress: Double =
+                            score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
+
+                        PlaybackButton(
+                            isPlaying: isPlaying,
+                            progress: progress,
+                            playAction: { playAction(score) },
+                            stopAction: stopAction
+                        )
+                        .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
+                        .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
+                    }
+                }
+                .padding(Spacing.lg)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(
+                    backgroundColor,
+                    in: RoundedRectangle(cornerRadius: 32)
+                )
+            }
+            .buttonStyle(.bouncy)
+        }
+
+        func smallTitleStyle() -> Self {
+            var card = self
+            card.isTitleSmall = true
+            return card
+        }
+
+        func playButtonVisibility(_ visibility: Visibility) -> Self {
+            var card = self
+            card.playButtonVisibility = visibility
+            return card
+        }
+
+        func backgroundColor(_ color: Color) -> Self {
+            var card = self
+            card.backgroundColor = color
+            return card
+        }
+
+        // MARK: - Rename Actions
+
+        private func startRename() {
+            titleDraft = score.title
+
+            isTitleEditing = true
+            Task { @MainActor in
+                isTitleFocused = true
+            }
+        }
+
+        private func endRename() {
+            renameScoreAction(score, titleDraft)
+
+            isTitleFocused = false
+            isTitleEditing = false
+        }
+
+        struct PlaybackButton: View {
+            let isPlaying: Bool
+            let progress: Double
+            let playAction: () -> Void
+            let stopAction: () -> Void
+
+            var body: some View {
+                Button {
+                    if isPlaying {
+                        stopAction()
+                    } else {
+                        playAction()
+                    }
+                } label: {
+                    Image(isPlaying ? .pause : .play)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 14, height: 14)
+                        .padding(.leading, isPlaying ? 0 : 2)
+                        .foregroundStyle(Color.black1)
+                        .frame(width: 30, height: 30)
+                        .background {
+                            let lineWidth: CGFloat = 3
+                            let isProgressPresented: Bool = isPlaying || progress > 0
+
+                            Circle()
+                                .inset(by: lineWidth / 2)
+                                .fill(Color.white2)
+                                .stroke(
+                                    isProgressPresented ? Color.bg1 : Color.white2,
+                                    lineWidth: lineWidth
+                                )
+                                .drawingGroup()
+
+                            Circle()
+                                .inset(by: lineWidth / 2)
+                                .trim(from: 0, to: progress)
+                                .stroke(
+                                    Color.bg2,
+                                    style: StrokeStyle(
+                                        lineWidth: lineWidth, lineCap: .round)
+                                )
+                                .rotationEffect(.degrees(-90))
+                                .opacity(isProgressPresented ? 1 : 0)
+                        }
+                }
+                .buttonStyle(.bouncy)
             }
         }
     }

@@ -4,25 +4,24 @@ import Foundation
 import SwiftData
 
 protocol HomeModelStateProtocol {
-    var selectedScore: Score? { get }
-    var isLatest: Bool { get }
-    var allScores: [Score] { get }
-    var playhead: Playhead { get }
     var songCount: Int { get }
-    var isScoresEmpty: Bool { get }
-    var sortedScores: [Score] { get }
+    var isLatest: Bool { get }
     var recentScores: [Score] { get }
+    var sortedScores: [Score] { get }
+    var selectedScore: Score? { get }
     var scoreToDelete: Score? { get }
+    var playhead: Playhead { get }
 }
 
 protocol HomeModelActionProtocol: AnyObject {
-    func setSelectedScore(_ score: Score?)
-    func setIsLatest(_ isLatest: Bool)
-    func toggleIsLatest()
-    func setAllScores(_ scores: [Score])
-    func updateScore(_ score: Score)
-    func updatePlayhead(_ playhead: Playhead)
+    func setScores(_ scores: [Score])
+    func setLatest(_ isLatest: Bool)
+    func selectScore(_ score: Score?)
     func setScoreToDelete(_ score: Score?)
+    func updatePlayhead(_ playhead: Playhead)
+
+    func updateTitle(_ score: Score, title: String)
+    func setUpdatedAt(_ score: Score, updatedAt: Date)
 }
 
 @Observable
@@ -30,65 +29,65 @@ final class HomeModel:
     HomeModelStateProtocol,
     HomeModelActionProtocol
 {
-    private(set) var selectedScore: Score?
+    private var scores: [Score]
+
     private(set) var isLatest: Bool
-    private(set) var allScores: [Score]
-    private(set) var playhead: Playhead
-    private(set) var scoreToDelete: Score?
-
-    init() {
-        self.selectedScore = nil
-        self.isLatest = true
-        self.allScores = []
-        self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
-        self.scoreToDelete = nil
+    var songCount: Int { scores.count }
+    var recentScores: [Score] {
+        Array(
+            scores
+                .sorted {
+                    ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
+                }
+                .prefix(3)
+        )
     }
-
-    var songCount: Int { allScores.count }
-    var isScoresEmpty: Bool { allScores.isEmpty }
-
     var sortedScores: [Score] {
         let comparator: (Score, Score) -> Bool = {
             self.isLatest
                 ? $0.createdAt > $1.createdAt
                 : $0.createdAt < $1.createdAt
         }
-        return allScores.sorted(by: comparator)
+        return scores.sorted(by: comparator)
+    }
+    private(set) var selectedScore: Score?
+    private(set) var scoreToDelete: Score?
+    private(set) var playhead: Playhead
+
+    init() {
+        self.scores = []
+
+        self.isLatest = true
+        self.selectedScore = nil
+        self.scoreToDelete = nil
+        self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
     }
 
-    var recentScores: [Score] {
-        allScores
-            .sorted {
-                ($0.updatedAt, $0.createdAt) > ($1.updatedAt, $1.createdAt)
-            }
+    func setScores(_ scores: [Score]) {
+        self.scores = scores
     }
 
-    func setSelectedScore(_ score: Score?) {
-        self.selectedScore = score
-    }
-
-    func setIsLatest(_ isLatest: Bool) {
+    func setLatest(_ isLatest: Bool) {
         self.isLatest = isLatest
     }
 
-    func toggleIsLatest() {
-        self.isLatest.toggle()
+    func selectScore(_ score: Score?) {
+        self.selectedScore = score
     }
 
-    func setAllScores(_ scores: [Score]) {
-        self.allScores = scores
-    }
-
-    func updateScore(_ score: Score) {
-        guard let index = allScores.firstIndex(where: { $0.id == score.id }) else { return }
-        allScores[index] = score
+    func setScoreToDelete(_ score: Score?) {
+        self.scoreToDelete = score
     }
 
     func updatePlayhead(_ playhead: Playhead) {
         self.playhead = playhead
     }
 
-    func setScoreToDelete(_ score: Score?) {
-        self.scoreToDelete = score
+    func updateTitle(_ score: Score, title: String) {
+        score.updateTitle(title)
+    }
+
+    func setUpdatedAt(_ score: Score, updatedAt: Date) {
+        score.setUpdatedAt(updatedAt)
     }
 }
