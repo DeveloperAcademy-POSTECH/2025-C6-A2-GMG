@@ -21,15 +21,22 @@ struct ControllerButton<Label: View>: View {
         Button {
             action()
         } label: {
-            label
-                .foregroundStyle(
-                    isDark ? Color.white1 : Color.black1
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(
-                    isDark ? Color.black : Color.white,
-                    in: RoundedRectangle(cornerRadius: 18)
-                )
+            ZStack {
+                label
+                    .transition(.blurReplace)
+            }
+            .geometryGroup()
+            .foregroundStyle(
+                isDark ? Color.white1 : Color.black1
+            )
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity
+            )
+            .background(
+                isDark ? Color.black : Color.white,
+                in: RoundedRectangle(cornerRadius: 18)
+            )
         }
         .buttonStyle(.bouncy)
     }
@@ -41,19 +48,13 @@ struct ControllerButton<Label: View>: View {
 }
 
 #Preview {
-    HStack {
-        ControllerButton {
+    @Previewable @State var isDark: Bool = false
 
-        } label: {
-            Text("Light")
-        }
-        ControllerButton(isDark: true) {
-
-        } label: {
-            Text("Dark")
-        }
+    ControllerButton(isDark: isDark) {
+        isDark.toggle()
+    } label: {
+        Text(isDark ? "Dark" : "Light")
+            .id(isDark)
     }
-    .padding()
     .frame(maxWidth: 320, maxHeight: 160)
-    .background(.gray, in: RoundedRectangle(cornerRadius: 18))
 }

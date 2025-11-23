@@ -344,8 +344,10 @@ struct RecordingView: View {
                                 .korean(Typography.Pretendard.M5)
                             )
                     }
+                    .id(primaryButtonTitle.key)
                 }
                 .columns(2)
+                .animation(.default, value: primaryButtonTitle.key)
 
                 if recordingURL != nil {
                     ControllerButton {
