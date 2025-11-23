@@ -44,18 +44,28 @@ final class ChordProgressModel:
     private(set) var isEditMode: Bool
     private(set) var playhead: Playhead
     private(set) var isMuted: Bool
-    private(set) var currentChordCell: ChordCell?
     private(set) var selectedChordCell: ChordCell?
     private(set) var canUndo: Bool
     private(set) var canRedo: Bool
     private(set) var segmentSlices: [[ChordSegmentSlice]]
+
+    var currentChordCell: ChordCell? {
+        guard
+            let currentChordCellIndex: Int =
+                score.retrieveCellIndexBy(time: playhead.elapsedTime + 0.01),
+            let currentChordCell: ChordCell =
+                score.retrieveChordCellBy(cellIndex: currentChordCellIndex)
+        else {
+            return nil
+        }
+        return currentChordCell
+    }
 
     init(score: Score) {
         self.score = score
         self.isEditMode = false
         self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
         self.isMuted = false
-        self.currentChordCell = nil
         self.selectedChordCell = nil
         self.canUndo = false
         self.canRedo = false
@@ -71,14 +81,6 @@ final class ChordProgressModel:
     func updatePlayhead(_ playhead: Playhead) {
         if self.playhead != playhead {
             self.playhead = playhead
-
-            if let currentChordCellIndex: Int =
-                score.retrieveCellIndexBy(time: playhead.elapsedTime + 0.01),
-                let currentChordCell: ChordCell =
-                    score.retrieveChordCellBy(cellIndex: currentChordCellIndex)
-            {
-                self.currentChordCell = currentChordCell
-            }
         }
     }
 

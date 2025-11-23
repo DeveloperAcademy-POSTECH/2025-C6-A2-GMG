@@ -30,3 +30,12 @@ extension ChordCell {
 extension ChordCell: Codable {}
 
 extension ChordCell: Hashable {}
+
+extension ChordCell: Equatable {
+    static func == (lhs: ChordCell, rhs: ChordCell) -> Bool {
+        lhs.chord == rhs.chord
+            && lhs.chordCandidates == rhs.chordCandidates
+            && lhs.startTime == rhs.startTime
+            && lhs.duration == rhs.duration
+    }
+}
