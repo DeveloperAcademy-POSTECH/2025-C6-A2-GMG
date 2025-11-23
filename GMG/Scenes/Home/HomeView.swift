@@ -79,13 +79,9 @@ extension HomeView {
 
     //MARK: - ScoreCard
     struct ScoreCard: View {
-        @State private var isEditable: Bool = false
+        @State private var isTitleEditing: Bool = false
         @FocusState private var isTitleFocused: Bool
         @State private var titleDraft: String = ""
-
-        /// 1. index, isSmall, isLatest, latestPalette, earlistPalette 빼기
-        /// 2. 외부에서 크기를 제한, 색상을 주입 받도록 변경
-        /// 3. Playbutton visibility를 외부에서 선택 (isSelected 빼기)
 
         let score: Score
         let isPlaying: Bool
@@ -103,7 +99,7 @@ extension HomeView {
 
         var body: some View {
             Button {
-                if isEditable {
+                if isTitleEditing {
                     endRename()
                 } else {
                     tapAction()
@@ -113,7 +109,7 @@ extension HomeView {
                     HStack {
                         TextField(
                             LocalizedStringKey(LocalizedStringResource.enterTitle.key),
-                            text: isEditable ? $titleDraft : .constant(score.title)
+                            text: isTitleEditing ? $titleDraft : .constant(score.title)
                         )
                         .multilineTextAlignment(.leading)
                         .font(
@@ -124,7 +120,7 @@ extension HomeView {
                         .focused($isTitleFocused)
                         .onSubmit { endRename() }
                         .submitLabel(.done)
-                        .disabled(isEditable == false)
+                        .disabled(isTitleEditing == false)
                         .onChange(of: titleDraft) {
                             if titleDraft.count > Constants.scoreTitleMaxLength {
                                 titleDraft = String(
@@ -251,7 +247,7 @@ extension HomeView {
         private func startRename() {
             titleDraft = score.title
 
-            isEditable = true
+            isTitleEditing = true
             Task { @MainActor in
                 isTitleFocused = true
             }
@@ -261,7 +257,7 @@ extension HomeView {
             renameScoreAction(titleDraft)
 
             isTitleFocused = false
-            isEditable = false
+            isTitleEditing = false
         }
 
         // MARK: - data Helpers
