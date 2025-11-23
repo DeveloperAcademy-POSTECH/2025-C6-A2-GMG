@@ -469,8 +469,10 @@ extension ChordProgressView {
                 } label: {
                     Image(primaryButtonImage)
                         .renderingMode(.template)
+                        .id(isPlaying)
                 }
                 .columns(3)
+                .animation(.default, value: isPlaying)
 
                 ControllerButton {
                     muteAction(!isMuted)
@@ -479,8 +481,10 @@ extension ChordProgressView {
                         .renderingMode(.template)
                         .frame(width: 24, height: 24)
                         .font(.system(size: 22, weight: .semibold))
+                        .id(isMuted)
                 }
                 .columns(1)
+                .animation(.default, value: isMuted)
             }
             .frame(height: 92)
         }
