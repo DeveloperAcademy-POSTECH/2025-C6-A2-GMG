@@ -33,7 +33,11 @@ final class Router {
         self.diContainer = diContainer
     }
 
-    func push(_ route: Route, id: (any Hashable)? = nil, in namespace: Namespace.ID? = nil) {
+    func push(_ route: Route) {
+        path.append(RouteWrapper(route: route, id: nil, namespace: nil))
+    }
+
+    func push(_ route: Route, id: any Hashable, in namespace: Namespace.ID) {
         path.append(RouteWrapper(route: route, id: id, namespace: namespace))
     }
 
