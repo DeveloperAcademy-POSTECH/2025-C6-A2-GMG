@@ -22,16 +22,19 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             Color.bg1
+                .padding(-Spacing.xxl)
                 .ignoresSafeArea()
 
-            ScrollView {
-                LazyVStack(spacing: Spacing.xl) {
-                    RecentFilesSection(model: model, intent: intent, router: router)
-                    AllFilesSection(model: model, intent: intent, router: router)
+            VStack {
+                ScrollView {
+                    LazyVStack(spacing: Spacing.xl) {
+                        RecentFilesSection(model: model, intent: intent, router: router)
+                        AllFilesSection(model: model, intent: intent, router: router)
+                    }
+                    .safeAreaPadding(Spacing.md)
                 }
-                .safeAreaPadding(Spacing.md)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
         }
         .task {
             intent.onAppear()
@@ -142,6 +145,9 @@ extension HomeView {
 
 extension HomeView {
     struct RecentFilesSection: View {
+        @Namespace private var namespace: Namespace.ID
+        private let recordButtonID: String = "RecordButton"
+
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
         weak var router: Router?
@@ -162,9 +168,10 @@ extension HomeView {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Spacing.md) {
                         AddScoreButton {
-                            router?.push(.recording)
+                            router?.push(.recording, id: recordButtonID, in: namespace)
                         }
                         .frame(width: model.songCount == 0 ? 156 : 124)
+                        .matchedTransitionSource(id: recordButtonID, in: namespace)
 
                         ScoreList(model: model, intent: intent, router: router)
                     }
@@ -194,6 +201,8 @@ extension HomeView {
         }
 
         struct ScoreList: View {
+            @Namespace private var namespace: Namespace.ID
+
             let model: HomeModelStateProtocol
             let intent: HomeIntentProtocol
             let router: Router?
@@ -214,7 +223,11 @@ extension HomeView {
                         elapsedTime: elapsedTime,
                         tapAction: { score in
                             intent.onTapScore(score)
-                            router?.push(.chordProgress(score: score))
+                            router?.push(
+                                .chordProgress(score: score),
+                                id: score.id,
+                                in: namespace
+                            )
                         },
                         playAction: intent.onTapPlayButton,
                         stopAction: intent.onTapStopButton,
@@ -225,6 +238,7 @@ extension HomeView {
                     .smallTitleStyle()
                     .backgroundColor(.latestColor(index: index))
                     .frame(minWidth: 156)
+                    .matchedTransitionSource(id: score.id, in: namespace)
                 }
             }
         }
@@ -332,6 +346,8 @@ extension HomeView {
         }
 
         struct ScoreList: View {
+            @Namespace private var namespace: Namespace.ID
+
             let model: HomeModelStateProtocol
             let intent: HomeIntentProtocol
             weak var router: Router?
@@ -354,7 +370,11 @@ extension HomeView {
                             tapAction: { score in
                                 if isSelected {
                                     intent.onTapScore(score)
-                                    router?.push(.chordProgress(score: score))
+                                    router?.push(
+                                        .chordProgress(score: score),
+                                        id: score.id,
+                                        in: namespace
+                                    )
                                 } else {
                                     intent.selectScore(score)
                                 }
@@ -371,6 +391,7 @@ extension HomeView {
                                 ? .latestColor(index: index) : .earliestColor(index: index)
                         )
                         .frame(minHeight: 128)
+                        .matchedTransitionSource(id: score.id, in: namespace)
                         .padding(.bottom, isSelected ? 60.0 : .zero)
                     }
                 }
