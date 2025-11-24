@@ -365,6 +365,8 @@ extension ChordProgressView {
         }
 
         struct ToggleButton: View {
+            @Environment(\.locale) private var locale
+
             let title: Text
             let isSelected: Bool
             let namespace: Namespace.ID
@@ -394,6 +396,21 @@ extension ChordProgressView {
                 self.action = action
             }
 
+            private var horizontalPadding: CGFloat {
+                if let code = locale.language.languageCode {
+                    switch code {
+                    case .korean:
+                        return 12
+                    case .english:
+                        return 10
+                    default:
+                        return 10
+                    }
+                } else {
+                    return 10
+                }
+            }
+
             var body: some View {
                 Button {
                     action()
@@ -410,7 +427,8 @@ extension ChordProgressView {
                         .foregroundStyle(
                             isSelected ? Color.white1 : Color.black1
                         )
-                        .padding(Spacing.xs)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, horizontalPadding)
                         .background {
                             if isSelected {
                                 RoundedRectangle(cornerRadius: 8)
@@ -549,5 +567,5 @@ extension ChordProgressView {
     PreviewContainer { router in
         router.view(.chordProgress(score: .mock))
     }
-    .environment(\.locale, .init(languageCode: .english))
+    .environment(\.locale, .init(languageCode: .korean))
 }
