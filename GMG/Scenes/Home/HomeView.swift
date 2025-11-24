@@ -425,103 +425,101 @@ extension HomeView {
         var backgroundColor: Color = .black1
 
         var body: some View {
-            Button {
+            VStack(spacing: Spacing.xxs) {
+                HStack {
+                    TextField(
+                        LocalizedStringKey(LocalizedStringResource.enterTitle.key),
+                        text: isTitleEditing ? $titleDraft : .constant(score.title)
+                    )
+                    .multilineTextAlignment(.leading)
+                    .font(
+                        isCompact ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
+                    )
+                    .foregroundStyle(Color.white1)
+                    .autocorrectionDisabled()
+                    .focused($isTitleFocused)
+                    .onSubmit { endRename() }
+                    .submitLabel(.done)
+                    .disabled(isTitleEditing == false)
+                    .onChange(of: titleDraft) {
+                        if titleDraft.count > Constants.scoreTitleMaxLength {
+                            titleDraft = String(
+                                titleDraft.prefix(Constants.scoreTitleMaxLength))
+                        }
+                    }
+
+                    Spacer()
+
+                    Menu {
+                        Button(.rename, systemImage: "pencil") {
+                            startRename()
+                        }
+
+                        Button(.export, systemImage: "square.and.arrow.up") {
+                            exportScoreAction(score)
+                        }
+
+                        Button(.delete, systemImage: "trash", role: .destructive) {
+                            deleteScoreAction(score)
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundStyle(Color.white1)
+                            .frame(maxWidth: 30, maxHeight: 30)
+                    }
+                    .menuIndicator(.hidden)
+                }
+
+                HStack {
+                    Text(score.createdAt.formattedDate())
+                        .font(Typography.WantedSansStd.R2)
+                        .foregroundStyle(Color.white1)
+
+                    Spacer()
+
+                    Text(score.totalDuration.formattedTime())
+                        .font(Typography.WantedSansStd.R2)
+                        .foregroundStyle(Color.white1)
+                }
+
+                Spacer(minLength: 0.0)
+
+                HStack(alignment: .bottom) {
+                    Text("\(score.key.description) Key")
+                        .font(
+                            isCompact
+                                ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
+                        )
+                        .foregroundStyle(Color.white2)
+
+                    Spacer()
+
+                    let progress: Double =
+                        score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
+
+                    PlaybackButton(
+                        isPlaying: isPlaying,
+                        progress: progress,
+                        playAction: { playAction(score) },
+                        stopAction: stopAction
+                    )
+                    .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
+                    .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
+                }
+            }
+            .padding(Spacing.lg)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                backgroundColor,
+                in: RoundedRectangle(cornerRadius: 32)
+            )
+            .onTapGesture {
                 if isTitleEditing {
                     endRename()
                 } else {
                     tapAction(score)
                 }
-            } label: {
-                VStack(spacing: Spacing.xxs) {
-                    HStack {
-                        TextField(
-                            LocalizedStringKey(LocalizedStringResource.enterTitle.key),
-                            text: isTitleEditing ? $titleDraft : .constant(score.title)
-                        )
-                        .multilineTextAlignment(.leading)
-                        .font(
-                            isCompact ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
-                        )
-                        .foregroundStyle(Color.white1)
-                        .autocorrectionDisabled()
-                        .focused($isTitleFocused)
-                        .onSubmit { endRename() }
-                        .submitLabel(.done)
-                        .disabled(isTitleEditing == false)
-                        .onChange(of: titleDraft) {
-                            if titleDraft.count > Constants.scoreTitleMaxLength {
-                                titleDraft = String(
-                                    titleDraft.prefix(Constants.scoreTitleMaxLength))
-                            }
-                        }
-
-                        Spacer()
-
-                        Menu {
-                            Button(.rename, systemImage: "pencil") {
-                                startRename()
-                            }
-
-                            Button(.export, systemImage: "square.and.arrow.up") {
-                                exportScoreAction(score)
-                            }
-
-                            Button(.delete, systemImage: "trash", role: .destructive) {
-                                deleteScoreAction(score)
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .foregroundStyle(Color.white1)
-                                .frame(maxWidth: 30, maxHeight: 30)
-                        }
-                        .menuIndicator(.hidden)
-                    }
-
-                    HStack {
-                        Text(score.createdAt.formattedDate())
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.white1)
-
-                        Spacer()
-
-                        Text(score.totalDuration.formattedTime())
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.white1)
-                    }
-
-                    Spacer(minLength: 0.0)
-
-                    HStack(alignment: .bottom) {
-                        Text("\(score.key.description) Key")
-                            .font(
-                                isCompact
-                                    ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
-                            )
-                            .foregroundStyle(Color.white2)
-
-                        Spacer()
-
-                        let progress: Double =
-                            score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
-
-                        PlaybackButton(
-                            isPlaying: isPlaying,
-                            progress: progress,
-                            playAction: { playAction(score) },
-                            stopAction: stopAction
-                        )
-                        .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
-                        .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
-                    }
-                }
-                .padding(Spacing.lg)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(
-                    backgroundColor,
-                    in: RoundedRectangle(cornerRadius: 32)
-                )
             }
-            .buttonStyle(.bouncy)
         }
 
         func compactStyle() -> Self {
