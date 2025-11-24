@@ -47,6 +47,11 @@ struct HomeView: View {
         }
         .safeAreaInset(edge: .top) {
             HeaderSection(count: model.songCount)
+                #if DEBUG
+                    .onLongPressGesture {
+                        router?.push(.dev)
+                    }
+                #endif
                 .padding(Spacing.md)
                 .padding(.top, Spacing.xs)
                 .background {
