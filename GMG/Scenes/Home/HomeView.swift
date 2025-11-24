@@ -489,7 +489,7 @@ extension HomeView {
                             .foregroundStyle(Color.white1)
                     }
 
-                    Spacer()
+                    Spacer(minLength: 0.0)
 
                     HStack(alignment: .bottom) {
                         Text("\(score.key.description) Key")
