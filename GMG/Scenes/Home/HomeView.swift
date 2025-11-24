@@ -237,7 +237,7 @@ extension HomeView {
                     )
                     .compactStyle()
                     .backgroundColor(.latestColor(index: index))
-                    .frame(maxWidth: 156)
+                    .frame(width: 156)
                     .matchedTransitionSource(id: score.id, in: namespace)
                 }
             }
@@ -390,7 +390,7 @@ extension HomeView {
                             model.isLatest
                                 ? .latestColor(index: index) : .earliestColor(index: index)
                         )
-                        .frame(minHeight: 128)
+                        .frame(height: 128)
                         .matchedTransitionSource(id: score.id, in: namespace)
                         .padding(.bottom, isSelected ? 60.0 : .zero)
                     }
