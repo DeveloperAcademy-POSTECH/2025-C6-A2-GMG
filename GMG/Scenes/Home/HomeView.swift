@@ -237,7 +237,7 @@ extension HomeView {
                     )
                     .smallTitleStyle()
                     .backgroundColor(.latestColor(index: index))
-                    .frame(minWidth: 156)
+                    .frame(maxWidth: 156)
                     .matchedTransitionSource(id: score.id, in: namespace)
                 }
             }
@@ -571,11 +571,11 @@ extension HomeView {
                         playAction()
                     }
                 } label: {
-                    Image(isPlaying ? .pause : .play)
+                    Image(isPlaying ? .pause : .smallPlay)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 14, height: 14)
+                        .frame(width: isPlaying ? 14 : 10, height: isPlaying ? 14 : 10)
                         .padding(.leading, isPlaying ? 0 : 2)
                         .foregroundStyle(Color.black1)
                         .frame(width: 30, height: 30)
