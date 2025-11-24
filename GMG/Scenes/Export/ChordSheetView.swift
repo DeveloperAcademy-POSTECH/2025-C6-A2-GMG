@@ -50,7 +50,7 @@ struct ChordSheetView: View {
                         )
                     }
                 }
-                .frame(minHeight: 500)
+                .frame(minHeight: 500, alignment: .top)
 
                 LogoView()
                     .padding(.top, 30)
