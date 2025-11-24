@@ -235,7 +235,7 @@ extension HomeView {
                         exportScoreAction: { router?.push(.export(score: $0)) },
                         deleteScoreAction: intent.requestDeleteScoreConfirmation
                     )
-                    .smallTitleStyle()
+                    .compactStyle()
                     .backgroundColor(.latestColor(index: index))
                     .frame(maxWidth: 156)
                     .matchedTransitionSource(id: score.id, in: namespace)
@@ -420,7 +420,7 @@ extension HomeView {
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
 
-        var isTitleSmall: Bool = false
+        var isCompact: Bool = false
         var playButtonVisibility: Visibility = .visible
         var backgroundColor: Color = .black1
 
@@ -440,7 +440,7 @@ extension HomeView {
                         )
                         .multilineTextAlignment(.leading)
                         .font(
-                            isTitleSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
+                            isCompact ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
                         )
                         .foregroundStyle(Color.white1)
                         .autocorrectionDisabled()
@@ -493,8 +493,11 @@ extension HomeView {
 
                     HStack(alignment: .bottom) {
                         Text("\(score.key.description) Key")
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.black6)
+                            .font(
+                                isCompact
+                                    ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
+                            )
+                            .foregroundStyle(Color.white2)
 
                         Spacer()
 
@@ -521,9 +524,9 @@ extension HomeView {
             .buttonStyle(.bouncy)
         }
 
-        func smallTitleStyle() -> Self {
+        func compactStyle() -> Self {
             var card = self
-            card.isTitleSmall = true
+            card.isCompact = true
             return card
         }
 
