@@ -235,9 +235,9 @@ extension HomeView {
                         exportScoreAction: { router?.push(.export(score: $0)) },
                         deleteScoreAction: intent.requestDeleteScoreConfirmation
                     )
-                    .smallTitleStyle()
+                    .compactStyle()
                     .backgroundColor(.latestColor(index: index))
-                    .frame(minWidth: 156)
+                    .frame(width: 156)
                     .matchedTransitionSource(id: score.id, in: namespace)
                 }
             }
@@ -390,7 +390,7 @@ extension HomeView {
                             model.isLatest
                                 ? .latestColor(index: index) : .earliestColor(index: index)
                         )
-                        .frame(minHeight: 128)
+                        .frame(height: 128)
                         .matchedTransitionSource(id: score.id, in: namespace)
                         .padding(.bottom, isSelected ? 60.0 : .zero)
                     }
@@ -420,110 +420,111 @@ extension HomeView {
         let exportScoreAction: (Score) -> Void
         let deleteScoreAction: (Score) -> Void
 
-        var isTitleSmall: Bool = false
+        var isCompact: Bool = false
         var playButtonVisibility: Visibility = .visible
         var backgroundColor: Color = .black1
 
         var body: some View {
-            Button {
+            VStack(spacing: Spacing.xxs) {
+                HStack {
+                    TextField(
+                        LocalizedStringKey(LocalizedStringResource.enterTitle.key),
+                        text: isTitleEditing ? $titleDraft : .constant(score.title)
+                    )
+                    .multilineTextAlignment(.leading)
+                    .font(
+                        isCompact ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
+                    )
+                    .foregroundStyle(Color.white1)
+                    .autocorrectionDisabled()
+                    .focused($isTitleFocused)
+                    .onSubmit { endRename() }
+                    .submitLabel(.done)
+                    .disabled(isTitleEditing == false)
+                    .onChange(of: titleDraft) {
+                        if titleDraft.count > Constants.scoreTitleMaxLength {
+                            titleDraft = String(
+                                titleDraft.prefix(Constants.scoreTitleMaxLength))
+                        }
+                    }
+
+                    Spacer()
+
+                    Menu {
+                        Button(.rename, systemImage: "pencil") {
+                            startRename()
+                        }
+
+                        Button(.export, systemImage: "square.and.arrow.up") {
+                            exportScoreAction(score)
+                        }
+
+                        Button(.delete, systemImage: "trash", role: .destructive) {
+                            deleteScoreAction(score)
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundStyle(Color.white1)
+                            .frame(maxWidth: 20, maxHeight: 30)
+                    }
+                    .menuIndicator(.hidden)
+                }
+
+                HStack {
+                    Text(score.createdAt.formattedDate())
+                        .font(Typography.WantedSansStd.R2)
+                        .foregroundStyle(Color.white1)
+
+                    Spacer()
+
+                    Text(score.totalDuration.formattedTime())
+                        .font(Typography.WantedSansStd.R2)
+                        .foregroundStyle(Color.white1)
+                }
+
+                Spacer(minLength: 0.0)
+
+                HStack(alignment: .bottom) {
+                    Text("\(score.key.description) Key")
+                        .font(
+                            isCompact
+                                ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
+                        )
+                        .foregroundStyle(Color.white2)
+
+                    Spacer()
+
+                    let progress: Double =
+                        score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
+
+                    PlaybackButton(
+                        isPlaying: isPlaying,
+                        progress: progress,
+                        playAction: { playAction(score) },
+                        stopAction: stopAction
+                    )
+                    .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
+                    .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
+                }
+            }
+            .padding(Spacing.lg)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                backgroundColor,
+                in: RoundedRectangle(cornerRadius: 32)
+            )
+            .onTapGesture {
                 if isTitleEditing {
                     endRename()
                 } else {
                     tapAction(score)
                 }
-            } label: {
-                VStack(spacing: Spacing.xxs) {
-                    HStack {
-                        TextField(
-                            LocalizedStringKey(LocalizedStringResource.enterTitle.key),
-                            text: isTitleEditing ? $titleDraft : .constant(score.title)
-                        )
-                        .multilineTextAlignment(.leading)
-                        .font(
-                            isTitleSmall ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
-                        )
-                        .foregroundStyle(Color.white1)
-                        .autocorrectionDisabled()
-                        .focused($isTitleFocused)
-                        .onSubmit { endRename() }
-                        .submitLabel(.done)
-                        .disabled(isTitleEditing == false)
-                        .onChange(of: titleDraft) {
-                            if titleDraft.count > Constants.scoreTitleMaxLength {
-                                titleDraft = String(
-                                    titleDraft.prefix(Constants.scoreTitleMaxLength))
-                            }
-                        }
-
-                        Spacer()
-
-                        Menu {
-                            Button(.rename, systemImage: "pencil") {
-                                startRename()
-                            }
-
-                            Button(.export, systemImage: "square.and.arrow.up") {
-                                exportScoreAction(score)
-                            }
-
-                            Button(.delete, systemImage: "trash", role: .destructive) {
-                                deleteScoreAction(score)
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .foregroundStyle(Color.white1)
-                                .frame(maxWidth: 30, maxHeight: 30)
-                        }
-                        .menuIndicator(.hidden)
-                    }
-
-                    HStack {
-                        Text(score.createdAt.formattedDate())
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.white1)
-
-                        Spacer()
-
-                        Text(score.totalDuration.formattedTime())
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.white1)
-                    }
-
-                    Spacer()
-
-                    HStack(alignment: .bottom) {
-                        Text("\(score.key.description) Key")
-                            .font(Typography.WantedSansStd.R2)
-                            .foregroundStyle(Color.black6)
-
-                        Spacer()
-
-                        let progress: Double =
-                            score.totalDuration > 0.0 ? elapsedTime / score.totalDuration : 0.0
-
-                        PlaybackButton(
-                            isPlaying: isPlaying,
-                            progress: progress,
-                            playAction: { playAction(score) },
-                            stopAction: stopAction
-                        )
-                        .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
-                        .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
-                    }
-                }
-                .padding(Spacing.lg)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(
-                    backgroundColor,
-                    in: RoundedRectangle(cornerRadius: 32)
-                )
             }
-            .buttonStyle(.bouncy)
         }
 
-        func smallTitleStyle() -> Self {
+        func compactStyle() -> Self {
             var card = self
-            card.isTitleSmall = true
+            card.isCompact = true
             return card
         }
 
@@ -571,11 +572,11 @@ extension HomeView {
                         playAction()
                     }
                 } label: {
-                    Image(isPlaying ? .pause : .play)
+                    Image(isPlaying ? .pause : .smallPlay)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 14, height: 14)
+                        .frame(width: isPlaying ? 12 : 10, height: isPlaying ? 12 : 10)
                         .padding(.leading, isPlaying ? 0 : 2)
                         .foregroundStyle(Color.black1)
                         .frame(width: 30, height: 30)
@@ -584,7 +585,7 @@ extension HomeView {
                             let isProgressPresented: Bool = isPlaying || progress > 0
 
                             Circle()
-                                .inset(by: lineWidth / 2)
+                                .inset(by: lineWidth / 2 + 0.2)
                                 .fill(Color.white2)
                                 .stroke(
                                     isProgressPresented ? Color.bg1 : Color.white2,
