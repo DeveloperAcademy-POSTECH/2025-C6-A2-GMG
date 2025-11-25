@@ -397,17 +397,10 @@ extension ChordProgressView {
             }
 
             private var horizontalPadding: CGFloat {
-                if let code = locale.language.languageCode {
-                    switch code {
-                    case .korean:
-                        return 12
-                    case .english:
-                        return 10
-                    default:
-                        return 10
-                    }
-                } else {
-                    return 10
+                switch locale.language.languageCode {
+                case .korean: return 12
+                case .english: return 10
+                default: return 10
                 }
             }
 
@@ -567,5 +560,5 @@ extension ChordProgressView {
     PreviewContainer { router in
         router.view(.chordProgress(score: .mock))
     }
-    .environment(\.locale, .init(languageCode: .korean))
+    .environment(\.locale, .init(languageCode: .english))
 }
