@@ -465,7 +465,7 @@ extension HomeView {
                     } label: {
                         Image(systemName: "ellipsis")
                             .foregroundStyle(Color.white1)
-                            .frame(maxWidth: 30, maxHeight: 30)
+                            .frame(maxWidth: 20, maxHeight: 30)
                     }
                     .menuIndicator(.hidden)
                 }
@@ -480,6 +480,7 @@ extension HomeView {
                     Text(score.totalDuration.formattedTime())
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
+                        .padding(.trailing, 0)
                 }
 
                 Spacer(minLength: 0.0)
@@ -491,6 +492,7 @@ extension HomeView {
                                 ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
                         )
                         .foregroundStyle(Color.white2)
+                        .padding(.trailing, 0)
 
                     Spacer()
 
@@ -506,6 +508,7 @@ extension HomeView {
                     .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
                     .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
                 }
+                .padding(.trailing, 0)
             }
             .padding(Spacing.lg)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -576,7 +579,7 @@ extension HomeView {
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: isPlaying ? 14 : 10, height: isPlaying ? 14 : 10)
+                        .frame(width: isPlaying ? 12 : 10, height: isPlaying ? 12 : 10)
                         .padding(.leading, isPlaying ? 0 : 2)
                         .foregroundStyle(Color.black1)
                         .frame(width: 30, height: 30)
@@ -585,7 +588,7 @@ extension HomeView {
                             let isProgressPresented: Bool = isPlaying || progress > 0
 
                             Circle()
-                                .inset(by: lineWidth / 2)
+                                .inset(by: lineWidth / 2 + 0.2)
                                 .fill(Color.white2)
                                 .stroke(
                                     isProgressPresented ? Color.bg1 : Color.white2,
