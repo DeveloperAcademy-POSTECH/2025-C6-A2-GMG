@@ -18,7 +18,7 @@ struct MainView: View {
             router.view(.home)
                 .navigationDestination(for: RouteWrapper.self) { route in
                     router.view(route.route)
-                        .zoomTransition(id: route.id, in: route.namespace)
+                    //                        .zoomTransition(id: route.id, in: route.namespace)
                 }
         }
     }
