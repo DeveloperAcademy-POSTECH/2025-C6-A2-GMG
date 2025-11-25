@@ -480,7 +480,6 @@ extension HomeView {
                     Text(score.totalDuration.formattedTime())
                         .font(Typography.WantedSansStd.R2)
                         .foregroundStyle(Color.white1)
-                        .padding(.trailing, 0)
                 }
 
                 Spacer(minLength: 0.0)
@@ -492,7 +491,6 @@ extension HomeView {
                                 ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
                         )
                         .foregroundStyle(Color.white2)
-                        .padding(.trailing, 0)
 
                     Spacer()
 
@@ -508,7 +506,6 @@ extension HomeView {
                     .opacity(playButtonVisibility != .hidden ? 1.0 : 0.0)
                     .blur(radius: playButtonVisibility != .hidden ? 0.0 : 8.0)
                 }
-                .padding(.trailing, 0)
             }
             .padding(Spacing.lg)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
