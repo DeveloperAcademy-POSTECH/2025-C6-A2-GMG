@@ -123,10 +123,12 @@ extension ScoreSchema.Score {
             totalDuration: self.totalDuration,
             createdAt: self.createdAt,
             updatedAt: self.updatedAt,
-            notes: self.notes.map { $0.toDomain() }.sorted(by: { $0.startTime < $1.startTime }),
-            chordCells: self.chordCells.map { $0.toDomain() }.sorted(by: {
-                $0.startTime < $1.startTime
-            }),
+            notes: self.notes
+                .map { $0.toDomain() }
+                .sorted(by: { $0.startTime < $1.startTime }),
+            chordCells: self.chordCells
+                .map { $0.toDomain() }
+                .sorted(by: { $0.startTime < $1.startTime }),
             audioLevels: self.audioLevels,
             isDeleted: self.isDeleted
         )
@@ -282,7 +284,11 @@ extension ChordCell {
     fileprivate func toPersistence() -> ScoreSchema.ChordCell {
         return .init(
             chord: self.chord?.toPersistence(),
-            chordCandidates: self.chordCandidates.map { $0.toPersistence() },
+            chordCandidates: self.chordCandidates
+                .enumerated()
+                .map { index, chord in
+                    ScoreSchema.ChordCandidate(order: index, chord: chord.toPersistence())
+                },
             startTime: self.startTime,
             duration: self.duration
         )
@@ -293,7 +299,9 @@ extension ScoreSchema.ChordCell {
     fileprivate func toDomain() -> ChordCell {
         return .init(
             chord: self.chord?.toDomain(),
-            chordCandidates: self.chordCandidates.map { $0.toDomain() },
+            chordCandidates: self.chordCandidates
+                .sorted(by: { $0.order < $1.order })
+                .map { $0.chord.toDomain() },
             startTime: self.startTime,
             duration: self.duration
         )
