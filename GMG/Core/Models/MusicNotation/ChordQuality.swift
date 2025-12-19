@@ -16,7 +16,7 @@ enum ChordQuality {
 extension ChordQuality: CustomStringConvertible {
     var description: String {
         switch self {
-        case .maj: return "M"
+        case .maj: return ""
         case .maj7: return "M7"
         case .maj9: return "M9"
         case .min: return "m"
