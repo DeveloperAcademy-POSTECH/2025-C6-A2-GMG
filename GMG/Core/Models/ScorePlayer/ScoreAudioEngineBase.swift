@@ -171,7 +171,6 @@ extension Chord {
         case .Ds: root = .Ds
         case .Eb: root = .Eb
         case .E: root = .E
-        case .Fb: root = .Fb
         case .F: root = .F
         case .Fs: root = .Fs
         case .Gb: root = .Gb

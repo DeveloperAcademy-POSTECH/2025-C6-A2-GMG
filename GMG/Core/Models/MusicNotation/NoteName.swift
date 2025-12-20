@@ -8,7 +8,6 @@ enum NoteName {
     case Ds
     case Eb
     case E
-    case Fb
     case F
     case Fs
     case Gb
@@ -31,7 +30,6 @@ extension NoteName: CustomStringConvertible {
         case .Ds: return "D#"
         case .Eb: return "Eb"
         case .E: return "E"
-        case .Fb: return "Fb"
         case .F: return "F"
         case .Fs: return "F#"
         case .Gb: return "Gb"
@@ -49,3 +47,5 @@ extension NoteName: CustomStringConvertible {
 extension NoteName: Codable {}
 
 extension NoteName: Hashable {}
+
+extension NoteName: CaseIterable {}
