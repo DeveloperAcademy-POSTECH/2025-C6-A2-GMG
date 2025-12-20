@@ -33,3 +33,5 @@ extension ChordQuality: CustomStringConvertible {
 extension ChordQuality: Codable {}
 
 extension ChordQuality: Hashable {}
+
+extension ChordQuality: CaseIterable {}
