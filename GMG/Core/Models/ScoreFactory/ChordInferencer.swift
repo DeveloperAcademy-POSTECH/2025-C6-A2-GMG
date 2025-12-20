@@ -578,7 +578,6 @@ extension NoteName {
         case .Ds: return 3
         case .Eb: return 3
         case .E: return 4
-        case .Fb: return 4
         case .F: return 5
         case .Fs: return 6
         case .Gb: return 6

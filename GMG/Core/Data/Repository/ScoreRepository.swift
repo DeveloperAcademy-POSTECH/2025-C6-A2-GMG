@@ -160,7 +160,6 @@ extension NoteName {
         case .Ds: return .Ds
         case .Eb: return .Eb
         case .E: return .E
-        case .Fb: return .Fb
         case .F: return .F
         case .Fs: return .Fs
         case .Gb: return .Gb
@@ -185,7 +184,6 @@ extension ScoreSchema.NoteName {
         case .Ds: return .Ds
         case .Eb: return .Eb
         case .E: return .E
-        case .Fb: return .Fb
         case .F: return .F
         case .Fs: return .Fs
         case .Gb: return .Gb

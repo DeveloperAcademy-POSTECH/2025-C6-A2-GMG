@@ -159,7 +159,6 @@ enum ScoreSchemaV1: VersionedSchema {
         case Ds
         case Eb
         case E
-        case Fb
         case F
         case Fs
         case Gb
