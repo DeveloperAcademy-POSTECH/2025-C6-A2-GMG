@@ -8,6 +8,10 @@ struct ChordProgressView: View {
 
     @State private var model: ChordProgressModelStateProtocol
     @State private var intent: ChordProgressIntentProtocol
+    // FIXME: 임시 실험용 상태 (다이아토닉 정제 확인 후 제거 예정)
+    @State private var isRefinementEnabled: Bool = false
+    @State private var refinedScore: Score?
+    @State private var refinedSegmentSlices: [[ChordSegmentSlice]]?
     private weak var router: Router?
 
     init(
@@ -21,14 +25,32 @@ struct ChordProgressView: View {
     }
 
     var body: some View {
+        let displayScore: Score =
+            isRefinementEnabled
+            ? (refinedScore ?? model.score)
+            : model.score
+
+        let displaySegmentSlices: [[ChordSegmentSlice]] =
+            isRefinementEnabled
+            ? (refinedSegmentSlices ?? model.segmentSlices)
+            : model.segmentSlices
+
+        let displayCurrentChordCell: ChordCell? = {
+            guard
+                let index =
+                    displayScore.retrieveCellIndexBy(time: model.playhead.elapsedTime + 0.01)
+            else { return nil }
+            return displayScore.retrieveChordCellBy(cellIndex: index)
+        }()
+
         ZStack {
             Background()
 
             VStack(spacing: .zero) {
                 HStack(alignment: .lastTextBaseline) {
                     ScoreInformation(
-                        key: model.score.key,
-                        totalDuration: model.score.totalDuration
+                        key: displayScore.key,
+                        totalDuration: displayScore.totalDuration
                     )
 
                     Spacer()
@@ -38,7 +60,8 @@ struct ChordProgressView: View {
                             canUndo: model.canUndo, canRedo: model.canRedo,
                             onTapUndo: intent.onTapUndoButton, onTapRedo: intent.onTapRedoButton
                         )
-                        .opacity(model.isEditMode ? 1.0 : 0.0)
+                        .opacity(model.isEditMode && isRefinementEnabled == false ? 1.0 : 0.0)
+                        .disabled(isRefinementEnabled)
 
                         EditModeToggle(
                             isEditMode: Binding<Bool>(
@@ -50,22 +73,34 @@ struct ChordProgressView: View {
                                 }
                             )
                         )
+                        .disabled(isRefinementEnabled)
+
+                        RefinementToggle(
+                            isOn: Binding<Bool>(
+                                get: { isRefinementEnabled },
+                                set: { handleRefinementToggle(isOn: $0) }
+                            )
+                        )
                     }
                     .layoutPriority(1)
                 }
                 .padding(Spacing.md)
 
                 let onTapChordCandidate: (Chord, ChordCell) -> Void = { chord, chordCell in
+                    guard isRefinementEnabled == false else { return }
                     intent.onTapCandidateChordCell(chord, in: chordCell, for: model.score)
                 }
 
                 SegmentsScrollView(
-                    totalDuration: model.score.totalDuration,
-                    segmentSlices: model.segmentSlices,
-                    currentChordCell: model.currentChordCell,
-                    selectedChordCell: model.selectedChordCell,
+                    totalDuration: displayScore.totalDuration,
+                    segmentSlices: displaySegmentSlices,
+                    currentChordCell: displayCurrentChordCell,
+                    selectedChordCell: isRefinementEnabled ? nil : model.selectedChordCell,
                     segmentHandlers: SegmentHandlers(
-                        onTapChordCell: intent.onTapChordCell,
+                        onTapChordCell: { chordCell, time in
+                            guard isRefinementEnabled == false else { return }
+                            intent.onTapChordCell(chordCell, seekTime: time)
+                        },
                         onTapChordCandidate: onTapChordCandidate
                     ),
                     waveformHandlers: WaveformHandlers(
@@ -74,7 +109,7 @@ struct ChordProgressView: View {
                         onDragChange: intent.onDragWaveformChange,
                         onDragEnd: intent.onDragWaveformEnd
                     ),
-                    audioLevels: model.score.audioLevels,
+                    audioLevels: displayScore.audioLevels,
                     elapsedTime: model.playhead.elapsedTime
                 )
             }
@@ -127,7 +162,11 @@ struct ChordProgressView: View {
         }
         .environment(
             \.editMode,
-            .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
+            .constant(
+                isRefinementEnabled
+                    ? EditMode.inactive
+                    : (model.isEditMode ? EditMode.active : EditMode.inactive)
+            )
         )
         .onAppear {
             intent.onAppear(model.score)
@@ -437,6 +476,37 @@ extension ChordProgressView {
         }
     }
 
+    struct RefinementToggle: View {
+        @Binding var isOn: Bool
+
+        var body: some View {
+            Button {
+                isOn.toggle()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text("정제")
+                        .font(
+                            .english(Typography.WantedSansStd.R3),
+                            .korean(Typography.Pretendard.SB3))
+                }
+                .foregroundStyle(isOn ? Color.white1 : Color.black1)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isOn ? Color.blue6 : Color.white1)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.black2.opacity(0.1), lineWidth: isOn ? 0 : 1)
+                        }
+                }
+            }
+            .buttonStyle(.bouncy)
+        }
+    }
+
     struct Controller: View {
         let isPlaying: Bool
         let isMuted: Bool
@@ -552,6 +622,87 @@ extension ChordProgressView {
                 }
                 .ignoresSafeArea()
             }
+        }
+    }
+}
+
+extension ChordProgressView {
+    fileprivate func handleRefinementToggle(isOn: Bool) {
+        if isOn {
+            let refined: Score = DiatonicChordRefiner.refine(score: model.score)
+            refinedScore = refined
+            refinedSegmentSlices = buildSegmentSlices(for: refined)
+            intent.onTapEditModeToggle(false)
+            isRefinementEnabled = true
+            intent.onTapRefinementToggle(true, score: refined)
+        } else {
+            isRefinementEnabled = false
+            refinedScore = nil
+            refinedSegmentSlices = nil
+            intent.onTapRefinementToggle(false, score: model.score)
+        }
+    }
+
+    fileprivate func buildSegmentSlices(for score: Score) -> [[ChordSegmentSlice]] {
+        let chordCells = score.retrieveAllChordCells()
+        let segmentCount = Int(ceil(score.totalDuration / Constants.segmentDuration))
+
+        guard segmentCount > 0 else { return [] }
+
+        var slices: [[ChordSegmentSlice]] = []
+
+        for index in 0..<segmentCount {
+            slices.append(
+                buildChordSlices(
+                    index: index,
+                    chordCells: chordCells,
+                    totalDuration: score.totalDuration,
+                    segmentDuration: Constants.segmentDuration
+                )
+            )
+        }
+
+        return slices
+    }
+
+    fileprivate func buildChordSlices(
+        index: Int,
+        chordCells: [ChordCell],
+        totalDuration: TimeInterval,
+        segmentDuration: TimeInterval
+    ) -> [ChordSegmentSlice] {
+        let segmentStartTime = TimeInterval(index) * segmentDuration
+        let segmentEndTime = min(segmentStartTime + segmentDuration, totalDuration)
+
+        guard segmentStartTime < segmentEndTime else { return [] }
+
+        let overlapping = chordCells.filter { cell in
+            let cellEndTime = cell.startTime + cell.duration
+            return segmentStartTime < cellEndTime && cell.startTime < segmentEndTime
+        }
+
+        let targetCells: [ChordCell] =
+            if overlapping.isEmpty {
+                if let previous = chordCells.last(where: { $0.startTime <= segmentStartTime }) {
+                    [previous]
+                } else if let first = chordCells.first {
+                    [first]
+                } else {
+                    []
+                }
+            } else {
+                overlapping
+            }
+
+        return targetCells.compactMap { cell in
+            let overlapStart = max(cell.startTime, segmentStartTime)
+            let overlapEnd = min(cell.startTime + cell.duration, segmentEndTime)
+            let durationInSegment = max(0, overlapEnd - overlapStart)
+            let occupancyRatio = durationInSegment / max(1, segmentDuration)
+
+            guard occupancyRatio > 0.02 else { return nil }
+
+            return ChordSegmentSlice(chordCell: cell, durationInSegment: durationInSegment)
         }
     }
 }
