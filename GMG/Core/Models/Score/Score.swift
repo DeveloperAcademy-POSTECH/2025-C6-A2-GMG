@@ -182,7 +182,7 @@ extension Score {
                         Chord(root: .Eb, quality: .maj),
                     ],
                     startTime: 5.0,
-                    duration: 6.3
+                    duration: 4.8
                 ),
                 ChordCell(
                     chord: Chord(root: .F, quality: .maj9),
@@ -193,8 +193,8 @@ extension Score {
                         Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 11.3,
-                    duration: 1.7
+                    startTime: 9.9,
+                    duration: 0.8
                 ),
                 ChordCell(
                     chord: Chord(root: .Bb, quality: .maj),
@@ -205,7 +205,7 @@ extension Score {
                         Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
                     ],
-                    startTime: 13.0,
+                    startTime: 10.7,
                     duration: 18.0
                 ),
             ],
