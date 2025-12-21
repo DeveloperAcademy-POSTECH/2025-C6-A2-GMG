@@ -176,7 +176,7 @@ extension Score {
                     chord: Chord(root: .E, quality: .dim),
                     chordCandidates: [
                         Chord(root: .E, quality: .dim),
-                        Chord(root: .D, quality: .maj),
+                        Chord(root: .D, quality: .min),
                         Chord(root: .Ab, quality: .maj),
                         Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
@@ -200,7 +200,7 @@ extension Score {
                     chord: Chord(root: .Bb, quality: .maj),
                     chordCandidates: [
                         Chord(root: .Bb, quality: .maj),
-                        Chord(root: .D, quality: .maj),
+                        Chord(root: .B, quality: .halfDim7),
                         Chord(root: .Ab, quality: .maj),
                         Chord(root: .Gb, quality: .maj),
                         Chord(root: .Eb, quality: .maj),
