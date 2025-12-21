@@ -5,34 +5,87 @@ import SwiftUI
 struct ChordFingeringView: View {
     private static let height: CGFloat = 128
 
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+
     let instrument: Instrument
     let chord: Chord
 
+    @State private var isPresented: Bool = false
+
+    private var backgroundShape: RoundedRectangle {
+        .init(cornerRadius: isPresented ? 12 : 32)
+    }
+
     private var backgroundColor: Color {
         return switch instrument {
-        case .piano: Color.black8
-        case .guitar: Color.white1
+        case .piano: Color.black8.opacity(0.2)
+        case .guitar: Color.white1.opacity(0.7)
+        }
+    }
+
+    private var symbolColor: Color {
+        return switch colorScheme {
+        case .light: .black1
+        case .dark: .white1
+        @unknown default: .black1
         }
     }
 
     var body: some View {
         ZStack {
-            switch instrument {
-            case .piano:
-                PianoFingeringView(chord: chord)
-            case .guitar:
-                GuitarFingeringView(chord: chord)
-                    .frame(width: 144)
+            if isPresented {
+                ZStack {
+                    Group {
+                        switch instrument {
+                        case .piano:
+                            PianoFingeringView(chord: chord)
+                        case .guitar:
+                            GuitarFingeringView(chord: chord)
+                                .frame(width: 144)
+                        }
+                    }
+                    .transition(.blurReplace)
+                }
+                .frame(maxWidth: .infinity)
+                .transition(
+                    .scale(.zero, anchor: .bottomTrailing)
+                        .combined(with: .blurReplace)
+                )
             }
         }
         .padding(.vertical, Spacing.xs)
         .padding(.horizontal, Spacing.sm)
         .frame(height: Self.height)
         .frame(maxWidth: .infinity)
-        .background(
-            backgroundColor,
-            in: RoundedRectangle(cornerRadius: 12)
-        )
+        .background(alignment: .bottomTrailing) {
+            backgroundShape
+                .fill(
+                    backgroundColor
+                        .opacity(isPresented ? 1.0 : 0.0)
+                )
+                .frame(
+                    width: isPresented ? nil : 44,
+                    height: isPresented ? nil : 44
+                )
+                .compatibleGlassEffect(in: backgroundShape)
+                .overlay {
+                    if isPresented == false {
+                        Image(systemName: "hand.raised.fingers.spread.fill")
+                            .foregroundStyle(symbolColor)
+                            .transition(
+                                .scale(2.0, anchor: .bottomTrailing)
+                                    .combined(with: .blurReplace)
+                            )
+                    }
+                }
+                .contentShape(backgroundShape)
+                .padding(isPresented ? 0.0 : Spacing.xs)
+        }
+        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: isPresented)
+        .animation(.default, value: instrument)
+        .onTapGesture {
+            isPresented.toggle()
+        }
     }
 }
 

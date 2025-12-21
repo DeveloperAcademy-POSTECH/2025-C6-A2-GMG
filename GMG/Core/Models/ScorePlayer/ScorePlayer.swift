@@ -13,6 +13,7 @@ enum ScorePlayerError: Error {
 protocol ScorePlayer {
     var playerMutedPublisher: CurrentValueSubject<Bool, Never> { get }
     var playheadPublisher: CurrentValueSubject<Playhead, Never> { get }
+    var currentInstrumentPublisher: CurrentValueSubject<Instrument, Never> { get }
 
     func prepareToPlay() throws
     func cleanupAfterPlay()
@@ -26,6 +27,8 @@ protocol ScorePlayer {
     func play(chord: Chord)
     func setPlayerMuted(_ isMuted: Bool)
     func prepareChordCells()
+
+    func setInstrument(_ instrument: Instrument)
 }
 
 final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
@@ -34,6 +37,7 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
 
     let playerMutedPublisher: CurrentValueSubject<Bool, Never>
     let playheadPublisher: CurrentValueSubject<Playhead, Never>
+    let currentInstrumentPublisher: CurrentValueSubject<Instrument, Never>
 
     private var cancellables: Set<AnyCancellable>
 
@@ -47,6 +51,7 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
                 elapsedTime: .zero
             )
         )
+        self.currentInstrumentPublisher = CurrentValueSubject<Instrument, Never>(.piano)
         self.cancellables = Set<AnyCancellable>()
 
         super.init(score: score)
@@ -62,7 +67,7 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         try loadAudioFile(score.audioURL)
 
         // 코드 재생 준비
-        try loadSoundBank()
+        try loadSoundBank(instrument: currentInstrumentPublisher.value)
         prepareChordCells()
 
         // 타이머 설정
@@ -225,6 +230,16 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         }
 
         playerMutedPublisher.send(isMuted)
+    }
+
+    func setInstrument(_ instrument: Instrument) {
+        do {
+            try loadSoundBank(instrument: instrument)
+
+            self.currentInstrumentPublisher.send(instrument)
+        } catch {
+            Logger.error(String(describing: error))
+        }
     }
 
     private func activateAudioSession() throws {

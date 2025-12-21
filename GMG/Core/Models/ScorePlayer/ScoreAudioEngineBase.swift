@@ -61,10 +61,10 @@ class ScoreAudioEngineBase {
         self.audioFile = audioFile
     }
 
-    func loadSoundBank() throws {
+    func loadSoundBank(instrument: Instrument = .piano) throws {
         guard
             let url = Bundle.main.url(
-                forResource: "KAWAI good piano",
+                forResource: instrument.soundfontFileName,
                 withExtension: "sf2"
             )
         else { throw ScorePlayerError.soundBankNotFound }
