@@ -104,7 +104,6 @@ struct Segment: View {
                 && chordSlices.contains(where: {
                     $0.chordCell.startTime == selectedChordCell?.startTime
                 })
-                && selectedChordCell?.startTime ?? 0.0 >= segmentStartTime
 
             ChordCellCandidates(
                 chordCell: selectedChordCell ?? ChordCell.empty,
