@@ -193,11 +193,8 @@ extension GuitarFingeringView {
         }
 
         private func fretToPress(for string: GuitarString) -> Int? {
-            return if case .fretted(let fret, _) = strings[string] {
-                fret
-            } else {
-                nil
-            }
+            guard case .fretted(let fret, _) = strings[string] else { return nil }
+            return fret
         }
     }
 
