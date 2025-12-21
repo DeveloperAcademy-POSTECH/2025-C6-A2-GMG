@@ -8,6 +8,7 @@ protocol ChordProgressModelStateProtocol {
     var isEditMode: Bool { get }
     var playhead: Playhead { get }
     var isMuted: Bool { get }
+    var currentInstrument: Instrument { get }
     var currentChordCell: ChordCell? { get }
     var selectedChordCell: ChordCell? { get }
     var canUndo: Bool { get }
@@ -19,6 +20,7 @@ protocol ChordProgressModelActionProtocol: AnyObject {
     func setEditMode(_ isEditMode: Bool)
     func updatePlayhead(_ playhead: Playhead)
     func setMuted(_ isMuted: Bool)
+    func setInstrument(_ instrument: Instrument)
     func selectChordCell(_ chordCell: ChordCell?)
     func replaceChord(with candidate: Chord?, for cell: ChordCell)
     func updateTitle(_ title: String)
@@ -44,6 +46,7 @@ final class ChordProgressModel:
     private(set) var isEditMode: Bool
     private(set) var playhead: Playhead
     private(set) var isMuted: Bool
+    private(set) var currentInstrument: Instrument
     private(set) var selectedChordCell: ChordCell?
     private(set) var canUndo: Bool
     private(set) var canRedo: Bool
@@ -66,6 +69,7 @@ final class ChordProgressModel:
         self.isEditMode = false
         self.playhead = Playhead(isPlaying: false, elapsedTime: .zero)
         self.isMuted = false
+        self.currentInstrument = .piano
         self.selectedChordCell = nil
         self.canUndo = false
         self.canRedo = false
@@ -86,6 +90,10 @@ final class ChordProgressModel:
 
     func setMuted(_ isMuted: Bool) {
         self.isMuted = isMuted
+    }
+
+    func setInstrument(_ instrument: Instrument) {
+        self.currentInstrument = instrument
     }
 
     func selectChordCell(_ chordCell: ChordCell?) {

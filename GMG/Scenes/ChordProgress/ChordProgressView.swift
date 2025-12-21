@@ -109,22 +109,32 @@ struct ChordProgressView: View {
                     }
                 }
             )
-            .environment(\.colorScheme, model.isEditMode ? .dark : .light)
 
             VStack {
                 Spacer()
 
+                let chord = model.currentChordCell?.chord
+
+                ChordFingeringView(
+                    instrument: model.currentInstrument,
+                    chord: chord ?? .init(root: .C, quality: .maj)
+                )
+
                 Controller(
                     isPlaying: model.playhead.isPlaying,
-                    isMuted: model.isMuted,
+                    instrument: model.currentInstrument,
                     playAction: intent.onTapPlayButton,
                     pauseAction: intent.onTapPauseButton,
                     stopAction: intent.onTapStopButton,
-                    muteAction: intent.onTapMuteButton
+                    changeInstrumentAction: intent.onTapChangeInstrumentButton
                 )
             }
             .padding()
         }
+        .environment(
+            \.colorScheme,
+            model.isEditMode ? .dark : .light
+        )
         .environment(
             \.editMode,
             .constant(model.isEditMode ? EditMode.active : EditMode.inactive)
@@ -439,11 +449,11 @@ extension ChordProgressView {
 
     struct Controller: View {
         let isPlaying: Bool
-        let isMuted: Bool
+        let instrument: Instrument
         let playAction: () -> Void
         let pauseAction: () -> Void
         let stopAction: () -> Void
-        let muteAction: (Bool) -> Void
+        let changeInstrumentAction: (Instrument) -> Void
 
         private var primaryButtonImage: ImageResource {
             if isPlaying {
@@ -458,14 +468,6 @@ extension ChordProgressView {
                 return pauseAction
             } else {
                 return playAction
-            }
-        }
-
-        private var muteIcon: Image {
-            if isMuted {
-                return Image(systemName: "music.note")
-            } else {
-                return Image(.waveform)
             }
         }
 
@@ -491,16 +493,15 @@ extension ChordProgressView {
                 .animation(.default, value: isPlaying)
 
                 ControllerButton {
-                    muteAction(!isMuted)
+                    changeInstrumentAction(instrument)
                 } label: {
-                    muteIcon
+                    Image(instrument.symbol)
                         .renderingMode(.template)
                         .frame(width: 24, height: 24)
-                        .font(.system(size: 22, weight: .semibold))
-                        .id(isMuted)
+                        .id(instrument)
                 }
                 .columns(1)
-                .animation(.default, value: isMuted)
+                .animation(.default, value: instrument)
             }
             .frame(height: 92)
         }
