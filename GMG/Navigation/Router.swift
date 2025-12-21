@@ -73,11 +73,19 @@ final class Router {
             }
         case .chordProgress(let score):
             if let scoreRepository: ScoreRepository = diContainer.makeScoreRepository() {
-                let model: ChordProgressModel = ChordProgressModel(score: score)
-                let intent: ChordProgressIntent = ChordProgressIntent(
-                    model: model, scoreRepository: scoreRepository)
+                // FIXME: 코드 정제 결과물 확인을 위해 잠시 router 경로를 변경합니다.
+                //                let model: ChordProgressModel = ChordProgressModel(score: score)
+                //                let intent: ChordProgressIntent = ChordProgressIntent(
+                //                    model: model, scoreRepository: scoreRepository)
+                //
+                //                ChordProgressView(model: model, intent: intent, router: self)
+                let model: ChordProgressExperimentalModel = .init(score: score)
+                let intent: ChordProgressExperimentalIntent = .init(
+                    model: model,
+                    scoreRepository: scoreRepository
+                )
 
-                ChordProgressView(model: model, intent: intent, router: self)
+                ChordProgressExperimentalView(model: model, intent: intent, router: self)
             } else {
                 ErrorView(description: "Failed to create database")
             }
