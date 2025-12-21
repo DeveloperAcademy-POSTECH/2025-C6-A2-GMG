@@ -33,3 +33,12 @@ extension Instrument {
         }
     }
 }
+
+extension Instrument {
+    var octave: Int {
+        return switch self {
+        case .piano: 2
+        case .guitar: 3
+        }
+    }
+}
