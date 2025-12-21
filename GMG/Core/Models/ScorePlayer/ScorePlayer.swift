@@ -68,7 +68,7 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
 
         // 코드 재생 준비
         try loadSoundBank(instrument: currentInstrumentPublisher.value)
-        prepareChordCells()
+        prepareChordCells(octave: currentInstrumentPublisher.value.octave)
 
         // 타이머 설정
         Timer.publish(
@@ -188,7 +188,9 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
 
         chordPlayTask = Task {
             let tonicChord = chord.tonicChord
-            let midiNotes = tonicChord.midiNoteNumbers
+            let midiNotes = tonicChord.midiNoteNumbers(
+                octave: currentInstrumentPublisher.value.octave
+            )
 
             midiNotes.forEach { midiNote in
                 sampler.startNote(
@@ -236,10 +238,20 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         do {
             try loadSoundBank(instrument: instrument)
 
+            super.prepareChordCells(octave: instrument.octave)
+
+            pause()
+
             self.currentInstrumentPublisher.send(instrument)
         } catch {
             Logger.error(String(describing: error))
         }
+    }
+
+    func prepareChordCells() {
+        super.prepareChordCells(
+            octave: currentInstrumentPublisher.value.octave
+        )
     }
 
     private func activateAudioSession() throws {

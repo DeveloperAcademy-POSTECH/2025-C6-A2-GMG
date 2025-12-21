@@ -11,7 +11,7 @@ struct PianoFingeringView: View {
     let chord: Chord
 
     var body: some View {
-        let midiNoteNumbers: [Int8] = chord.tonicChord.midiNoteNumbers
+        let midiNoteNumbers: [Int8] = chord.tonicChord.midiNoteNumbers(octave: 2)
         let notes: [PianoNote] = Self.range.map(PianoNote.init)
 
         let whiteNotes: [PianoNote] = notes.filter { !$0.isBlackKey }

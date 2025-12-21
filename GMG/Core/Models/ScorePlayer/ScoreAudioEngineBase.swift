@@ -97,7 +97,7 @@ class ScoreAudioEngineBase {
         )
     }
 
-    func prepareChordCells() {
+    func prepareChordCells(octave: Int = 2) {
         for track in Array(sequencer.tracks) {
             sequencer.removeTrack(track)
         }
@@ -124,7 +124,7 @@ class ScoreAudioEngineBase {
             let duration: TimeInterval =
                 nextChordCell.startTime - position
             let tonicChord: Tonic.Chord = chord.tonicChord
-            let midiNotes: [Int8] = tonicChord.midiNoteNumbers
+            let midiNotes: [Int8] = tonicChord.midiNoteNumbers(octave: octave)
 
             for midiNote in midiNotes {
                 let noteEvent: AVExtendedNoteOnEvent = AVExtendedNoteOnEvent(
@@ -143,7 +143,7 @@ class ScoreAudioEngineBase {
             let position: TimeInterval = lastChordCell.startTime
             let duration: TimeInterval = audioDuration - position
             let tonicChord: Tonic.Chord = chord.tonicChord
-            let midiNotes: [Int8] = tonicChord.midiNoteNumbers
+            let midiNotes: [Int8] = tonicChord.midiNoteNumbers(octave: octave)
 
             for midiNote in midiNotes {
                 let noteEvent: AVExtendedNoteOnEvent = AVExtendedNoteOnEvent(
