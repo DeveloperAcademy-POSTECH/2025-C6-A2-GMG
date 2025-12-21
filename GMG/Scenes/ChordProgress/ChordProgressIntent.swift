@@ -8,7 +8,6 @@ protocol ChordProgressIntentProtocol {
     func onAppear(_ score: Score)
     func onDisappear()
     func onTapEditModeToggle(_ isEditMode: Bool)
-    func onTapRefinementToggle(_ isEnabled: Bool, score: Score)
     func onTapPlayButton()
     func onTapPauseButton()
     func onTapStopButton()
@@ -56,7 +55,19 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     }
 
     func onAppear(_ score: Score) {
-        resetScorePlayer(with: score)
+        do {
+            let scorePlayer: ScorePlayer = DefaultScorePlayer(score: score)
+
+            try scorePlayer.prepareToPlay()
+
+            self.scorePlayer = scorePlayer
+
+            setupScorePlayerPublisher()
+
+            setupUndoManagerPublisher()
+        } catch {
+            Logger.error(String(describing: error))
+        }
     }
 
     func onDisappear() {
@@ -69,11 +80,6 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
 
     func onTapEditModeToggle(_ isEditMode: Bool) {
         self.model?.setEditMode(isEditMode)
-    }
-
-    func onTapRefinementToggle(_ isEnabled: Bool, score: Score) {
-        _ = isEnabled
-        resetScorePlayer(with: score)
     }
 
     func onTapPlayButton() {
@@ -265,27 +271,6 @@ final class ChordProgressIntent: ChordProgressIntentProtocol {
     private func updateScore(_ score: Score) {
         do {
             try scoreRepository.update(score)
-        } catch {
-            Logger.error(String(describing: error))
-        }
-    }
-
-    private func resetScorePlayer(with score: Score) {
-        cancellables.removeAll()
-
-        self.scorePlayer?.cleanupAfterPlay()
-        self.scorePlayer = nil
-
-        do {
-            let scorePlayer: ScorePlayer = DefaultScorePlayer(score: score)
-
-            try scorePlayer.prepareToPlay()
-
-            self.scorePlayer = scorePlayer
-
-            setupScorePlayerPublisher()
-
-            setupUndoManagerPublisher()
         } catch {
             Logger.error(String(describing: error))
         }
