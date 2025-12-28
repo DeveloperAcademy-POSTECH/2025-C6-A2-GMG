@@ -8,7 +8,7 @@ struct LoadingView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            RecordingPalette.Loading.background
                 .ignoresSafeArea()
 
             VStack(spacing: 144) {
@@ -53,7 +53,7 @@ struct LoadingView: View {
         }
 
         private var color: Color {
-            isEnabled ? Color.black1 : Color.black7
+            isEnabled ? RecordingPalette.LoadingRow.active : RecordingPalette.LoadingRow.inactive
         }
 
         var body: some View {
