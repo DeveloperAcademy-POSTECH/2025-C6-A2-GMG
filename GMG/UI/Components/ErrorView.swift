@@ -11,9 +11,8 @@ struct ErrorView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            ComponentPalette.ErrorView.background
                 .ignoresSafeArea()
-
             VStack {
                 Text("Error")
                     .font(Typography.WantedSansStd.B13)
@@ -21,7 +20,7 @@ struct ErrorView: View {
                     .font(Typography.WantedSansStd.R5)
 
             }
-            .foregroundStyle(Color.black1)
+            .foregroundStyle(ComponentPalette.ErrorView.text)
             .navigationBar(
                 leading: {
 
