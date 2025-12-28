@@ -153,7 +153,7 @@ struct Segment: View {
 
         var body: some View {
             ZStack {
-                Color.black2
+                ProgressPalette.Segment.CandidateStrip.background
 
                 HStack {
                     Spacer()
@@ -185,11 +185,11 @@ struct Segment: View {
 
         private var backgroundColor: Color {
             if selectedChord == chord {
-                return .blue6
+                return ProgressPalette.Segment.CandidateButton.selectedBackground
             } else if index == 0 || index == 1 {
-                return .blue7
+                return ProgressPalette.Segment.CandidateButton.primaryBackground
             } else {
-                return .blue3
+                return ProgressPalette.Segment.CandidateButton.secondaryBackground
             }
         }
 
@@ -200,7 +200,7 @@ struct Segment: View {
                 VStack {
                     Text(chord.description)
                         .font(Typography.WantedSansStd.R5)
-                        .foregroundStyle(.white1)
+                        .foregroundStyle(ProgressPalette.Segment.CandidateButton.title)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
@@ -226,17 +226,17 @@ struct Segment: View {
         private var foregroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
                 if isSelected {
-                    return Color.white1
+                    return ProgressPalette.Segment.ChordCellForeground.editSelected
                 } else if isCurrentChord {
-                    return Color.black1
+                    return ProgressPalette.Segment.ChordCellForeground.editCurrent
                 } else {
-                    return Color.white1
+                    return ProgressPalette.Segment.ChordCellForeground.editNormal
                 }
             } else {
                 if isCurrentChord {
-                    return Color.white1
+                    return ProgressPalette.Segment.ChordCellForeground.viewCurrent
                 } else {
-                    return Color.black1
+                    return ProgressPalette.Segment.ChordCellForeground.viewNormal
                 }
             }
         }
@@ -244,17 +244,17 @@ struct Segment: View {
         private var backgroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
                 if isSelected {
-                    return Color.blue6
+                    return ProgressPalette.Segment.ChordCellBackground.editSelected
                 } else if isCurrentChord {
-                    return Color.white1
+                    return ProgressPalette.Segment.ChordCellBackground.editCurrent
                 } else {
-                    return Color.black2
+                    return ProgressPalette.Segment.ChordCellBackground.editNormal
                 }
             } else {
                 if isCurrentChord {
-                    return Color.blue6
+                    return ProgressPalette.Segment.ChordCellBackground.viewCurrent
                 } else {
-                    return Color.white1
+                    return ProgressPalette.Segment.ChordCellBackground.viewNormal
                 }
             }
         }
@@ -329,7 +329,8 @@ struct Segment: View {
             }
             .foregroundStyle(
                 editMode?.wrappedValue.isEditing == true
-                    ? Color.black5 : Color.black8
+                    ? ProgressPalette.Segment.TimeRuler.edit
+                    : ProgressPalette.Segment.TimeRuler.view
             )
             .padding(.horizontal, Spacing.xs)
         }

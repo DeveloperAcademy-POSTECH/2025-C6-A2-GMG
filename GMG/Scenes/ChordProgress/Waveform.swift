@@ -27,25 +27,25 @@ struct Waveform: View {
 
     private var backgroundColor: Color {
         if editMode?.wrappedValue.isEditing == true {
-            Color.black2
+            ProgressPalette.Waveform.backgroundEdit
         } else {
-            Color.white2
+            ProgressPalette.Waveform.backgroundView
         }
     }
 
     private var unFilledCapsuleColor: Color {
         if editMode?.wrappedValue.isEditing == true {
-            Color.black7
+            ProgressPalette.Waveform.unfilledEdit
         } else {
-            Color.white3
+            ProgressPalette.Waveform.unfilledView
         }
     }
 
     private var filledCapsuleColor: Color {
         if editMode?.wrappedValue.isEditing == true {
-            Color.white1
+            ProgressPalette.Waveform.filledEdit
         } else {
-            Color.blue4
+            ProgressPalette.Waveform.filledView
         }
     }
 
