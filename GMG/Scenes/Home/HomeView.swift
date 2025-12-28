@@ -21,7 +21,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            HomePalette.Background.root
                 .padding(-Spacing.xxl)
                 .ignoresSafeArea()
 
@@ -52,7 +52,7 @@ struct HomeView: View {
                 .background {
                     BlurUIKitView(
                         maximumBlurRadius: 4,
-                        dimmingTintColor: UIColor.bg1,
+                        dimmingTintColor: UIColor.Home.headerBlurTint,
                         dimmingAlpha: .constant(alpha: 0.8),
                         dimmingOvershoot: .relative(fraction: 0.5)
                     )
@@ -102,13 +102,13 @@ extension HomeView {
         struct Logo: View {
             private var reString: AttributedString {
                 var string: AttributedString = AttributedString("Re:")
-                string.foregroundColor = Color.black3
+                string.foregroundColor = HomePalette.Header.logoRe
                 return string
             }
 
             private var chordString: AttributedString {
                 var string: AttributedString = AttributedString("chord")
-                string.foregroundColor = Color.black1
+                string.foregroundColor = HomePalette.Header.logoChord
                 return string
             }
 
@@ -135,7 +135,7 @@ extension HomeView {
 
             var body: some View {
                 Text("\(countString) \(unitString)")
-                    .foregroundStyle(Color.black1)
+                    .foregroundStyle(HomePalette.Header.songCountText)
             }
         }
     }
@@ -160,7 +160,7 @@ extension HomeView {
                             .english(Typography.WantedSansStd.R7),
                             .korean(Typography.Pretendard.SB7)
                         )
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(HomePalette.Recent.title)
 
                     Spacer()
                 }
@@ -189,10 +189,10 @@ extension HomeView {
                     action()
                 } label: {
                     Image(systemName: "plus")
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(HomePalette.Recent.addButtonIcon)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(
-                            Color.white,
+                            HomePalette.Recent.addButtonBackground,
                             in: RoundedRectangle(cornerRadius: 32)
                         )
                 }
@@ -236,7 +236,7 @@ extension HomeView {
                         deleteScoreAction: intent.requestDeleteScoreConfirmation
                     )
                     .compactStyle()
-                    .backgroundColor(.latestColor(index: index))
+                    .backgroundColor(HomePalette.ScoreCard.latestBackground(index: index))
                     .frame(width: 156)
                     .matchedTransitionSource(id: score.id, in: namespace)
                 }
@@ -261,7 +261,7 @@ extension HomeView {
                             .english(Typography.WantedSansStd.R7),
                             .korean(Typography.Pretendard.SB7)
                         )
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(HomePalette.All.title)
 
                     HStack(alignment: .lastTextBaseline, spacing: Spacing.sm) {
                         SortButton(.latest) {
@@ -318,7 +318,9 @@ extension HomeView {
                             .korean(Typography.Pretendard.M5)
                         )
                         .foregroundStyle(
-                            isEnabled == false ? Color.black5 : Color.black3
+                            isEnabled == false
+                                ? HomePalette.All.sortDisabled
+                                : HomePalette.All.sortEnabled
                         )
                 }
                 .buttonStyle(.bouncy)
@@ -329,13 +331,13 @@ extension HomeView {
             var body: some View {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     Text("An experience")
-                        .foregroundStyle(Color.white3.opacity(0.55))
+                        .foregroundStyle(HomePalette.All.emptyLine1)
                     Text("where humming")
-                        .foregroundStyle(Color.black8.opacity(0.3))
+                        .foregroundStyle(HomePalette.All.emptyLine2)
                     Text("becomes the")
-                        .foregroundStyle(Color.black4.opacity(0.3))
+                        .foregroundStyle(HomePalette.All.emptyLine3)
                     Text("start of a song")
-                        .foregroundStyle(Color.black4.opacity(0.35))
+                        .foregroundStyle(HomePalette.All.emptyLine4)
                 }
                 .font(
                     .custom(Typography.WantedSansStd.Bold, size: 42)
@@ -388,7 +390,8 @@ extension HomeView {
                         .playButtonVisibility(isSelected ? .visible : .hidden)
                         .backgroundColor(
                             model.isLatest
-                                ? .latestColor(index: index) : .earliestColor(index: index)
+                                ? HomePalette.ScoreCard.latestBackground(index: index)
+                                : HomePalette.ScoreCard.earliestBackground(index: index)
                         )
                         .frame(height: 128)
                         .matchedTransitionSource(id: score.id, in: namespace)
@@ -435,7 +438,7 @@ extension HomeView {
                     .font(
                         isCompact ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
                     )
-                    .foregroundStyle(Color.white1)
+                    .foregroundStyle(HomePalette.ScoreCard.title)
                     .autocorrectionDisabled()
                     .focused($isTitleFocused)
                     .onSubmit { endRename() }
@@ -464,7 +467,7 @@ extension HomeView {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .foregroundStyle(Color.white1)
+                            .foregroundStyle(HomePalette.ScoreCard.menuIcon)
                             .frame(maxWidth: 20, maxHeight: 30)
                     }
                     .menuIndicator(.hidden)
@@ -473,13 +476,13 @@ extension HomeView {
                 HStack {
                     Text(score.createdAt.formattedDate())
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(HomePalette.ScoreCard.meta)
 
                     Spacer()
 
                     Text(score.totalDuration.formattedTime())
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(HomePalette.ScoreCard.meta)
                 }
 
                 Spacer(minLength: 0.0)
@@ -490,7 +493,7 @@ extension HomeView {
                             isCompact
                                 ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
                         )
-                        .foregroundStyle(Color.white2)
+                        .foregroundStyle(HomePalette.ScoreCard.key)
 
                     Spacer()
 
@@ -578,7 +581,7 @@ extension HomeView {
                         .scaledToFit()
                         .frame(width: isPlaying ? 12 : 10, height: isPlaying ? 12 : 10)
                         .padding(.leading, isPlaying ? 0 : 2)
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(HomePalette.Playback.icon)
                         .frame(width: 30, height: 30)
                         .background {
                             let lineWidth: CGFloat = 3
@@ -586,9 +589,11 @@ extension HomeView {
 
                             Circle()
                                 .inset(by: lineWidth / 2 + 0.2)
-                                .fill(Color.white2)
+                                .fill(HomePalette.Playback.circleFill)
                                 .stroke(
-                                    isProgressPresented ? Color.bg1 : Color.white2,
+                                    isProgressPresented
+                                        ? HomePalette.Playback.circleBaseStroke
+                                        : HomePalette.Playback.circleBaseStrokeIdle,
                                     lineWidth: lineWidth
                                 )
                                 .drawingGroup()
@@ -597,7 +602,7 @@ extension HomeView {
                                 .inset(by: lineWidth / 2)
                                 .trim(from: 0, to: progress)
                                 .stroke(
-                                    Color.bg2,
+                                    HomePalette.Playback.progress,
                                     style: StrokeStyle(
                                         lineWidth: lineWidth, lineCap: .round)
                                 )
@@ -616,19 +621,6 @@ extension HomeView {
         router.view(.home)
     }
     .environment(\.locale, .init(languageCode: .english))
-}
-
-extension Color {
-    private static let latestColors: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
-    private static let earliestColors: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
-
-    fileprivate static func latestColor(index: Int) -> Self {
-        return latestColors[index % latestColors.count]
-    }
-
-    fileprivate static func earliestColor(index: Int) -> Self {
-        return earliestColors[index % earliestColors.count]
-    }
 }
 
 extension Date {
