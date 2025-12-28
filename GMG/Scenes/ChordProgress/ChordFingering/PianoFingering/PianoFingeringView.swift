@@ -78,7 +78,9 @@ extension PianoFingeringView {
         var body: some View {
             RoundedRectangle(cornerRadius: 4)
                 .foregroundStyle(
-                    isActive ? Color.blue3 : Color.black1
+                    isActive
+                        ? ProgressPalette.Fingering.PianoKey.blackActive
+                        : ProgressPalette.Fingering.PianoKey.blackInactive
                 )
         }
     }
@@ -89,7 +91,9 @@ extension PianoFingeringView {
         var body: some View {
             RoundedRectangle(cornerRadius: 4)
                 .foregroundStyle(
-                    isActive ? Color.blue3 : Color.white1
+                    isActive
+                        ? ProgressPalette.Fingering.PianoKey.whiteActive
+                        : ProgressPalette.Fingering.PianoKey.whiteInactive
                 )
         }
     }
@@ -105,7 +109,10 @@ extension PianoFingeringView {
         .padding(.horizontal, Spacing.md)
         .padding(.vertical, Spacing.sm)
         .frame(height: 128)
-        .background(Color.black8, in: RoundedRectangle(cornerRadius: 12))
+        .background(
+            ProgressPalette.Fingering.Preview.background,
+            in: RoundedRectangle(cornerRadius: 12)
+        )
 
         HStack {
             Picker(
