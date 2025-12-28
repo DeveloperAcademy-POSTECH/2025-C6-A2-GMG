@@ -27,7 +27,15 @@ struct ControllerButton<Label: View>: View {
             }
             .geometryGroup()
             .foregroundStyle(
-                isDark ? Color.white1 : Color.black1
+                isDark
+                    ? ComponentPalette.ControllerButton.Foreground.dark
+                    : ComponentPalette.ControllerButton.Foreground.light
+            )
+            .background(
+                isDark
+                    ? ComponentPalette.ControllerButton.Background.dark
+                    : ComponentPalette.ControllerButton.Background.light,
+                in: RoundedRectangle(cornerRadius: 18)
             )
             .frame(
                 maxWidth: .infinity,

@@ -12,8 +12,10 @@ struct BackButton: View {
         } label: {
             Image(systemName: "chevron.backward")
                 .foregroundStyle(
-                    colorScheme == .light ?
-                    Color.black1 : Color.white1)
+                    colorScheme == .light
+                        ? ComponentPalette.BackButton.light
+                        : ComponentPalette.BackButton.dark
+                )
         }
     }
 }
