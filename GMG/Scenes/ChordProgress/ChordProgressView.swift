@@ -88,7 +88,8 @@ struct ChordProgressView: View {
                             .renderingMode(.template)
                             .foregroundStyle(
                                 model.isEditMode == false
-                                    ? Color.black1 : Color.white1
+                                    ? ProgressPalette.Navigation.homeLight
+                                    : ProgressPalette.Navigation.homeDark
                             )
                     }
                 },
@@ -192,7 +193,8 @@ extension ChordProgressView {
                 .font(Typography.WantedSansStd.R6)
                 .foregroundStyle(
                     colorScheme == .light
-                        ? Color.black1 : Color.white1
+                        ? ProgressPalette.Title.fieldTextLight
+                        : ProgressPalette.Title.fieldTextDark
                 )
                 .focused($isTitleFieldFocused)
                 .submitLabel(.done)
@@ -213,7 +215,8 @@ extension ChordProgressView {
                         .font(Typography.WantedSansStd.R6)
                         .foregroundStyle(
                             colorScheme == .light
-                                ? Color.black4 : Color.black3
+                                ? ProgressPalette.Title.labelTextLight
+                                : ProgressPalette.Title.labelTextDark
                         )
                         .opacity(
                             isTitleEditing ? 0 : 1
@@ -223,8 +226,8 @@ extension ChordProgressView {
                         .renderingMode(.template)
                         .foregroundColor(
                             colorScheme == .light
-                                ? Color.black1
-                                : Color.white1
+                                ? ProgressPalette.Title.pencilLight
+                                : ProgressPalette.Title.pencilDark
                         )
                         .opacity(
                             isTitleEditing ? 0 : 1
@@ -240,7 +243,8 @@ extension ChordProgressView {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(
                             colorScheme == .light
-                                ? Color.white3 : Color.black7
+                                ? ProgressPalette.Title.editingBackgroundLight
+                                : ProgressPalette.Title.editingBackgroundDark
                         )
                 }
             }
@@ -252,9 +256,9 @@ extension ChordProgressView {
 
         private var backgroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
-                Color.bg2
+                ProgressPalette.Background.edit
             } else {
-                Color.bg1
+                ProgressPalette.Background.normal
             }
         }
 
@@ -293,7 +297,8 @@ extension ChordProgressView {
             }
             .foregroundStyle(
                 editMode?.wrappedValue.isEditing == true
-                    ? Color.white1 : Color.black1
+                    ? ProgressPalette.ScoreInformation.edit
+                    : ProgressPalette.ScoreInformation.normal
             )
         }
     }
@@ -336,7 +341,9 @@ extension ChordProgressView {
                 } label: {
                     label()
                         .foregroundStyle(
-                            isEnabled ? .white1 : .black2
+                            isEnabled
+                                ? ProgressPalette.EditController.enabled
+                                : ProgressPalette.EditController.disabled
                         )
                 }
                 .buttonStyle(.bouncy)
@@ -369,7 +376,7 @@ extension ChordProgressView {
             .background(
                 RoundedRectangle(cornerRadius: 8)
                     .inset(by: isEditMode ? 0.2 : 0)
-                    .fill(.white1)
+                    .fill(ProgressPalette.EditModeToggle.background)
             )
             .animation(.default, value: isEditMode)
         }
@@ -428,14 +435,16 @@ extension ChordProgressView {
                         )
                         .bold(isSelected)
                         .foregroundStyle(
-                            isSelected ? Color.white1 : Color.black1
+                            isSelected
+                                ? ProgressPalette.EditModeToggle.titleSelected
+                                : ProgressPalette.EditModeToggle.titleUnselected
                         )
                         .padding(.vertical, 10)
                         .padding(.horizontal, horizontalPadding)
                         .background {
                             if isSelected {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.blue6)
+                                    .fill(ProgressPalette.EditModeToggle.selectedBackground)
                                     .matchedGeometryEffect(
                                         id: "Background",
                                         in: namespace
@@ -542,14 +551,20 @@ extension ChordProgressView {
                 VStack(spacing: .zero) {
                     LinearGradient(
                         stops: [
-                            Gradient.Stop(color: .clear, location: 0.0),
-                            Gradient.Stop(color: .white, location: 1.0),
+                            Gradient.Stop(
+                                color: ProgressPalette.SegmentsScrollMask.topGradientStart,
+                                location: 0.0
+                            ),
+                            Gradient.Stop(
+                                color: ProgressPalette.SegmentsScrollMask.topGradientEnd,
+                                location: 1.0
+                            ),
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                     .frame(height: Spacing.md)
-                    Color.white
+                    ProgressPalette.SegmentsScrollMask.bottom
                 }
                 .ignoresSafeArea()
             }

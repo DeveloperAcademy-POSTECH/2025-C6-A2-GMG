@@ -18,16 +18,16 @@ struct ChordFingeringView: View {
 
     private var backgroundColor: Color {
         return switch instrument {
-        case .piano: Color.black8.opacity(0.2)
-        case .guitar: Color.white1.opacity(0.7)
+        case .piano: ProgressPalette.Fingering.ChordBackground.piano
+        case .guitar: ProgressPalette.Fingering.ChordBackground.guitar
         }
     }
 
     private var symbolColor: Color {
         return switch colorScheme {
-        case .light: .black1
-        case .dark: .white1
-        @unknown default: .black1
+        case .light: ProgressPalette.Fingering.Symbol.light
+        case .dark: ProgressPalette.Fingering.Symbol.dark
+        @unknown default: ProgressPalette.Fingering.Symbol.light
         }
     }
 

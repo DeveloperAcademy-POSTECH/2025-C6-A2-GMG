@@ -57,7 +57,7 @@ extension GuitarFingeringView {
                 ForEach(GuitarString.allCases.reversed(), id: \.self) { string in
                     Text(symbol(for: strings[string]))
                         .font(Typography.WantedSansStd.R4.font)
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(ProgressPalette.Fingering.GuitarStringIndicator.text)
                         .frame(
                             width: Self.indicatorSize.width,
                             height: Self.indicatorSize.height
@@ -83,7 +83,7 @@ extension GuitarFingeringView {
 
         var body: some View {
             RoundedRectangle(cornerRadius: 2)
-                .fill(Color.black1)
+                .fill(ProgressPalette.Fingering.Nut.fill)
                 .opacity(startFret <= 1 ? 1.0 : 0.0)
                 .frame(width: Self.nutWidth)
         }
@@ -138,8 +138,8 @@ extension GuitarFingeringView {
 
         private func guitarStringColor(for state: GuitarStringState?) -> Color {
             return switch state {
-            case .mute: .red1
-            default: .black1
+            case .mute: ProgressPalette.Fingering.String.mute
+            default: ProgressPalette.Fingering.String.normal
             }
         }
     }
@@ -153,7 +153,7 @@ extension GuitarFingeringView {
 
                 ForEach(0..<3) { _ in
                     Rectangle()
-                        .fill(Color.black8)
+                        .fill(ProgressPalette.Fingering.FretDivider.line)
                         .frame(width: Self.dividerWidth)
 
                     Spacer()
@@ -176,7 +176,7 @@ extension GuitarFingeringView {
                             let currentFret: Int = max(startFret, 1) + fret
 
                             Circle()
-                                .fill(Color.blue3)
+                                .fill(ProgressPalette.Fingering.Dot.fill)
                                 .frame(
                                     width: Self.dotSize.width,
                                     height: Self.dotSize.height
@@ -223,7 +223,7 @@ extension GuitarFingeringView {
                                     )
 
                                 Capsule()
-                                    .fill(Color.blue3)
+                                    .fill(ProgressPalette.Fingering.Barre.fill)
                                     .frame(width: Self.barreWidth)
 
                                 Color.clear
@@ -250,7 +250,7 @@ extension GuitarFingeringView {
 
                     Text("\(currentFret)")
                         .font(Typography.WantedSansStd.R4.font)
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(ProgressPalette.Fingering.FretIndicator.text)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -268,7 +268,10 @@ extension GuitarFingeringView {
             .padding(.horizontal, Spacing.md)
             .frame(height: 128)
             .frame(maxWidth: .infinity)
-            .background(Color.white1, in: RoundedRectangle(cornerRadius: 12))
+            .background(
+                ProgressPalette.Fingering.Preview.background,
+                in: RoundedRectangle(cornerRadius: 12)
+            )
 
         HStack {
             Picker(
