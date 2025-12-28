@@ -20,7 +20,7 @@ struct RecordingView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            RecordingPalette.Background.root
                 .ignoresSafeArea()
 
             VStack {
@@ -110,9 +110,8 @@ struct RecordingView: View {
 
         var body: some View {
             ZStack {
-                Color.black
-                    .opacity(countdown > 0 ? 0.6 : 0.0)
-                    .ignoresSafeArea()
+                RecordingPalette.Countdown.dimming
+                    .opacity(countdown > 0 ? 1.0 : 0.0)
 
                 if countdown > 0 {
                     Text(countdown.formatted())
@@ -122,7 +121,7 @@ struct RecordingView: View {
                                 size: 128
                             )
                         )
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(RecordingPalette.Countdown.number)
                         .contentTransition(.numericText())
                         .offset(y: -80)
 
@@ -132,7 +131,7 @@ struct RecordingView: View {
                         Text(.skip)
                             .font(Typography.WantedSansStd.R6)
                             .underline()
-                            .foregroundStyle(Color.white1)
+                            .foregroundStyle(RecordingPalette.Countdown.skip)
                     }
                     .buttonStyle(.bouncy)
                     .offset(y: 144)
@@ -155,8 +154,8 @@ struct RecordingView: View {
                                 recordingTime.truncatingRemainder(dividingBy: 2)
                             )
                                 == 1)
-                            ? Color.red1
-                            : Color.black3
+                            ? RecordingPalette.RecordingTime.indicatorRecording
+                            : RecordingPalette.RecordingTime.indicatorIdle
                     )
                     .frame(width: 14, height: 14)
                     .offset(y: -20)
@@ -178,31 +177,34 @@ struct RecordingView: View {
                 String(format: "%02d:%02d", minute, second)
             )
 
-            attributedString.foregroundColor = Color.black3
+            attributedString.foregroundColor = RecordingPalette.RecordingTime.timeBase
 
             if minute >= 10 {
-                attributedString.foregroundColor = Color.black1
+                attributedString.foregroundColor = RecordingPalette.RecordingTime.timeHighlight
             } else if minute > 0 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 1
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.black1
+                attributedString[range].foregroundColor =
+                    RecordingPalette.RecordingTime.timeHighlight
             } else if second >= 10 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 3
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.black1
+                attributedString[range].foregroundColor =
+                    RecordingPalette.RecordingTime.timeHighlight
             } else if second > 0 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 4
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.black1
+                attributedString[range].foregroundColor =
+                    RecordingPalette.RecordingTime.timeHighlight
             }
 
             return attributedString
@@ -245,7 +247,7 @@ struct RecordingView: View {
                         )
 
                         let path: Path = Path(roundedRect: rect, cornerRadius: capsuleWidth / 2)
-                        context.fill(path, with: .color(Color.black4))
+                        context.fill(path, with: .color(RecordingPalette.WaveForm.bar))
                     }
                 }
             }
