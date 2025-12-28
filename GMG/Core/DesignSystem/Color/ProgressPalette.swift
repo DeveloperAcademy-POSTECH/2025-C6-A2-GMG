@@ -62,6 +62,14 @@ enum ProgressPalette {
             static let guitar = Color.white1.opacity(0.7)
         }
 
+        enum PianoKey {
+            static let blackActive = Color.blue3
+            static let blackInactive = Color.black1
+
+            static let whiteActive = Color.blue3
+            static let whiteInactive = Color.white1
+        }
+
         enum Symbol {
             static let light = Color.black1
             static let dark = Color.white1
