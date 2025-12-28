@@ -21,7 +21,7 @@ struct ExportView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            ExportPalette.Background.root
                 .ignoresSafeArea()
 
             VStack(spacing: .zero) {
@@ -60,7 +60,7 @@ struct ExportView: View {
                             .english(Typography.WantedSansStd.R6),
                             .korean(Typography.Pretendard.M6)
                         )
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(ExportPalette.Navigation.title)
                 },
                 trailing: {
                     Button {
@@ -68,7 +68,7 @@ struct ExportView: View {
                     } label: {
                         Image(.home)
                             .renderingMode(.template)
-                            .foregroundStyle(Color.black1)
+                            .foregroundStyle(ExportPalette.Navigation.homeIcon)
                     }
                 }
             )
@@ -87,7 +87,7 @@ extension ExportView {
             HStack(spacing: 0) {
                 Text(title)
                     .font(Typography.WantedSansStd.B15)
-                    .foregroundStyle(Color.black1)
+                    .foregroundStyle(ExportPalette.Info.title)
                 Spacer()
             }
         }
@@ -101,11 +101,11 @@ extension ExportView {
             HStack(spacing: 0) {
                 Text(keyDescription)
                     .font(Typography.WantedSansStd.R7)
-                    .foregroundStyle(Color.black1)
+                    .foregroundStyle(ExportPalette.Info.key)
                 Spacer()
                 Text(dateString)
                     .font(Typography.WantedSansStd.R4)
-                    .foregroundStyle(Color.black5)
+                    .foregroundStyle(ExportPalette.Info.date)
             }
         }
     }
@@ -151,7 +151,11 @@ extension ExportView {
                 HStack {
                     ForEach(images.indices, id: \.self) { index in
                         Circle()
-                            .fill(focusedImageIndex == index ? Color.black1 : Color.black8)
+                            .fill(
+                                focusedImageIndex == index
+                                    ? ExportPalette.Carousel.indicatorActive
+                                    : ExportPalette.Carousel.indicatorInactive
+                            )
                             .frame(width: 6, height: 6)
                             .onTapGesture {
                                 focusedImageIndex = index
@@ -201,7 +205,7 @@ extension ExportView {
                             .english(Typography.WantedSansStd.M2),
                             .korean(Typography.Pretendard.M6)
                         )
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(ExportPalette.Button.primaryText)
                     Image(image)
                         .offset(y: -2)
                 }
@@ -209,7 +213,7 @@ extension ExportView {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 18)
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(ExportPalette.Button.primaryBackground)
                 )
             }
             .buttonStyle(.bouncy)
