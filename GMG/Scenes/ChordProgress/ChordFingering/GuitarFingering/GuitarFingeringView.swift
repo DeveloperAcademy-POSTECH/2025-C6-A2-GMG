@@ -51,13 +51,14 @@ extension GuitarFingeringView {
         private static let indicatorSize: CGSize = .init(width: 12, height: 8)
 
         let strings: [GuitarString: GuitarStringState]
+        @Environment(\.palette) private var palette
 
         var body: some View {
             VStack(spacing: .zero) {
                 ForEach(GuitarString.allCases.reversed(), id: \.self) { string in
                     Text(symbol(for: strings[string]))
                         .font(Typography.WantedSansStd.R4.font)
-                        .foregroundStyle(ProgressPalette.Fingering.GuitarStringIndicator.text)
+                        .foregroundStyle(palette.primaryText)
                         .frame(
                             width: Self.indicatorSize.width,
                             height: Self.indicatorSize.height
@@ -80,10 +81,11 @@ extension GuitarFingeringView {
         private static let nutWidth: CGFloat = 8
 
         let startFret: Int
+        @Environment(\.palette) private var palette
 
         var body: some View {
             RoundedRectangle(cornerRadius: 2)
-                .fill(ProgressPalette.Fingering.Nut.fill)
+                .fill(palette.primaryText)
                 .opacity(startFret <= 1 ? 1.0 : 0.0)
                 .frame(width: Self.nutWidth)
         }
@@ -124,6 +126,7 @@ extension GuitarFingeringView {
 
     private struct GuitarStringView: View {
         let strings: [GuitarString: GuitarStringState]
+        @Environment(\.palette) private var palette
 
         var body: some View {
             VStack(spacing: .zero) {
@@ -137,15 +140,18 @@ extension GuitarFingeringView {
         }
 
         private func guitarStringColor(for state: GuitarStringState?) -> Color {
-            return switch state {
-            case .mute: ProgressPalette.Fingering.String.mute
-            default: ProgressPalette.Fingering.String.normal
+            switch state {
+            case .mute:
+                return palette.statusRecording  // red1
+            default:
+                return palette.primaryText  // black1
             }
         }
     }
 
     private struct FretDividerView: View {
         private static let dividerWidth: CGFloat = 2
+        @Environment(\.palette) private var palette
 
         var body: some View {
             HStack(spacing: .zero) {
@@ -153,7 +159,7 @@ extension GuitarFingeringView {
 
                 ForEach(0..<3) { _ in
                     Rectangle()
-                        .fill(ProgressPalette.Fingering.FretDivider.line)
+                        .fill(palette.disabledText)  // black7 ≈ black8
                         .frame(width: Self.dividerWidth)
 
                     Spacer()
@@ -167,6 +173,7 @@ extension GuitarFingeringView {
 
         let startFret: Int
         let strings: [GuitarString: GuitarStringState]
+        @Environment(\.palette) private var palette
 
         var body: some View {
             Grid(horizontalSpacing: .zero, verticalSpacing: .zero) {
@@ -176,7 +183,7 @@ extension GuitarFingeringView {
                             let currentFret: Int = max(startFret, 1) + fret
 
                             Circle()
-                                .fill(ProgressPalette.Fingering.Dot.fill)
+                                .fill(palette.fingeringColor)  // blue3
                                 .frame(
                                     width: Self.dotSize.width,
                                     height: Self.dotSize.height
@@ -204,6 +211,7 @@ extension GuitarFingeringView {
 
         let startFret: Int
         let barres: [Barre]
+        @Environment(\.palette) private var palette
 
         var body: some View {
             GeometryReader { geometry in
@@ -223,7 +231,7 @@ extension GuitarFingeringView {
                                     )
 
                                 Capsule()
-                                    .fill(ProgressPalette.Fingering.Barre.fill)
+                                    .fill(palette.fingeringColor)  // blue3
                                     .frame(width: Self.barreWidth)
 
                                 Color.clear
@@ -242,6 +250,7 @@ extension GuitarFingeringView {
 
     private struct FretIndicatorView: View {
         let startFret: Int
+        @Environment(\.palette) private var palette
 
         var body: some View {
             HStack(spacing: .zero) {
@@ -250,7 +259,7 @@ extension GuitarFingeringView {
 
                     Text("\(currentFret)")
                         .font(Typography.WantedSansStd.R4.font)
-                        .foregroundStyle(ProgressPalette.Fingering.FretIndicator.text)
+                        .foregroundStyle(palette.primaryText)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -269,7 +278,7 @@ extension GuitarFingeringView {
             .frame(height: 128)
             .frame(maxWidth: .infinity)
             .background(
-                ProgressPalette.Fingering.Preview.background,
+                Palette.basic.sheetBackground,
                 in: RoundedRectangle(cornerRadius: 12)
             )
 

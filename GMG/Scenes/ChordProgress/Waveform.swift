@@ -3,6 +3,7 @@ import SwiftUI
 
 struct Waveform: View {
     @Environment(\.editMode) private var editMode
+    @Environment(\.palette) private var palette
 
     let width: CGFloat
     let amplitudes: [Float]
@@ -27,25 +28,25 @@ struct Waveform: View {
 
     private var backgroundColor: Color {
         if editMode?.wrappedValue.isEditing == true {
-            ProgressPalette.Waveform.backgroundEdit
+            palette.waveformBackgroundEdit
         } else {
-            ProgressPalette.Waveform.backgroundView
+            palette.waveformBackgroundView
         }
     }
 
     private var unFilledCapsuleColor: Color {
         if editMode?.wrappedValue.isEditing == true {
-            ProgressPalette.Waveform.unfilledEdit
+            palette.waveformUnfilledEdit
         } else {
-            ProgressPalette.Waveform.unfilledView
+            palette.waveformUnfilledView
         }
     }
 
     private var filledCapsuleColor: Color {
         if editMode?.wrappedValue.isEditing == true {
-            ProgressPalette.Waveform.filledEdit
+            palette.waveformFilledEdit
         } else {
-            ProgressPalette.Waveform.filledView
+            palette.waveformFilledView
         }
     }
 

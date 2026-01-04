@@ -28,6 +28,7 @@ struct Segment: View {
     let waveformHandlers: WaveformHandlers
 
     @Environment(\.editMode) private var editMode
+    @Environment(\.palette) private var palette
 
     private let audioSampleInterval: TimeInterval = 0.1
 
@@ -148,12 +149,13 @@ struct Segment: View {
     }
 
     struct ChordCellCandidates: View {
+        @Environment(\.palette) private var palette
         let chordCell: ChordCell
         let onTapChordCandidate: (Chord, ChordCell) -> Void
 
         var body: some View {
             ZStack {
-                ProgressPalette.Segment.CandidateStrip.background
+                palette.waveformBackgroundEdit
 
                 HStack {
                     Spacer()
@@ -178,6 +180,7 @@ struct Segment: View {
     }
 
     struct ChordCandidateButton: View {
+        @Environment(\.palette) private var palette
         let index: Int
         let chord: Chord
         let selectedChord: Chord?
@@ -185,11 +188,11 @@ struct Segment: View {
 
         private var backgroundColor: Color {
             if selectedChord == chord {
-                return ProgressPalette.Segment.CandidateButton.selectedBackground
+                return palette.chordCandidateSelectedBackground
             } else if index == 0 || index == 1 {
-                return ProgressPalette.Segment.CandidateButton.primaryBackground
+                return palette.chordCandidatePrimaryBackground
             } else {
-                return ProgressPalette.Segment.CandidateButton.secondaryBackground
+                return palette.chordCandidateSecondaryBackground
             }
         }
 
@@ -200,7 +203,7 @@ struct Segment: View {
                 VStack {
                     Text(chord.description)
                         .font(Typography.WantedSansStd.R5)
-                        .foregroundStyle(ProgressPalette.Segment.CandidateButton.title)
+                        .foregroundStyle(palette.primaryButtonLabel)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
@@ -222,21 +225,22 @@ struct Segment: View {
         let onTapButton: () -> Void
 
         @Environment(\.editMode) private var editMode
+        @Environment(\.palette) private var palette
 
         private var foregroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
                 if isSelected {
-                    return ProgressPalette.Segment.ChordCellForeground.editSelected
+                    return palette.overlayPrimaryText
                 } else if isCurrentChord {
-                    return ProgressPalette.Segment.ChordCellForeground.editCurrent
+                    return palette.primaryText
                 } else {
-                    return ProgressPalette.Segment.ChordCellForeground.editNormal
+                    return palette.overlayPrimaryText
                 }
             } else {
                 if isCurrentChord {
-                    return ProgressPalette.Segment.ChordCellForeground.viewCurrent
+                    return palette.overlayPrimaryText
                 } else {
-                    return ProgressPalette.Segment.ChordCellForeground.viewNormal
+                    return palette.primaryText
                 }
             }
         }
@@ -244,17 +248,17 @@ struct Segment: View {
         private var backgroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
                 if isSelected {
-                    return ProgressPalette.Segment.ChordCellBackground.editSelected
+                    return palette.chordCellHighlightBackground
                 } else if isCurrentChord {
-                    return ProgressPalette.Segment.ChordCellBackground.editCurrent
+                    return palette.sheetBackground
                 } else {
-                    return ProgressPalette.Segment.ChordCellBackground.editNormal
+                    return palette.waveformBackgroundEdit
                 }
             } else {
                 if isCurrentChord {
-                    return ProgressPalette.Segment.ChordCellBackground.viewCurrent
+                    return palette.chordCellHighlightBackground
                 } else {
-                    return ProgressPalette.Segment.ChordCellBackground.viewNormal
+                    return palette.sheetBackground
                 }
             }
         }
@@ -304,6 +308,7 @@ struct Segment: View {
         let dotCount: Int
 
         @Environment(\.editMode) private var editMode
+        @Environment(\.palette) private var palette
 
         var body: some View {
             HStack {
@@ -327,11 +332,7 @@ struct Segment: View {
                     Spacer()
                 }
             }
-            .foregroundStyle(
-                editMode?.wrappedValue.isEditing == true
-                    ? ProgressPalette.Segment.TimeRuler.edit
-                    : ProgressPalette.Segment.TimeRuler.view
-            )
+            .foregroundStyle(palette.timeRulerLabelText)
             .padding(.horizontal, Spacing.xs)
         }
     }

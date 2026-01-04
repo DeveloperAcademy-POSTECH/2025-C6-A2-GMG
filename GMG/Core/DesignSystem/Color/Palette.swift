@@ -152,6 +152,15 @@ extension Palette {
         }
     }
 
+    // MARK: - Accent
+
+    var fingeringColor: Color {
+        switch self {
+        case .basic: return .blue3
+        case .next: return .blue3
+        }
+    }
+
     // MARK: - Controls
 
     // Sort
@@ -265,6 +274,38 @@ extension Palette {
         switch self {
         case .basic: return .black9
         case .next: return .black9
+        }
+    }
+
+    // Segment - Chord Candidates
+
+    var chordCandidateSelectedBackground: Color {
+        switch self {
+        case .basic: return .blue6
+        case .next: return .blue6
+        }
+    }
+
+    var chordCandidatePrimaryBackground: Color {
+        switch self {
+        case .basic: return .blue7
+        case .next: return .blue7
+        }
+    }
+
+    var chordCandidateSecondaryBackground: Color {
+        switch self {
+        case .basic: return .blue3
+        case .next: return .blue3
+        }
+    }
+
+    // Segment - Chord Cells
+
+    var chordCellHighlightBackground: Color {
+        switch self {
+        case .basic: return .blue6
+        case .next: return .blue6
         }
     }
 
