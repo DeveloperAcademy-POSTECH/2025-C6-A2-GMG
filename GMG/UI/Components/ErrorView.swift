@@ -3,6 +3,7 @@
 import SwiftUI
 
 struct ErrorView: View {
+    @Environment(\.palette) private var palette
     private let description: String?
 
     init(description: String? = nil) {
@@ -11,7 +12,7 @@ struct ErrorView: View {
 
     var body: some View {
         ZStack {
-            ComponentPalette.ErrorView.background
+            palette.background
                 .ignoresSafeArea()
             VStack {
                 Text("Error")
@@ -20,7 +21,7 @@ struct ErrorView: View {
                     .font(Typography.WantedSansStd.R5)
 
             }
-            .foregroundStyle(ComponentPalette.ErrorView.text)
+            .foregroundStyle(palette.primaryText)
             .navigationBar(
                 leading: {
 

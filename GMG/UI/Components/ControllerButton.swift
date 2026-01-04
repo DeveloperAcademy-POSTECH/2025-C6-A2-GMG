@@ -3,6 +3,7 @@
 import SwiftUI
 
 struct ControllerButton<Label: View>: View {
+    @Environment(\.palette) private var palette
     let isDark: Bool
     let action: () -> Void
     let label: Label
@@ -28,13 +29,13 @@ struct ControllerButton<Label: View>: View {
             .geometryGroup()
             .foregroundStyle(
                 isDark
-                    ? ComponentPalette.ControllerButton.Foreground.dark
-                    : ComponentPalette.ControllerButton.Foreground.light
+                    ? palette.primaryButtonLabel
+                    : palette.secondaryButtonLabel
             )
             .background(
                 isDark
-                    ? ComponentPalette.ControllerButton.Background.dark
-                    : ComponentPalette.ControllerButton.Background.light,
+                    ? palette.primaryButtonBackground
+                    : palette.secondaryButtonBackground,
                 in: RoundedRectangle(cornerRadius: 18)
             )
             .frame(
