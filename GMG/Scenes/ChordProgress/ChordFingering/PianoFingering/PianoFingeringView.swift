@@ -9,6 +9,7 @@ struct PianoFingeringView: View {
     private static let range: ClosedRange<Int8> = midiNumberC2...midiNumberB3
 
     let chord: Chord
+    @Environment(\.palette) private var palette
 
     var body: some View {
         let midiNoteNumbers: [Int8] = chord.tonicChord.midiNoteNumbers(octave: 2)
@@ -35,6 +36,7 @@ struct PianoFingeringView: View {
                         .frame(width: whiteKeyWidth, height: height)
                     }
                 }
+
                 ForEach(blackNotes, id: \.self) { note in
                     if let precedingWhiteIndex =
                         whiteNotes.firstIndex(where: { $0.midiNumber == note.midiNumber - 1 })
@@ -74,26 +76,28 @@ struct PianoFingeringView: View {
 extension PianoFingeringView {
     private struct BlackKeyView: View {
         let isActive: Bool
+        @Environment(\.palette) private var palette
 
         var body: some View {
             RoundedRectangle(cornerRadius: 4)
                 .foregroundStyle(
                     isActive
-                        ? ProgressPalette.Fingering.PianoKey.blackActive
-                        : ProgressPalette.Fingering.PianoKey.blackInactive
+                        ? palette.fingeringColor
+                        : palette.primaryText  // black1
                 )
         }
     }
 
     private struct WhiteKeyView: View {
         let isActive: Bool
+        @Environment(\.palette) private var palette
 
         var body: some View {
             RoundedRectangle(cornerRadius: 4)
                 .foregroundStyle(
                     isActive
-                        ? ProgressPalette.Fingering.PianoKey.whiteActive
-                        : ProgressPalette.Fingering.PianoKey.whiteInactive
+                        ? palette.fingeringColor
+                        : palette.sheetBackground  // white1
                 )
         }
     }
@@ -110,7 +114,7 @@ extension PianoFingeringView {
         .padding(.vertical, Spacing.sm)
         .frame(height: 128)
         .background(
-            ProgressPalette.Fingering.Preview.background,
+            Palette.basic.sheetBackground,
             in: RoundedRectangle(cornerRadius: 12)
         )
 
@@ -127,6 +131,7 @@ extension PianoFingeringView {
                 }
             }
             .pickerStyle(.wheel)
+
             Picker(
                 "Quality",
                 selection: Binding(
