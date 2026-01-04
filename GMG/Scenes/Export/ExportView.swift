@@ -5,6 +5,7 @@ internal import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
+    @Environment(\.palette) private var palette
     @State private var model: ExportModelStateProtocol
     @State private var intent: ExportIntentProtocol
     private weak var router: Router?
@@ -21,7 +22,7 @@ struct ExportView: View {
 
     var body: some View {
         ZStack {
-            ExportPalette.Background.root
+            palette.background
                 .ignoresSafeArea()
 
             VStack(spacing: .zero) {
@@ -60,7 +61,7 @@ struct ExportView: View {
                             .english(Typography.WantedSansStd.R6),
                             .korean(Typography.Pretendard.M6)
                         )
-                        .foregroundStyle(ExportPalette.Navigation.title)
+                        .foregroundStyle(palette.navigationBarTitleText)
                 },
                 trailing: {
                     Button {
@@ -68,7 +69,7 @@ struct ExportView: View {
                     } label: {
                         Image(.home)
                             .renderingMode(.template)
-                            .foregroundStyle(ExportPalette.Navigation.homeIcon)
+                            .foregroundStyle(palette.navigationBarIcon)
                     }
                 }
             )
@@ -81,19 +82,21 @@ struct ExportView: View {
 
 extension ExportView {
     struct Title: View {
+        @Environment(\.palette) private var palette
         let title: String
 
         var body: some View {
             HStack(spacing: 0) {
                 Text(title)
                     .font(Typography.WantedSansStd.B15)
-                    .foregroundStyle(ExportPalette.Info.title)
+                    .foregroundStyle(palette.primaryText)
                 Spacer()
             }
         }
     }
 
     struct KeyDate: View {
+        @Environment(\.palette) private var palette
         let keyDescription: String
         let dateString: String
 
@@ -101,16 +104,17 @@ extension ExportView {
             HStack(spacing: 0) {
                 Text(keyDescription)
                     .font(Typography.WantedSansStd.R7)
-                    .foregroundStyle(ExportPalette.Info.key)
+                    .foregroundStyle(palette.primaryText)
                 Spacer()
                 Text(dateString)
                     .font(Typography.WantedSansStd.R4)
-                    .foregroundStyle(ExportPalette.Info.date)
+                    .foregroundStyle(palette.metaText)
             }
         }
     }
 
     struct ImageCarousel: View {
+        @Environment(\.palette) private var palette
         let images: [UIImage]
 
         @State private var focusedImageIndex: Int? = .zero
@@ -153,8 +157,8 @@ extension ExportView {
                         Circle()
                             .fill(
                                 focusedImageIndex == index
-                                    ? ExportPalette.Carousel.indicatorActive
-                                    : ExportPalette.Carousel.indicatorInactive
+                                    ? palette.pageIndicatorActive
+                                    : palette.pageIndicatorInactive
                             )
                             .frame(width: 6, height: 6)
                             .onTapGesture {
@@ -169,6 +173,7 @@ extension ExportView {
     }
 
     struct ExportButton: View {
+        @Environment(\.palette) private var palette
         let items: [URL]
         let title: Text
         let image: ImageResource
@@ -205,7 +210,7 @@ extension ExportView {
                             .english(Typography.WantedSansStd.M2),
                             .korean(Typography.Pretendard.M6)
                         )
-                        .foregroundStyle(ExportPalette.Button.primaryText)
+                        .foregroundStyle(palette.primaryButtonLabel)
                     Image(image)
                         .offset(y: -2)
                 }
@@ -213,7 +218,7 @@ extension ExportView {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 18)
-                        .foregroundStyle(ExportPalette.Button.primaryBackground)
+                        .foregroundStyle(palette.primaryButtonBackground)
                 )
             }
             .buttonStyle(.bouncy)
