@@ -42,3 +42,12 @@ extension Instrument {
         }
     }
 }
+
+extension Instrument {
+    var program: Int {
+        return switch self {
+        case .piano: 0
+        case .guitar: 6
+        }
+    }
+}
