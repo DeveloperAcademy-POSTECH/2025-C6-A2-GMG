@@ -73,7 +73,7 @@ struct SegmentsScrollView: View {
                 isUserScrolling = newPhase == .interacting
             }
             .onChange(of: isPlaying) { _, isPlaying in
-                guard isPlaying, shouldAutoScroll else { return }
+                guard shouldAutoScroll else { return }
                 guard let index = currentSegmentIndex else { return }
                 withAnimation(.easeInOut(duration: 0.2)) {
                     proxy.scrollTo(index, anchor: .center)
