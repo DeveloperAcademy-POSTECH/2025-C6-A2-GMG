@@ -71,7 +71,7 @@ class ScoreAudioEngineBase {
 
         try sampler.loadSoundBankInstrument(
             at: url,
-            program: .zero,
+            program: UInt8(instrument.program),
             bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
             bankLSB: UInt8(kAUSampler_DefaultBankLSB)
         )
