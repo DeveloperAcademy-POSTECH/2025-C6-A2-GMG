@@ -68,7 +68,7 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
 
         // 코드 재생 준비
         try loadSoundBank(instrument: currentInstrumentPublisher.value)
-        prepareChordCells(octave: currentInstrumentPublisher.value.octave)
+        prepareChordCells()
 
         // 타이머 설정
         Timer.publish(
@@ -93,30 +93,32 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         }
         .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: AVAudioSession.routeChangeNotification)
-            .sink { [weak self] notification in
-                guard let self else { return }
+        NotificationCenter.default.publisher(
+            for: AVAudioSession.routeChangeNotification
+        )
+        .sink { [weak self] notification in
+            guard let self else { return }
 
-                do {
-                    let wasPlaying = self.player.isPlaying
-                    self.pause()
+            do {
+                let wasPlaying = self.player.isPlaying
+                self.pause()
 
-                    try self.activateAudioSession()
-                    try self.engine.start()
+                try self.activateAudioSession()
+                try self.engine.start()
 
-                    Task {
-                        try? await Task.sleep(for: .seconds(0.1))
-                        try? self.loadSoundBank()
+                Task {
+                    try? await Task.sleep(for: .seconds(0.1))
+                    try? self.loadSoundBank()
 
-                        if wasPlaying {
-                            self.play()
-                        }
+                    if wasPlaying {
+                        self.play()
                     }
-                } catch {
-                    Logger.error(String(describing: error))
                 }
+            } catch {
+                Logger.error(String(describing: error))
             }
-            .store(in: &cancellables)
+        }
+        .store(in: &cancellables)
     }
 
     func cleanupAfterPlay() {
@@ -238,9 +240,7 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         do {
             try loadSoundBank(instrument: instrument)
 
-            super.prepareChordCells(octave: instrument.octave)
-
-            pause()
+            prepareChordCells()
 
             self.currentInstrumentPublisher.send(instrument)
         } catch {
@@ -249,9 +249,17 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
     }
 
     func prepareChordCells() {
+        let wasPlaying = player.isPlaying
+
+        pause()
+
         super.prepareChordCells(
             octave: currentInstrumentPublisher.value.octave
         )
+
+        if wasPlaying {
+            play()
+        }
     }
 
     private func activateAudioSession() throws {
