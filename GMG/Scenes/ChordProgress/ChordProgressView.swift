@@ -76,7 +76,8 @@ struct ChordProgressView: View {
                         onDragEnd: intent.onDragWaveformEnd
                     ),
                     audioLevels: model.score.audioLevels,
-                    elapsedTime: model.playhead.elapsedTime
+                    elapsedTime: model.playhead.elapsedTime,
+                    isPlaying: model.playhead.isPlaying
                 )
             }
             .navigationBar(
