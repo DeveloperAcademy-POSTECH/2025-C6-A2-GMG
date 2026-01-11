@@ -4,6 +4,7 @@ import SwiftData
 import SwiftUI
 
 struct RecordingView: View {
+    @Environment(\.palette) private var palette
     @State private var model: RecordingModelStateProtocol
     @State private var intent: RecordingIntentProtocol
     private weak var router: Router?
@@ -20,7 +21,7 @@ struct RecordingView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            palette.background
                 .ignoresSafeArea()
 
             VStack {
@@ -105,14 +106,14 @@ struct RecordingView: View {
     }
 
     struct Countdown: View {
+        @Environment(\.palette) private var palette
         let countdown: Int
         let skipAction: () -> Void
 
         var body: some View {
             ZStack {
-                Color.black
-                    .opacity(countdown > 0 ? 0.6 : 0.0)
-                    .ignoresSafeArea()
+                palette.overlayDimming
+                    .opacity(countdown > 0 ? 1.0 : 0.0)
 
                 if countdown > 0 {
                     Text(countdown.formatted())
@@ -122,7 +123,7 @@ struct RecordingView: View {
                                 size: 128
                             )
                         )
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(palette.overlayPrimaryText)
                         .contentTransition(.numericText())
                         .offset(y: -80)
 
@@ -132,7 +133,7 @@ struct RecordingView: View {
                         Text(.skip)
                             .font(Typography.WantedSansStd.R6)
                             .underline()
-                            .foregroundStyle(Color.white1)
+                            .foregroundStyle(palette.overlayPrimaryText)
                     }
                     .buttonStyle(.bouncy)
                     .offset(y: 144)
@@ -143,6 +144,7 @@ struct RecordingView: View {
     }
 
     struct RecordingTime: View {
+        @Environment(\.palette) private var palette
         let isRecording: Bool
         let recordingTime: TimeInterval
 
@@ -155,8 +157,8 @@ struct RecordingView: View {
                                 recordingTime.truncatingRemainder(dividingBy: 2)
                             )
                                 == 1)
-                            ? Color.red1
-                            : Color.black3
+                            ? palette.statusRecording
+                            : palette.statusIdle
                     )
                     .frame(width: 14, height: 14)
                     .offset(y: -20)
@@ -178,31 +180,34 @@ struct RecordingView: View {
                 String(format: "%02d:%02d", minute, second)
             )
 
-            attributedString.foregroundColor = Color.black3
+            attributedString.foregroundColor = palette.statusIdle
 
             if minute >= 10 {
-                attributedString.foregroundColor = Color.black1
+                attributedString.foregroundColor = palette.primaryText
             } else if minute > 0 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 1
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.black1
+                attributedString[range].foregroundColor =
+                    palette.primaryText
             } else if second >= 10 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 3
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.black1
+                attributedString[range].foregroundColor =
+                    palette.primaryText
             } else if second > 0 {
                 let range =
                     attributedString.index(
                         attributedString.startIndex,
                         offsetByCharacters: 4
                     )..<attributedString.endIndex
-                attributedString[range].foregroundColor = Color.black1
+                attributedString[range].foregroundColor =
+                    palette.primaryText
             }
 
             return attributedString
@@ -210,6 +215,7 @@ struct RecordingView: View {
     }
 
     struct WaveForm: View {
+        @Environment(\.palette) private var palette
         let audioLevels: [Float]
 
         private let spacing: CGFloat = 7
@@ -245,7 +251,7 @@ struct RecordingView: View {
                         )
 
                         let path: Path = Path(roundedRect: rect, cornerRadius: capsuleWidth / 2)
-                        context.fill(path, with: .color(Color.black4))
+                        context.fill(path, with: .color(palette.waveformBar))
                     }
                 }
             }

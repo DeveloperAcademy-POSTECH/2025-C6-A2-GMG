@@ -5,6 +5,7 @@ import SwiftUI
 struct ChordFingeringView: View {
     private static let height: CGFloat = 128
 
+    @Environment(\.palette) private var palette
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
     let instrument: Instrument
@@ -17,17 +18,26 @@ struct ChordFingeringView: View {
     }
 
     private var backgroundColor: Color {
-        return switch instrument {
-        case .piano: Color.black8.opacity(0.2)
-        case .guitar: Color.white1.opacity(0.7)
+        switch instrument {
+        case .piano:
+            // ProgressPalette.Fingering.ChordBackground.piano = Color.black8.opacity(0.2)
+            return Color.black8.opacity(0.2)
+        case .guitar:
+            // ProgressPalette.Fingering.ChordBackground.guitar = Color.white1.opacity(0.7)
+            return palette.sheetBackground.opacity(0.7)
         }
     }
 
     private var symbolColor: Color {
-        return switch colorScheme {
-        case .light: .black1
-        case .dark: .white1
-        @unknown default: .black1
+        switch colorScheme {
+        case .light:
+            // ProgressPalette.Fingering.Symbol.light = Color.black1
+            return palette.primaryText
+        case .dark:
+            // ProgressPalette.Fingering.Symbol.dark = Color.white1
+            return palette.overlayPrimaryText
+        @unknown default:
+            return palette.primaryText
         }
     }
 

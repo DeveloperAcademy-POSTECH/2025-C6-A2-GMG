@@ -5,6 +5,7 @@ internal import UIKit
 internal import UniformTypeIdentifiers
 
 struct ExportView: View {
+    @Environment(\.palette) private var palette
     @State private var model: ExportModelStateProtocol
     @State private var intent: ExportIntentProtocol
     private weak var router: Router?
@@ -21,7 +22,7 @@ struct ExportView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            palette.background
                 .ignoresSafeArea()
 
             VStack(spacing: .zero) {
@@ -60,7 +61,7 @@ struct ExportView: View {
                             .english(Typography.WantedSansStd.R6),
                             .korean(Typography.Pretendard.M6)
                         )
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(palette.navigationBarTitleText)
                 },
                 trailing: {
                     Button {
@@ -68,7 +69,7 @@ struct ExportView: View {
                     } label: {
                         Image(.home)
                             .renderingMode(.template)
-                            .foregroundStyle(Color.black1)
+                            .foregroundStyle(palette.navigationBarIcon)
                     }
                 }
             )
@@ -81,19 +82,21 @@ struct ExportView: View {
 
 extension ExportView {
     struct Title: View {
+        @Environment(\.palette) private var palette
         let title: String
 
         var body: some View {
             HStack(spacing: 0) {
                 Text(title)
                     .font(Typography.WantedSansStd.B15)
-                    .foregroundStyle(Color.black1)
+                    .foregroundStyle(palette.primaryText)
                 Spacer()
             }
         }
     }
 
     struct KeyDate: View {
+        @Environment(\.palette) private var palette
         let keyDescription: String
         let dateString: String
 
@@ -101,16 +104,17 @@ extension ExportView {
             HStack(spacing: 0) {
                 Text(keyDescription)
                     .font(Typography.WantedSansStd.R7)
-                    .foregroundStyle(Color.black1)
+                    .foregroundStyle(palette.primaryText)
                 Spacer()
                 Text(dateString)
                     .font(Typography.WantedSansStd.R4)
-                    .foregroundStyle(Color.black5)
+                    .foregroundStyle(palette.metaText)
             }
         }
     }
 
     struct ImageCarousel: View {
+        @Environment(\.palette) private var palette
         let images: [UIImage]
 
         @State private var focusedImageIndex: Int? = .zero
@@ -151,7 +155,11 @@ extension ExportView {
                 HStack {
                     ForEach(images.indices, id: \.self) { index in
                         Circle()
-                            .fill(focusedImageIndex == index ? Color.black1 : Color.black8)
+                            .fill(
+                                focusedImageIndex == index
+                                    ? palette.pageIndicatorActive
+                                    : palette.pageIndicatorInactive
+                            )
                             .frame(width: 6, height: 6)
                             .onTapGesture {
                                 focusedImageIndex = index
@@ -165,6 +173,7 @@ extension ExportView {
     }
 
     struct ExportButton: View {
+        @Environment(\.palette) private var palette
         let items: [URL]
         let title: Text
         let image: ImageResource
@@ -201,7 +210,7 @@ extension ExportView {
                             .english(Typography.WantedSansStd.M2),
                             .korean(Typography.Pretendard.M6)
                         )
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(palette.primaryButtonLabel)
                     Image(image)
                         .offset(y: -2)
                 }
@@ -209,7 +218,7 @@ extension ExportView {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 18)
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(palette.primaryButtonBackground)
                 )
             }
             .buttonStyle(.bouncy)
