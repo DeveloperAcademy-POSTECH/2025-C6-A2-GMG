@@ -76,8 +76,7 @@ struct ChordProgressView: View {
                         onDragEnd: intent.onDragWaveformEnd
                     ),
                     audioLevels: model.score.audioLevels,
-                    elapsedTime: model.playhead.elapsedTime,
-                    isPlaying: model.playhead.isPlaying
+                    elapsedTime: model.playhead.elapsedTime
                 )
             }
             .navigationBar(
@@ -90,8 +89,8 @@ struct ChordProgressView: View {
                             .renderingMode(.template)
                             .foregroundStyle(
                                 model.isEditMode
-                                    ? palette.secondaryText  // edit(=dark) 모드 → 밝은 아이콘
-                                    : palette.primaryText  // normal(=light) 모드 → 어두운 아이콘
+                                    ? palette.secondaryText
+                                    : palette.primaryText
                             )
                     }
                 },
