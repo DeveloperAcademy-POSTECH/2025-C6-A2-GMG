@@ -3,6 +3,8 @@
 import SwiftUI
 
 struct ChordSheetView: View {
+    @Environment(\.palette) private var palette
+
     let title: String
     let key: Key
     let segmentStartTime: TimeInterval
@@ -31,7 +33,7 @@ struct ChordSheetView: View {
 
     var body: some View {
         ZStack {
-            Color.white1
+            palette.sheetBackground
                 .ignoresSafeArea()
 
             VStack(spacing: 30) {
@@ -62,6 +64,8 @@ struct ChordSheetView: View {
 
 extension ChordSheetView {
     struct ScoreInformationView: View {
+        @Environment(\.palette) private var palette
+
         let title: String
         let key: Key
 
@@ -72,7 +76,7 @@ extension ChordSheetView {
                 Text("\(key.description) Key")
                     .font(Typography.WantedSansStd.R7)
             }
-            .foregroundStyle(Color.black1)
+            .foregroundStyle(palette.sheetHeaderTitleText)
         }
     }
 
@@ -111,6 +115,8 @@ extension ChordSheetView {
     }
 
     struct ChordInSegmentView: View {
+        @Environment(\.palette) private var palette
+
         let chord: Chord
 
         var body: some View {
@@ -124,19 +130,21 @@ extension ChordSheetView {
             }
             .padding(Spacing.xxs)
             .font(Typography.WantedSansStd.R7)
-            .foregroundStyle(Color.black1)
+            .foregroundStyle(palette.primaryText)
             .frame(
                 maxWidth: .infinity,
                 maxHeight: .infinity
             )
             .background {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.black9)
+                    .fill(palette.chordSegmentBackground)
             }
         }
     }
 
     struct TimeRulerView: View {
+        @Environment(\.palette) private var palette
+
         let startTime: TimeInterval
         let endTime: TimeInterval
         let dotCount: Int
@@ -155,7 +163,7 @@ extension ChordSheetView {
                     .font(Typography.WantedSansStd.R2)
                     .fixedSize()
             }
-            .foregroundStyle(Color.black7)
+            .foregroundStyle(palette.timeRulerLabelText)
             .padding(.horizontal, Spacing.xs)
         }
     }

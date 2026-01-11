@@ -4,11 +4,12 @@ import Lottie
 import SwiftUI
 
 struct LoadingView: View {
+    @Environment(\.palette) private var palette
     let scoreFactoryState: ScoreFactoryState
 
     var body: some View {
         ZStack {
-            Color.bg1
+            palette.background
                 .ignoresSafeArea()
 
             VStack(spacing: 144) {
@@ -40,6 +41,7 @@ struct LoadingView: View {
     }
 
     struct LoadingStateRow: View {
+        @Environment(\.palette) private var palette
         @Environment(\.isEnabled) private var isEnabled: Bool
 
         let text: Text
@@ -53,7 +55,7 @@ struct LoadingView: View {
         }
 
         private var color: Color {
-            isEnabled ? Color.black1 : Color.black7
+            isEnabled ? palette.primaryText : palette.disabledText
         }
 
         var body: some View {

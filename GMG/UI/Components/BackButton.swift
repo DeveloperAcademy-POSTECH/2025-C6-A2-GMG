@@ -3,7 +3,7 @@
 import SwiftUI
 
 struct BackButton: View {
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+    @Environment(\.palette) private var palette
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -11,9 +11,7 @@ struct BackButton: View {
             dismiss()
         } label: {
             Image(systemName: "chevron.backward")
-                .foregroundStyle(
-                    colorScheme == .light ?
-                    Color.black1 : Color.white1)
+                .foregroundStyle(palette.navigationBarIcon)
         }
     }
 }

@@ -7,6 +7,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var model: HomeModelStateProtocol
     @State private var intent: HomeIntentProtocol
+    @Environment(\.palette) private var palette
     private weak var router: Router?
 
     init(
@@ -21,7 +22,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color.bg1
+            palette.background
                 .padding(-Spacing.xxl)
                 .ignoresSafeArea()
 
@@ -52,7 +53,7 @@ struct HomeView: View {
                 .background {
                     BlurUIKitView(
                         maximumBlurRadius: 4,
-                        dimmingTintColor: UIColor.bg1,
+                        dimmingTintColor: UIColor.Home.headerBlurTint,
                         dimmingAlpha: .constant(alpha: 0.8),
                         dimmingOvershoot: .relative(fraction: 0.5)
                     )
@@ -100,15 +101,17 @@ extension HomeView {
         }
 
         struct Logo: View {
+            @Environment(\.palette) private var palette
+
             private var reString: AttributedString {
                 var string: AttributedString = AttributedString("Re:")
-                string.foregroundColor = Color.black3
+                string.foregroundColor = palette.secondaryInfoText  // was HomePalette.Header.logoRe (.black3)
                 return string
             }
 
             private var chordString: AttributedString {
                 var string: AttributedString = AttributedString("chord")
-                string.foregroundColor = Color.black1
+                string.foregroundColor = palette.primaryText  // was HomePalette.Header.logoChord (.black1)
                 return string
             }
 
@@ -119,6 +122,7 @@ extension HomeView {
         }
 
         struct SongCount: View {
+            @Environment(\.palette) private var palette
             let count: Int
 
             private var countString: AttributedString {
@@ -135,7 +139,7 @@ extension HomeView {
 
             var body: some View {
                 Text("\(countString) \(unitString)")
-                    .foregroundStyle(Color.black1)
+                    .foregroundStyle(palette.primaryText)  // was HomePalette.Header.songCountText (.black1)
             }
         }
     }
@@ -145,6 +149,7 @@ extension HomeView {
 
 extension HomeView {
     struct RecentFilesSection: View {
+        @Environment(\.palette) private var palette
         @Namespace private var namespace: Namespace.ID
         private let recordButtonID: String = "RecordButton"
 
@@ -160,7 +165,7 @@ extension HomeView {
                             .english(Typography.WantedSansStd.R7),
                             .korean(Typography.Pretendard.SB7)
                         )
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(palette.primaryText)  // was HomePalette.Recent.title (.black1)
 
                     Spacer()
                 }
@@ -182,6 +187,7 @@ extension HomeView {
         }
 
         struct AddScoreButton: View {
+            @Environment(\.palette) private var palette
             let action: () -> Void
 
             var body: some View {
@@ -189,10 +195,10 @@ extension HomeView {
                     action()
                 } label: {
                     Image(systemName: "plus")
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(palette.primaryText)  // was HomePalette.Recent.addButtonIcon (.black1)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(
-                            Color.white,
+                            palette.sheetBackground,  // was HomePalette.Recent.addButtonBackground (.white)
                             in: RoundedRectangle(cornerRadius: 32)
                         )
                 }
@@ -236,7 +242,7 @@ extension HomeView {
                         deleteScoreAction: intent.requestDeleteScoreConfirmation
                     )
                     .compactStyle()
-                    .backgroundColor(.latestColor(index: index))
+                    .backgroundColor(Palette.scoreCardLatestBackground(index: index))
                     .frame(width: 156)
                     .matchedTransitionSource(id: score.id, in: namespace)
                 }
@@ -249,6 +255,8 @@ extension HomeView {
 
 extension HomeView {
     struct AllFilesSection: View {
+        @Environment(\.palette) private var palette
+
         let model: HomeModelStateProtocol
         let intent: HomeIntentProtocol
         weak var router: Router?
@@ -261,7 +269,7 @@ extension HomeView {
                             .english(Typography.WantedSansStd.R7),
                             .korean(Typography.Pretendard.SB7)
                         )
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(palette.primaryText)  // was HomePalette.All.title (.black1)
 
                     HStack(alignment: .lastTextBaseline, spacing: Spacing.sm) {
                         SortButton(.latest) {
@@ -294,6 +302,7 @@ extension HomeView {
 
         struct SortButton: View {
             @Environment(\.isEnabled) private var isEnabled: Bool
+            @Environment(\.palette) private var palette
 
             let title: Text
             let action: () -> Void
@@ -318,7 +327,9 @@ extension HomeView {
                             .korean(Typography.Pretendard.M5)
                         )
                         .foregroundStyle(
-                            isEnabled == false ? Color.black5 : Color.black3
+                            isEnabled == false
+                                ? palette.sortDisabledText  // was HomePalette.All.sortDisabled (.black5)
+                                : palette.sortEnabledText  // was HomePalette.All.sortEnabled (.black3)
                         )
                 }
                 .buttonStyle(.bouncy)
@@ -329,13 +340,13 @@ extension HomeView {
             var body: some View {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     Text("An experience")
-                        .foregroundStyle(Color.white3.opacity(0.55))
+                        .foregroundStyle(Palette.emptyStateLineColor(index: 0))
                     Text("where humming")
-                        .foregroundStyle(Color.black8.opacity(0.3))
+                        .foregroundStyle(Palette.emptyStateLineColor(index: 1))
                     Text("becomes the")
-                        .foregroundStyle(Color.black4.opacity(0.3))
+                        .foregroundStyle(Palette.emptyStateLineColor(index: 2))
                     Text("start of a song")
-                        .foregroundStyle(Color.black4.opacity(0.35))
+                        .foregroundStyle(Palette.emptyStateLineColor(index: 3))
                 }
                 .font(
                     .custom(Typography.WantedSansStd.Bold, size: 42)
@@ -388,7 +399,8 @@ extension HomeView {
                         .playButtonVisibility(isSelected ? .visible : .hidden)
                         .backgroundColor(
                             model.isLatest
-                                ? .latestColor(index: index) : .earliestColor(index: index)
+                                ? Palette.scoreCardLatestBackground(index: index)
+                                : Palette.scoreCardEarliestBackground(index: index)
                         )
                         .frame(height: 128)
                         .matchedTransitionSource(id: score.id, in: namespace)
@@ -406,6 +418,7 @@ extension HomeView {
 
 extension HomeView {
     struct ScoreCard: View {
+        @Environment(\.palette) private var palette
         @State private var isTitleEditing: Bool = false
         @FocusState private var isTitleFocused: Bool
         @State private var titleDraft: String = ""
@@ -435,7 +448,7 @@ extension HomeView {
                     .font(
                         isCompact ? Typography.WantedSansStd.R4 : Typography.WantedSansStd.R5
                     )
-                    .foregroundStyle(Color.white1)
+                    .foregroundStyle(palette.overlayPrimaryText)  // was HomePalette.ScoreCard.title (.white1)
                     .autocorrectionDisabled()
                     .focused($isTitleFocused)
                     .onSubmit { endRename() }
@@ -464,7 +477,7 @@ extension HomeView {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .foregroundStyle(Color.white1)
+                            .foregroundStyle(palette.overlayPrimaryText)  // was HomePalette.ScoreCard.menuIcon (.white1)
                             .frame(maxWidth: 20, maxHeight: 30)
                     }
                     .menuIndicator(.hidden)
@@ -473,13 +486,13 @@ extension HomeView {
                 HStack {
                     Text(score.createdAt.formattedDate())
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(palette.overlayPrimaryText)  // was HomePalette.ScoreCard.meta (.white1)
 
                     Spacer()
 
                     Text(score.totalDuration.formattedTime())
                         .font(Typography.WantedSansStd.R2)
-                        .foregroundStyle(Color.white1)
+                        .foregroundStyle(palette.overlayPrimaryText)  // was HomePalette.ScoreCard.meta (.white1)
                 }
 
                 Spacer(minLength: 0.0)
@@ -490,7 +503,7 @@ extension HomeView {
                             isCompact
                                 ? Typography.WantedSansStd.R2 : Typography.WantedSansStd.R4
                         )
-                        .foregroundStyle(Color.white2)
+                        .foregroundStyle(palette.keyLabelText)  // was HomePalette.ScoreCard.key (.white2)
 
                     Spacer()
 
@@ -559,6 +572,8 @@ extension HomeView {
         }
 
         struct PlaybackButton: View {
+            @Environment(\.palette) private var palette
+
             let isPlaying: Bool
             let progress: Double
             let playAction: () -> Void
@@ -578,7 +593,7 @@ extension HomeView {
                         .scaledToFit()
                         .frame(width: isPlaying ? 12 : 10, height: isPlaying ? 12 : 10)
                         .padding(.leading, isPlaying ? 0 : 2)
-                        .foregroundStyle(Color.black1)
+                        .foregroundStyle(palette.primaryText)  // was HomePalette.Playback.icon (.black1)
                         .frame(width: 30, height: 30)
                         .background {
                             let lineWidth: CGFloat = 3
@@ -586,9 +601,11 @@ extension HomeView {
 
                             Circle()
                                 .inset(by: lineWidth / 2 + 0.2)
-                                .fill(Color.white2)
+                                .fill(palette.sheetBackground)  // was HomePalette.Playback.circleFill (.white2)
                                 .stroke(
-                                    isProgressPresented ? Color.bg1 : Color.white2,
+                                    isProgressPresented
+                                        ? palette.background  // was HomePalette.Playback.circleBaseStroke (.bg1)
+                                        : palette.sheetBackground,  // was HomePalette.Playback.circleBaseStrokeIdle (.white2)
                                     lineWidth: lineWidth
                                 )
                                 .drawingGroup()
@@ -597,7 +614,7 @@ extension HomeView {
                                 .inset(by: lineWidth / 2)
                                 .trim(from: 0, to: progress)
                                 .stroke(
-                                    Color.bg2,
+                                    palette.playbackProgressTrack,  // was HomePalette.Playback.progress (.bg2)
                                     style: StrokeStyle(
                                         lineWidth: lineWidth, lineCap: .round)
                                 )
@@ -616,19 +633,6 @@ extension HomeView {
         router.view(.home)
     }
     .environment(\.locale, .init(languageCode: .english))
-}
-
-extension Color {
-    private static let latestColors: [Color] = [.blue3, .blue4, .blue5, .blue1, .blue2]
-    private static let earliestColors: [Color] = [.blue2, .blue1, .blue5, .blue4, .blue3]
-
-    fileprivate static func latestColor(index: Int) -> Self {
-        return latestColors[index % latestColors.count]
-    }
-
-    fileprivate static func earliestColor(index: Int) -> Self {
-        return earliestColors[index % earliestColors.count]
-    }
 }
 
 extension Date {

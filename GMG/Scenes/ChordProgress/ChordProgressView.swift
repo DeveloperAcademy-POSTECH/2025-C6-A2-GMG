@@ -4,6 +4,7 @@ import Foundation
 import SwiftUI
 
 struct ChordProgressView: View {
+    @Environment(\.palette) private var palette
     @Namespace private var namespace: Namespace.ID
 
     @State private var model: ChordProgressModelStateProtocol
@@ -75,8 +76,7 @@ struct ChordProgressView: View {
                         onDragEnd: intent.onDragWaveformEnd
                     ),
                     audioLevels: model.score.audioLevels,
-                    elapsedTime: model.playhead.elapsedTime,
-                    isPlaying: model.playhead.isPlaying
+                    elapsedTime: model.playhead.elapsedTime
                 )
             }
             .navigationBar(
@@ -88,8 +88,9 @@ struct ChordProgressView: View {
                         Image(.home)
                             .renderingMode(.template)
                             .foregroundStyle(
-                                model.isEditMode == false
-                                    ? Color.black1 : Color.white1
+                                model.isEditMode
+                                    ? palette.secondaryText
+                                    : palette.primaryText
                             )
                     }
                 },
@@ -107,6 +108,12 @@ struct ChordProgressView: View {
                         router?.push(.export(score: model.score))
                     } label: {
                         Image(systemName: "square.and.arrow.up")
+                            .renderingMode(.template)
+                            .foregroundStyle(
+                                model.isEditMode
+                                    ? palette.secondaryText
+                                    : palette.primaryText
+                            )
                     }
                 }
             )
@@ -152,6 +159,7 @@ struct ChordProgressView: View {
 extension ChordProgressView {
     struct NavigationTitle: View {
         @Environment(\.colorScheme) private var colorScheme: ColorScheme
+        @Environment(\.palette) private var palette
 
         let title: String
         @State var titleDraft: String
@@ -193,7 +201,8 @@ extension ChordProgressView {
                 .font(Typography.WantedSansStd.R6)
                 .foregroundStyle(
                     colorScheme == .light
-                        ? Color.black1 : Color.white1
+                        ? palette.primaryText  // 원래 fieldTextLight = black1
+                        : palette.overlayPrimaryText  // 원래 fieldTextDark = white1
                 )
                 .focused($isTitleFieldFocused)
                 .submitLabel(.done)
@@ -214,7 +223,8 @@ extension ChordProgressView {
                         .font(Typography.WantedSansStd.R6)
                         .foregroundStyle(
                             colorScheme == .light
-                                ? Color.black4 : Color.black3
+                                ? palette.primaryText  // labelTextLight = black1
+                                : palette.secondaryInfoText  // labelTextDark = black3
                         )
                         .opacity(
                             isTitleEditing ? 0 : 1
@@ -224,8 +234,8 @@ extension ChordProgressView {
                         .renderingMode(.template)
                         .foregroundColor(
                             colorScheme == .light
-                                ? Color.black1
-                                : Color.white1
+                                ? palette.primaryText  // pencilLight = black1
+                                : palette.overlayPrimaryText  // pencilDark = white1
                         )
                         .opacity(
                             isTitleEditing ? 0 : 1
@@ -241,7 +251,8 @@ extension ChordProgressView {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(
                             colorScheme == .light
-                                ? Color.white3 : Color.black7
+                                ? palette.waveformUnfilledView  // white3
+                                : palette.disabledText  // black7
                         )
                 }
             }
@@ -253,9 +264,9 @@ extension ChordProgressView {
 
         private var backgroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
-                Color.bg2
+                return .bg2  // ProgressPalette.Background.edit
             } else {
-                Color.bg1
+                return .bg1  // ProgressPalette.Background.normal
             }
         }
 
@@ -270,6 +281,7 @@ extension ChordProgressView {
         let totalDuration: TimeInterval
 
         @Environment(\.editMode) private var editMode
+        @Environment(\.palette) private var palette
 
         private var minuteString: String {
             String(
@@ -294,7 +306,8 @@ extension ChordProgressView {
             }
             .foregroundStyle(
                 editMode?.wrappedValue.isEditing == true
-                    ? Color.white1 : Color.black1
+                    ? palette.secondaryText  // 원래 edit = white1
+                    : palette.primaryText  // 원래 normal = black1
             )
         }
     }
@@ -327,6 +340,7 @@ extension ChordProgressView {
 
         struct EditControllerButton<Label: View>: View {
             @Environment(\.isEnabled) private var isEnabled: Bool
+            @Environment(\.palette) private var palette
 
             let action: () -> Void
             @ViewBuilder let label: () -> Label
@@ -337,7 +351,9 @@ extension ChordProgressView {
                 } label: {
                     label()
                         .foregroundStyle(
-                            isEnabled ? .white1 : .black2
+                            isEnabled
+                                ? palette.primaryButtonLabel  // 원래 enabled = white1
+                                : palette.disabledText  // 원래 disabled = black2 ≈ black7
                         )
                 }
                 .buttonStyle(.bouncy)
@@ -346,6 +362,8 @@ extension ChordProgressView {
     }
 
     struct EditModeToggle: View {
+        @Environment(\.palette) private var palette
+
         @Binding var isEditMode: Bool
         @Namespace var namespace
 
@@ -370,13 +388,14 @@ extension ChordProgressView {
             .background(
                 RoundedRectangle(cornerRadius: 8)
                     .inset(by: isEditMode ? 0.2 : 0)
-                    .fill(.white1)
+                    .fill(palette.sheetBackground)  // 원래 EditModeToggle.background = white1
             )
             .animation(.default, value: isEditMode)
         }
 
         struct ToggleButton: View {
             @Environment(\.locale) private var locale
+            @Environment(\.palette) private var palette
 
             let title: Text
             let isSelected: Bool
@@ -429,14 +448,16 @@ extension ChordProgressView {
                         )
                         .bold(isSelected)
                         .foregroundStyle(
-                            isSelected ? Color.white1 : Color.black1
+                            isSelected
+                                ? palette.primaryButtonLabel  // 원래 titleSelected = white1
+                                : palette.primaryText  // 원래 titleUnselected = black1
                         )
                         .padding(.vertical, 10)
                         .padding(.horizontal, horizontalPadding)
                         .background {
                             if isSelected {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.blue6)
+                                    .fill(palette.chordCellHighlightBackground)  // blue6
                                     .matchedGeometryEffect(
                                         id: "Background",
                                         in: namespace
@@ -505,6 +526,63 @@ extension ChordProgressView {
                 .animation(.default, value: instrument)
             }
             .frame(height: 92)
+        }
+    }
+
+    struct SegmentsScrollView: View {
+        @Environment(\.palette) private var palette
+
+        let totalDuration: TimeInterval
+        let segmentSlices: [[ChordSegmentSlice]]
+        let currentChordCell: ChordCell?
+        let selectedChordCell: ChordCell?
+        let segmentHandlers: SegmentHandlers
+        let waveformHandlers: WaveformHandlers
+        let audioLevels: [Float]
+        let elapsedTime: TimeInterval
+
+        var body: some View {
+            ScrollView {
+                LazyVStack(spacing: Spacing.md) {
+                    ForEach(Array(segmentSlices.enumerated()), id: \.offset) { index, slices in
+                        Segment(
+                            index: index,
+                            totalDuration: totalDuration,
+                            chordSlices: slices,
+                            segmentDuration: Constants.segmentDuration,
+                            currentChordCell: currentChordCell,
+                            selectedChordCell: selectedChordCell,
+                            audioLevels: audioLevels,
+                            elapsedTime: elapsedTime,
+                            segmentHandlers: segmentHandlers,
+                            waveformHandlers: waveformHandlers
+                        )
+                    }
+                }
+                .safeAreaPadding(Spacing.md)
+                .safeAreaPadding(.bottom, 128)
+            }
+            .mask {
+                VStack(spacing: .zero) {
+                    LinearGradient(
+                        stops: [
+                            Gradient.Stop(
+                                color: palette.scrollMaskTopStart,
+                                location: 0.0
+                            ),
+                            Gradient.Stop(
+                                color: palette.scrollMaskTopEnd,
+                                location: 1.0
+                            ),
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: Spacing.md)
+                    palette.scrollMaskBottom
+                }
+                .ignoresSafeArea()
+            }
         }
     }
 }

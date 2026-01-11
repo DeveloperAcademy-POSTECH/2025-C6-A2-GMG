@@ -3,6 +3,7 @@
 import SwiftUI
 
 struct ControllerButton<Label: View>: View {
+    @Environment(\.palette) private var palette
     let isDark: Bool
     let action: () -> Void
     let label: Label
@@ -27,7 +28,15 @@ struct ControllerButton<Label: View>: View {
             }
             .geometryGroup()
             .foregroundStyle(
-                isDark ? Color.white1 : Color.black1
+                isDark
+                    ? palette.primaryButtonLabel
+                    : palette.secondaryButtonLabel
+            )
+            .background(
+                isDark
+                    ? palette.primaryButtonBackground
+                    : palette.secondaryButtonBackground,
+                in: RoundedRectangle(cornerRadius: 18)
             )
             .frame(
                 maxWidth: .infinity,

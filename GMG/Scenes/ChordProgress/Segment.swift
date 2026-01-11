@@ -28,6 +28,7 @@ struct Segment: View {
     let waveformHandlers: WaveformHandlers
 
     @Environment(\.editMode) private var editMode
+    @Environment(\.palette) private var palette
 
     private let audioSampleInterval: TimeInterval = 0.1
 
@@ -148,12 +149,13 @@ struct Segment: View {
     }
 
     struct ChordCellCandidates: View {
+        @Environment(\.palette) private var palette
         let chordCell: ChordCell
         let onTapChordCandidate: (Chord, ChordCell) -> Void
 
         var body: some View {
             ZStack {
-                Color.black2
+                palette.waveformBackgroundEdit
 
                 HStack {
                     Spacer()
@@ -178,6 +180,7 @@ struct Segment: View {
     }
 
     struct ChordCandidateButton: View {
+        @Environment(\.palette) private var palette
         let index: Int
         let chord: Chord
         let selectedChord: Chord?
@@ -185,11 +188,11 @@ struct Segment: View {
 
         private var backgroundColor: Color {
             if selectedChord == chord {
-                return .blue6
+                return palette.chordCandidateSelectedBackground
             } else if index == 0 || index == 1 {
-                return .blue7
+                return palette.chordCandidatePrimaryBackground
             } else {
-                return .blue3
+                return palette.chordCandidateSecondaryBackground
             }
         }
 
@@ -200,7 +203,7 @@ struct Segment: View {
                 VStack {
                     Text(chord.description)
                         .font(Typography.WantedSansStd.R5)
-                        .foregroundStyle(.white1)
+                        .foregroundStyle(palette.primaryButtonLabel)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
@@ -222,21 +225,22 @@ struct Segment: View {
         let onTapButton: () -> Void
 
         @Environment(\.editMode) private var editMode
+        @Environment(\.palette) private var palette
 
         private var foregroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
                 if isSelected {
-                    return Color.white1
+                    return palette.overlayPrimaryText
                 } else if isCurrentChord {
-                    return Color.black1
+                    return palette.primaryText
                 } else {
-                    return Color.white1
+                    return palette.overlayPrimaryText
                 }
             } else {
                 if isCurrentChord {
-                    return Color.white1
+                    return palette.overlayPrimaryText
                 } else {
-                    return Color.black1
+                    return palette.primaryText
                 }
             }
         }
@@ -244,17 +248,17 @@ struct Segment: View {
         private var backgroundColor: Color {
             if editMode?.wrappedValue.isEditing == true {
                 if isSelected {
-                    return Color.blue6
+                    return palette.chordCellHighlightBackground
                 } else if isCurrentChord {
-                    return Color.white1
+                    return palette.sheetBackground
                 } else {
-                    return Color.black2
+                    return palette.waveformBackgroundEdit
                 }
             } else {
                 if isCurrentChord {
-                    return Color.blue6
+                    return palette.chordCellHighlightBackground
                 } else {
-                    return Color.white1
+                    return palette.sheetBackground
                 }
             }
         }
@@ -304,6 +308,7 @@ struct Segment: View {
         let dotCount: Int
 
         @Environment(\.editMode) private var editMode
+        @Environment(\.palette) private var palette
 
         var body: some View {
             HStack {
@@ -327,10 +332,7 @@ struct Segment: View {
                     Spacer()
                 }
             }
-            .foregroundStyle(
-                editMode?.wrappedValue.isEditing == true
-                    ? Color.black5 : Color.black8
-            )
+            .foregroundStyle(palette.timeRulerLabelText)
             .padding(.horizontal, Spacing.xs)
         }
     }
