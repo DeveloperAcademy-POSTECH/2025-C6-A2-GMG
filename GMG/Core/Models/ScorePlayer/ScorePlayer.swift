@@ -240,9 +240,9 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         do {
             try loadSoundBank(instrument: instrument)
 
-            prepareChordCells()
-
             self.currentInstrumentPublisher.send(instrument)
+
+            prepareChordCells()
         } catch {
             Logger.error(String(describing: error))
         }
