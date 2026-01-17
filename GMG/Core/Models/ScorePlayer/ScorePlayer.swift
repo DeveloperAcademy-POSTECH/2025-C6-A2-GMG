@@ -97,25 +97,27 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
             for: AVAudioSession.routeChangeNotification
         )
         .sink { [weak self] notification in
-            guard let self else { return }
+            Task {
+                guard let self else { return }
 
-            do {
                 let wasPlaying = self.player.isPlaying
                 self.pause()
 
-                try self.activateAudioSession()
-                try self.engine.start()
+                do {
+                    try self.activateAudioSession()
+                    try self.engine.start()
 
-                Task {
                     try? await Task.sleep(for: .seconds(0.1))
-                    try? self.loadSoundBank()
-
-                    if wasPlaying {
-                        self.play()
-                    }
+                    try self.loadSoundBank(
+                        instrument: self.currentInstrumentPublisher.value
+                    )
+                } catch {
+                    Logger.error(String(describing: error))
                 }
-            } catch {
-                Logger.error(String(describing: error))
+
+                if wasPlaying {
+                    self.play()
+                }
             }
         }
         .store(in: &cancellables)
@@ -189,10 +191,13 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         chordPlayTask?.cancel()
 
         chordPlayTask = Task {
+            let instrument = currentInstrumentPublisher.value
+            let octave =
+                instrument.octaveUpRootNote.contains(chord.root)
+                ? instrument.octave + 1 : instrument.octave
+
             let tonicChord = chord.tonicChord
-            let midiNotes = tonicChord.midiNoteNumbers(
-                octave: currentInstrumentPublisher.value.octave
-            )
+            let midiNotes = tonicChord.midiNoteNumbers(octave: octave)
 
             midiNotes.forEach { midiNote in
                 sampler.startNote(
@@ -254,7 +259,8 @@ final class DefaultScorePlayer: ScoreAudioEngineBase, ScorePlayer {
         pause()
 
         super.prepareChordCells(
-            octave: currentInstrumentPublisher.value.octave
+            octave: currentInstrumentPublisher.value.octave,
+            octaveUpRootNotes: currentInstrumentPublisher.value.octaveUpRootNote
         )
 
         if wasPlaying {

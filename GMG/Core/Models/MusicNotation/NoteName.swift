@@ -1,6 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
-enum NoteName {
+nonisolated enum NoteName {
     case C
     case Cs
     case Db
@@ -46,6 +46,6 @@ extension NoteName: CustomStringConvertible {
 
 extension NoteName: Codable {}
 
-extension NoteName: Hashable {}
+nonisolated extension NoteName: Hashable {}
 
 extension NoteName: CaseIterable {}
