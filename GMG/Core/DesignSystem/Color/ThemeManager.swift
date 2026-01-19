@@ -1,37 +1,48 @@
 //  Copyright © 2026 ADA 4th GMG. All rights reserved.
 
-import Combine
+import Observation
 import SwiftUI
+
+enum Theme: String {
+    case basic
+    case next
+
+    var palette: Palette {
+        switch self {
+        case .basic: return .basic
+        case .next: return .next
+        }
+    }
+}
 
 @Observable
 final class ThemeManager {
+    @ObservationIgnored
     @AppStorage("selectedTheme") private var storedTheme: String = "basic"
 
-    @Published var palette: Palette = .basic {
+    var theme: Theme = .basic {
         didSet {
-            switch palette {
-            case .basic: storedTheme = "basic"
-            case .next: storedTheme = "next"
-            }
+            storedTheme = theme.rawValue
         }
+    }
+
+    var palette: Palette {
+        theme.palette
     }
 
     init() {
-        switch storedTheme {
-        case "next": palette = .next
-        default: palette = .basic
-        }
+        theme = Theme(rawValue: storedTheme) ?? .basic
     }
 
     func useBasic() {
-        palette = .basic
+        theme = .basic
     }
 
     func useNext() {
-        palette = .next
+        theme = .next
     }
 
     func toggle() {
-        palette = (palette == .basic) ? .next : .basic
+        theme = (theme == .basic) ? .next : .basic
     }
 }

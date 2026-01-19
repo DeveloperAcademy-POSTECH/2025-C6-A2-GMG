@@ -2,327 +2,178 @@
 
 import SwiftUI
 
-enum Palette {
-    case basic
-    case next
+struct Palette {
+    // MARK: - Surface
+    let background: Color
+    let sheetBackground: Color
+
+    // MARK: - Text
+    let primaryText: Color
+    let secondaryText: Color
+    let keyLabelText: Color
+    let metaText: Color
+    let secondaryInfoText: Color
+    let disabledText: Color
+
+    // MARK: - Overlay
+    let overlayDimming: Color
+    let overlayPrimaryText: Color
+
+    // MARK: - Status / Indicator
+    let statusRecording: Color
+    let statusIdle: Color
+
+    // MARK: - Waveform
+    let waveformBar: Color
+    let waveformBackgroundEdit: Color
+    let waveformBackgroundView: Color
+    let waveformUnfilledEdit: Color
+    let waveformUnfilledView: Color
+    let waveformFilledEdit: Color
+    let waveformFilledView: Color
+
+    // MARK: - Accent
+    let fingeringColor: Color
+
+    // MARK: - Controls
+    let sortEnabledText: Color
+    let sortDisabledText: Color
+
+    // Indicators
+    let pageIndicatorActive: Color
+    let pageIndicatorInactive: Color
+
+    // Buttons
+    let primaryButtonLabel: Color
+    let primaryButtonBackground: Color
+    let secondaryButtonLabel: Color
+    let secondaryButtonBackground: Color
+
+    // MARK: - Scroll Mask
+    let scrollMaskTopStart: Color
+    let scrollMaskTopEnd: Color
+    let scrollMaskBottom: Color
+
+    // MARK: - Components
+    let chordSegmentBackground: Color
+
+    // Segment - Chord Candidates
+    let chordCandidateSelectedBackground: Color
+    let chordCandidatePrimaryBackground: Color
+    let chordCandidateSecondaryBackground: Color
+
+    // Segment - Chord Cells
+    let chordCellHighlightBackground: Color
+
+    // Time Ruler
+    let timeRulerLabelText: Color
+
+    // Playback
+    let playbackProgressTrack: Color
 }
 
 extension Palette {
 
-    // MARK: - Surface
+    // MARK: - Presets
 
-    var background: Color {
-        switch self {
-        case .basic: return .bg1
-        case .next: return .bg1
-        }
-    }
+    static let basic: Palette = .init(
+        background: .bg1,
+        sheetBackground: .white1,
+        primaryText: .black1,
+        secondaryText: .white1,
+        keyLabelText: .white2,
+        metaText: .black5,
+        secondaryInfoText: .black3,
+        disabledText: .black7,
+        overlayDimming: Color.black.opacity(0.6),
+        overlayPrimaryText: .white1,
+        statusRecording: .red1,
+        statusIdle: .black3,
+        waveformBar: .black4,
+        waveformBackgroundEdit: .black2,
+        waveformBackgroundView: .white2,
+        waveformUnfilledEdit: .black7,
+        waveformUnfilledView: .white3,
+        waveformFilledEdit: .white1,
+        waveformFilledView: .blue4,
+        fingeringColor: .blue3,
+        sortEnabledText: .black3,
+        sortDisabledText: .black5,
+        pageIndicatorActive: .black1,
+        pageIndicatorInactive: .black8,
+        primaryButtonLabel: .white1,
+        primaryButtonBackground: .black1,
+        secondaryButtonLabel: .black1,
+        secondaryButtonBackground: .white1,
+        scrollMaskTopStart: .clear,
+        scrollMaskTopEnd: .white1,
+        scrollMaskBottom: .white1,
+        chordSegmentBackground: .black9,
+        chordCandidateSelectedBackground: .blue6,
+        chordCandidatePrimaryBackground: .blue7,
+        chordCandidateSecondaryBackground: .blue3,
+        chordCellHighlightBackground: .blue6,
+        timeRulerLabelText: .black7,
+        playbackProgressTrack: .bg2
+    )
 
-    var sheetBackground: Color {
-        switch self {
-        case .basic: return .white1
-        case .next: return .white1
-        }
-    }
+    static let next: Palette = .init(
+        background: .bg1,
+        sheetBackground: .white1,
+        primaryText: .black1,
+        secondaryText: .white1,
+        keyLabelText: .white2,
+        metaText: .black5,
+        secondaryInfoText: .black3,
+        disabledText: .black7,
+        overlayDimming: Color.black.opacity(0.6),
+        overlayPrimaryText: .white1,
+        statusRecording: .red1,
+        statusIdle: .black3,
+        waveformBar: .black4,
+        waveformBackgroundEdit: .black2,
+        waveformBackgroundView: .white2,
+        waveformUnfilledEdit: .black7,
+        waveformUnfilledView: .white3,
+        waveformFilledEdit: .white1,
+        waveformFilledView: .blue4,
+        fingeringColor: .blue3,
+        sortEnabledText: .black3,
+        sortDisabledText: .black5,
+        pageIndicatorActive: .black1,
+        pageIndicatorInactive: .black8,
+        primaryButtonLabel: .white1,
+        primaryButtonBackground: .black1,
+        secondaryButtonLabel: .black1,
+        secondaryButtonBackground: .white1,
+        scrollMaskTopStart: .clear,
+        scrollMaskTopEnd: .white1,
+        scrollMaskBottom: .white1,
+        chordSegmentBackground: .black9,
+        chordCandidateSelectedBackground: .blue6,
+        chordCandidatePrimaryBackground: .blue7,
+        chordCandidateSecondaryBackground: .blue3,
+        chordCellHighlightBackground: .blue6,
+        timeRulerLabelText: .black7,
+        playbackProgressTrack: .bg2
+    )
 
-    // MARK: - Text
+    // MARK: - Navigation
 
-    var primaryText: Color {
-        switch self {
-        case .basic: return .black1
-        case .next: return .black1
-        }
-    }
+    var navigationBarTitleText: Color { primaryText }
+    var navigationBarIcon: Color { primaryText }
 
-    var secondaryText: Color {
-        switch self {
-        case .basic: return .white1
-        case .next: return .white1
-        }
-    }
+    // MARK: - Components - Sheet
 
-    var keyLabelText: Color {
-        switch self {
-        case .basic: return .white2
-        case .next: return .white2
-        }
-    }
+    var sheetHeaderTitleText: Color { primaryText }
+    var sheetHeaderKeyText: Color { primaryText }
 
-    var metaText: Color {
-        switch self {
-        case .basic: return .black5
-        case .next: return .black5
-        }
-    }
-
-    var secondaryInfoText: Color {
-        switch self {
-        case .basic: return .black3
-        case .next: return .black3
-        }
-    }
-
-    var disabledText: Color {
-        switch self {
-        case .basic: return .black7
-        case .next: return .black7
-        }
-    }
-
-    // MARK: - Overlay
-
-    var overlayDimming: Color {
-        switch self {
-        case .basic: return Color.black.opacity(0.6)
-        case .next: return Color.black.opacity(0.6)
-        }
-    }
-
-    var overlayPrimaryText: Color {
-        switch self {
-        case .basic: return .white1
-        case .next: return .white1
-        }
-    }
-
-    // MARK: - Status / Indicator
-
-    var statusRecording: Color {
-        switch self {
-        case .basic: return .red1
-        case .next: return .red1
-        }
-    }
-
-    var statusIdle: Color {
-        switch self {
-        case .basic: return .black3
-        case .next: return .black3
-        }
-    }
-
-    // MARK: - Waveform
-
-    var waveformBar: Color {
-        switch self {
-        case .basic: return .black4
-        case .next: return .black4
-        }
-    }
-
-    var waveformBackgroundEdit: Color {
-        switch self {
-        case .basic: return .black2
-        case .next: return .black2
-        }
-    }
-
-    var waveformBackgroundView: Color {
-        switch self {
-        case .basic: return .white2
-        case .next: return .white2
-        }
-    }
-
-    var waveformUnfilledEdit: Color {
-        switch self {
-        case .basic: return .black7
-        case .next: return .black7
-        }
-    }
-
-    var waveformUnfilledView: Color {
-        switch self {
-        case .basic: return .white3
-        case .next: return .white3
-        }
-    }
-
-    var waveformFilledEdit: Color {
-        switch self {
-        case .basic: return .white1
-        case .next: return .white1
-        }
-    }
-
-    var waveformFilledView: Color {
-        switch self {
-        case .basic: return .blue4
-        case .next: return .blue4
-        }
-    }
-
-    // MARK: - Accent
-
-    var fingeringColor: Color {
-        switch self {
-        case .basic: return .blue3
-        case .next: return .blue3
-        }
-    }
-
-    // MARK: - Controls
-
-    // Sort
-
-    var sortEnabledText: Color {
-        switch self {
-        case .basic: return .black3
-        case .next: return .black3
-        }
-    }
-
-    var sortDisabledText: Color {
-        switch self {
-        case .basic: return .black5
-        case .next: return .black5
-        }
-    }
-
-    // Navigation
-
-    var navigationBarTitleText: Color {
-        primaryText
-    }
-
-    var navigationBarIcon: Color {
-        primaryText
-    }
-
-    // Indicators
-
-    var pageIndicatorActive: Color {
-        switch self {
-        case .basic: return .black1
-        case .next: return .black1
-        }
-    }
-
-    var pageIndicatorInactive: Color {
-        switch self {
-        case .basic: return .black8
-        case .next: return .black8
-        }
-    }
-
-    // Buttons
-
-    var primaryButtonLabel: Color {
-        switch self {
-        case .basic: return .white1
-        case .next: return .white1
-        }
-    }
-
-    var primaryButtonBackground: Color {
-        switch self {
-        case .basic: return .black1
-        case .next: return .black1
-        }
-    }
-
-    var secondaryButtonLabel: Color {
-        switch self {
-        case .basic: return .black1
-        case .next: return .black1
-        }
-    }
-
-    var secondaryButtonBackground: Color {
-        switch self {
-        case .basic: return .white1
-        case .next: return .white1
-        }
-    }
-
-    // MARK: - Scroll Mask
-
-    var scrollMaskTopStart: Color {
-        switch self {
-        case .basic: return .clear
-        case .next: return .clear
-        }
-    }
-
-    var scrollMaskTopEnd: Color {
-        switch self {
-        case .basic: return sheetBackground
-        case .next: return sheetBackground
-        }
-    }
-
-    var scrollMaskBottom: Color {
-        switch self {
-        case .basic: return sheetBackground
-        case .next: return sheetBackground
-        }
-    }
-
-    // MARK: - Components
-
-    // Sheet
-
-    var sheetHeaderTitleText: Color {
-        primaryText
-    }
-
-    var sheetHeaderKeyText: Color {
-        primaryText
-    }
-
-    var chordSegmentBackground: Color {
-        switch self {
-        case .basic: return .black9
-        case .next: return .black9
-        }
-    }
-
-    // Segment - Chord Candidates
-
-    var chordCandidateSelectedBackground: Color {
-        switch self {
-        case .basic: return .blue6
-        case .next: return .blue6
-        }
-    }
-
-    var chordCandidatePrimaryBackground: Color {
-        switch self {
-        case .basic: return .blue7
-        case .next: return .blue7
-        }
-    }
-
-    var chordCandidateSecondaryBackground: Color {
-        switch self {
-        case .basic: return .blue3
-        case .next: return .blue3
-        }
-    }
-
-    // Segment - Chord Cells
-
-    var chordCellHighlightBackground: Color {
-        switch self {
-        case .basic: return .blue6
-        case .next: return .blue6
-        }
-    }
-
-    // Time Ruler
-
-    var timeRulerLabelText: Color {
-        switch self {
-        case .basic: return .black7
-        case .next: return .black7
-        }
-    }
-
-    // ScoreCard
+    // MARK: - ScoreCard
 
     private static let scoreCardLatestBackgrounds: [Color] = [
         .blue3, .blue4, .blue5, .blue1, .blue2,
     ]
+
     private static let scoreCardEarliestBackgrounds: [Color] = [
         .blue2, .blue1, .blue5, .blue4, .blue3,
     ]
@@ -333,15 +184,6 @@ extension Palette {
 
     static func scoreCardEarliestBackground(index: Int) -> Color {
         scoreCardEarliestBackgrounds[index % scoreCardEarliestBackgrounds.count]
-    }
-
-    // Playback
-
-    var playbackProgressTrack: Color {
-        switch self {
-        case .basic: return .bg2
-        case .next: return .bg2
-        }
     }
 
     // MARK: - Empty State
