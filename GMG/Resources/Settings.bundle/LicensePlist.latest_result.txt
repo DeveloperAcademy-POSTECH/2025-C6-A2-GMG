@@ -1,0 +1,23 @@
+name: BlurUIKit, nameSpecified: BlurUIKit, owner: TimOliver, version: 1.2.2, source: https://github.com/TimOliver/BlurUIKit
+
+name: lottie-spm, nameSpecified: Lottie, owner: airbnb, version: 4.5.2, source: https://github.com/airbnb/lottie-spm
+
+name: onnxruntime-swift-package-manager, nameSpecified: onnxruntime, owner: microsoft, version: 1.20.0, source: https://github.com/microsoft/onnxruntime-swift-package-manager
+
+name: SwiftF0, nameSpecified: SwiftF0, owner: Segyun, version: 1.0.0, source: https://github.com/Segyun/SwiftF0
+
+name: Tonic, nameSpecified: Tonic, owner: AudioKit, version: 2.1.0, source: https://github.com/AudioKit/Tonic
+
+name: BlurUIKit, nameSpecified: BlurUIKit, owner: TimOliver, version: 1.2.2, source: https://github.com/TimOliver/BlurUIKit
+
+name: lottie-spm, nameSpecified: Lottie, owner: airbnb, version: 4.5.2, source: https://github.com/airbnb/lottie-spm
+
+name: onnxruntime-swift-package-manager, nameSpecified: onnxruntime, owner: microsoft, version: 1.20.0, source: https://github.com/microsoft/onnxruntime-swift-package-manager
+
+name: SwiftF0, nameSpecified: SwiftF0, owner: Segyun, version: 1.0.0, source: https://github.com/Segyun/SwiftF0
+
+name: Tonic, nameSpecified: Tonic, owner: AudioKit, version: 2.1.0, source: https://github.com/AudioKit/Tonic
+
+add-version-numbers: true
+
+LicensePlist Version: 3.27.2

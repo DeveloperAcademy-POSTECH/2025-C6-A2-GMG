@@ -571,8 +571,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Segyun/SwiftF0";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 		E331F8DD2EB9F44400752589 /* XCRemoteSwiftPackageReference "Tonic" */ = {

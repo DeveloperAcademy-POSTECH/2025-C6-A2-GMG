@@ -26,3 +26,9 @@ env-pull:
 env-push:
 	@cd .env && git add . && git commit -m "Update env variables" || echo "Nothing to commit"
 	@cd .env && git push
+
+# Generate license plist for third-party libraries
+licenses:
+	license-plist --prefix LicensePlist --add-version-numbers \
+		--output-path ./GMG/Resources/Settings.bundle \
+		--package-path ./GMG.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved

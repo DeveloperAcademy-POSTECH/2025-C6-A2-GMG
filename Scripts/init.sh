@@ -28,6 +28,18 @@ else
     echo "swift-format is already installed."
 fi
 
+# Check if license-plist is installed
+if ! command -v license-plist &> /dev/null; then
+    echo "license-plist is not installed. Installing it now..."
+
+    # Install license-plist
+    brew install license-plist
+
+    echo "license-plist installation completed."
+else
+    echo "license-plist is already installed."
+fi
+
 # Copy the pre-commit hook to the .git/hooks directory
 cp -f Scripts/Hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 echo "Pre-commit hook installed successfully."
