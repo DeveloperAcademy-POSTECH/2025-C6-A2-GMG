@@ -3,7 +3,8 @@
 import Combine
 import SwiftUI
 
-final class ThemeManager: ObservableObject {
+@Observable
+final class ThemeManager {
     @AppStorage("selectedTheme") private var storedTheme: String = "basic"
 
     @Published var palette: Palette = .basic {

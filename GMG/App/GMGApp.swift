@@ -9,11 +9,11 @@ import SwiftUI
 
 @main
 struct GMGApp: App {
-    @StateObject private var themeManager = ThemeManager()
+    @State private var themeManager: ThemeManager = .init()
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environmentObject(themeManager)
+                .environment(themeManager)
                 .environment(\.palette, themeManager.palette)
         }
     }
