@@ -330,7 +330,7 @@ extension ChordInferencer {
 
     private func convertToChordCells(
         _ inferenceResults: [[InferenceResult]],
-        threshold: Float = 0.4
+        threshold: Float = 0.7
     ) -> [ChordCell] {
         func convertToChordCell(
             position: TimeInterval,

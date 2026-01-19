@@ -1,1 +1,2 @@
+/Users/nahyunheum/Documents/GitHub/2025-C6-A2-GMG/GMG/Core/Models/ScoreFactory/TransformerChordInference.mlpackage/Data/com.apple.CoreML/model.mlmodel filter=lfs diff=lfs merge=lfs -text
 GMG/Core/Models/ScoreFactory/TransformerChordInference.mlpackage/Data/com.apple.CoreML/weights/weight.bin filter=lfs diff=lfs merge=lfs -text
