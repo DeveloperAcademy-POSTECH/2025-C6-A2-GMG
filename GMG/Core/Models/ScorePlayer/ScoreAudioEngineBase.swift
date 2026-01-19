@@ -97,7 +97,7 @@ class ScoreAudioEngineBase {
         )
     }
 
-    func prepareChordCells(octave: Int = 2) {
+    func prepareChordCells(octave: Int = 2, octaveUpRootNotes: Set<NoteName> = .init()) {
         for track in Array(sequencer.tracks) {
             sequencer.removeTrack(track)
         }
@@ -123,6 +123,7 @@ class ScoreAudioEngineBase {
             let position: TimeInterval = currentChordCell.startTime
             let duration: TimeInterval =
                 nextChordCell.startTime - position
+            let octave = octaveUpRootNotes.contains(chord.root) ? octave + 1 : octave
             let tonicChord: Tonic.Chord = chord.tonicChord
             let midiNotes: [Int8] = tonicChord.midiNoteNumbers(octave: octave)
 

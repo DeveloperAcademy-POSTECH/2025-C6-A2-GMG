@@ -51,3 +51,12 @@ extension Instrument {
         }
     }
 }
+
+extension Instrument {
+    var octaveUpRootNote: Set<NoteName> {
+        return switch self {
+        case .piano: []
+        case .guitar: [.C, .Cs, .Db, .D, .Ds, .Eb, .E, .F]
+        }
+    }
+}
