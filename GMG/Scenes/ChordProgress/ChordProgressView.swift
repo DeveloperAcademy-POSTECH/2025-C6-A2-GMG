@@ -76,7 +76,8 @@ struct ChordProgressView: View {
                         onDragEnd: intent.onDragWaveformEnd
                     ),
                     audioLevels: model.score.audioLevels,
-                    elapsedTime: model.playhead.elapsedTime
+                    elapsedTime: model.playhead.elapsedTime,
+                    isPlaying: model.playhead.isPlaying
                 )
             }
             .navigationBar(
@@ -526,63 +527,6 @@ extension ChordProgressView {
                 .animation(.default, value: instrument)
             }
             .frame(height: 92)
-        }
-    }
-
-    struct SegmentsScrollView: View {
-        @Environment(\.palette) private var palette
-
-        let totalDuration: TimeInterval
-        let segmentSlices: [[ChordSegmentSlice]]
-        let currentChordCell: ChordCell?
-        let selectedChordCell: ChordCell?
-        let segmentHandlers: SegmentHandlers
-        let waveformHandlers: WaveformHandlers
-        let audioLevels: [Float]
-        let elapsedTime: TimeInterval
-
-        var body: some View {
-            ScrollView {
-                LazyVStack(spacing: Spacing.md) {
-                    ForEach(Array(segmentSlices.enumerated()), id: \.offset) { index, slices in
-                        Segment(
-                            index: index,
-                            totalDuration: totalDuration,
-                            chordSlices: slices,
-                            segmentDuration: Constants.segmentDuration,
-                            currentChordCell: currentChordCell,
-                            selectedChordCell: selectedChordCell,
-                            audioLevels: audioLevels,
-                            elapsedTime: elapsedTime,
-                            segmentHandlers: segmentHandlers,
-                            waveformHandlers: waveformHandlers
-                        )
-                    }
-                }
-                .safeAreaPadding(Spacing.md)
-                .safeAreaPadding(.bottom, 128)
-            }
-            .mask {
-                VStack(spacing: .zero) {
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(
-                                color: palette.scrollMaskTopStart,
-                                location: 0.0
-                            ),
-                            Gradient.Stop(
-                                color: palette.scrollMaskTopEnd,
-                                location: 1.0
-                            ),
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: Spacing.md)
-                    palette.scrollMaskBottom
-                }
-                .ignoresSafeArea()
-            }
         }
     }
 }
