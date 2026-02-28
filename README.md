@@ -130,7 +130,8 @@ H --> I["공유"]
 ## 5. 주요 기능
 
 ### 5.1 허밍 녹음
-- 영상 링크: [FEATURE_VIDEO_RECORDING]
+<img width="1920" height="1080" alt="App-1" src="https://github.com/user-attachments/assets/a3b6fd28-669e-4378-8eb0-2333b3ba8571" />
+
 - 페이지 설명: 사용자는 카운트다운 후 바로 허밍을 녹음하고, 녹음 상태를 직관적으로 확인할 수 있습니다.
 - 기술 포인트:
 1. 녹음 권한 처리와 상태 전환을 Intent에서 일관되게 제어합니다.
@@ -138,32 +139,28 @@ H --> I["공유"]
 3. 녹음 완료 후 다음 분석 단계로 자연스럽게 연결됩니다.
 
 ### 5.2 AI 코드 추론
-- 영상 링크: [FEATURE_VIDEO_AI_INFERENCE]
+<img width="1920" height="1080" alt="App-2" src="https://github.com/user-attachments/assets/cbca9b04-3fc6-46a9-81fc-2381ca1c1770" />
+  
 - 페이지 설명: 허밍 오디오를 바탕으로 조성 및 코드 진행 후보를 자동 생성해 초안을 빠르게 만듭니다.
 - 기술 포인트:
 1. 피치 검출과 음표 시퀀스 변환으로 ML 입력 품질을 확보합니다.
 2. Transformer 기반 추론으로 구간별 코드 후보(top-k)를 생성합니다.
 3. 후처리로 코드 경계와 길이를 정리해 편집 가능한 형태로 제공합니다.
 
-### 5.3 코드 보기/편집 + 운지법 확인
-- 영상 링크: [FEATURE_VIDEO_EDIT_FINGERING]
-- 페이지 설명: 사용자는 5초 단위 세그먼트 화면에서 코드를 수정하고, 악기별 운지법을 확인하며 편곡을 다듬을 수 있습니다.
+### 5.3 코드 편집
+<img width="1920" height="1080" alt="App-3" src="https://github.com/user-attachments/assets/2bed1a9a-96e2-4f3e-814d-316d76be873e" />
+  
+- 페이지 설명: 사용자는 5초 단위 세그먼트 화면에서 코드를 수정하고 편곡을 다듬을 수 있습니다.
 - 기술 포인트:
 1. 파형 탭/드래그로 원하는 시점으로 즉시 이동해 세밀한 편집이 가능합니다.
 2. 후보 코드를 선택하면 해당 코드만 즉시 1회 미리듣기로 재생됩니다.
 3. 코드 변경 이력은 Undo/Redo 스택으로 관리해 반복 수정에 대응합니다.
 
 ### 5.4 코드 시트/오디오 내보내기
-- 영상 링크: [FEATURE_VIDEO_EXPORT]
+<img width="1920" height="1080" alt="App-4" src="https://github.com/user-attachments/assets/c140a057-8f34-46b6-8126-b5e8fa5c5768" />
+
 - 페이지 설명: 완성된 결과를 코드 시트 이미지와 오디오 파일로 내보내고 공유할 수 있습니다.
 - 기술 포인트:
 1. 코드 시트를 이미지로 렌더링해 빠르게 공유 가능한 형태로 제공합니다.
 2. 오프라인 렌더링으로 내보내기용 오디오 파일을 생성합니다.
 3. 공유 액션을 통해 결과물을 외부 앱으로 전달할 수 있습니다.
-
-## 6. 개발자 깃 링크
-| 역할 | 이름 | GitHub |
-| --- | --- | --- |
-| Main | [DEVELOPER_MAIN_NAME] | [DEVELOPER_MAIN_GITHUB] |
-| Member | [DEVELOPER_MEMBER_1_NAME] | [DEVELOPER_MEMBER_1_GITHUB] |
-| Member | [DEVELOPER_MEMBER_2_NAME] | [DEVELOPER_MEMBER_2_GITHUB] |
