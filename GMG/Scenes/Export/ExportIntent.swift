@@ -2,7 +2,7 @@
 
 import Foundation
 import SwiftUI
-internal import UIKit
+import UIKit
 
 protocol ExportIntentProtocol {
     func onAppear(score: Score)

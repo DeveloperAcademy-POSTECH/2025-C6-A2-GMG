@@ -1,7 +1,7 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
 import Foundation
-internal import UIKit
+import UIKit
 
 protocol ChordProgressModelStateProtocol {
     var score: Score { get }

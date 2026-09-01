@@ -3,7 +3,7 @@
 import AVFAudio
 import Combine
 import Foundation
-internal import UIKit
+import UIKit
 
 protocol RecordingIntentProtocol {
     func onAppear() async

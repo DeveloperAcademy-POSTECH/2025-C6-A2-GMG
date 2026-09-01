@@ -3,7 +3,7 @@
 import AVFAudio
 import Combine
 import Foundation
-internal import UniformTypeIdentifiers
+import UniformTypeIdentifiers
 
 final class RecordManager {
     private var audioRecorder: AVAudioRecorder?
