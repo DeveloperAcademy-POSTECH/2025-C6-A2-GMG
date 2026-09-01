@@ -70,9 +70,21 @@ final class ScoreFactory {
 
         scoreFactoryStatePublisher.send(.chordGeneration)
 
+        // The model reads beats, so the recording has to be placed on a beat
+        // grid. Estimating that from free humming is not solved (see
+        // TempoEstimator), and a wrong grid ruins the input outright — so a
+        // suggestion is only taken when it is confident, and 120 BPM stands in
+        // otherwise. Replace this with the tempo the singer recorded to, once
+        // there is a count-in or a tap to read it from.
+        let suggestion = TempoEstimator.suggest(onsets: notes.map(\.startTime))
+        let tempo: Tempo =
+            suggestion.confidence >= TempoEstimator.usableConfidence
+            ? suggestion.tempo
+            : Tempo(bpm: Tempo.default.bpm, phase: notes.first?.startTime ?? 0)
+
         let inferencer = try ChordInferencer()
         let chordInferencerResult: ChordInferencerResult =
-            try await inferencer.inference(notes: notes)
+            try await inferencer.inference(notes: notes, tempo: tempo)
 
         let key: Key = chordInferencerResult.key
         let chordCells: [ChordCell] = chordInferencerResult.chordCells

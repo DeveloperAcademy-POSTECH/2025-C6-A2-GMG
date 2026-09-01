@@ -245,6 +245,8 @@ extension ChordQuality {
         case .dim: return .dim
         case .dim7: return .dim7
         case .halfDim7: return .halfDim7
+        case .sus4: return .sus4
+        case .aug: return .aug
         }
     }
 }
@@ -262,6 +264,8 @@ extension ScoreSchema.ChordQuality {
         case .dim: return .dim
         case .dim7: return .dim7
         case .halfDim7: return .halfDim7
+        case .sus4: return .sus4
+        case .aug: return .aug
         }
     }
 }

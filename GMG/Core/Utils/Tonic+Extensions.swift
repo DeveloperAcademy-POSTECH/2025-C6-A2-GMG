@@ -37,6 +37,8 @@ extension Chord {
         case .dim: type = .dim
         case .dim7: type = .dim7
         case .halfDim7: type = .halfDim7
+        case .sus4: type = .sus4
+        case .aug: type = .aug
         }
 
         let tonicChord: Tonic.Chord = Tonic.Chord(root, type: type)

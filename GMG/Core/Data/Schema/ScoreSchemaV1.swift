@@ -117,6 +117,10 @@ enum ScoreSchemaV1: VersionedSchema {
         case dim
         case dim7
         case halfDim7
+        // Added with the tick-grid model. Raw values are new strings, so rows
+        // written before this stay readable.
+        case sus4
+        case aug
     }
 
     @Model
