@@ -1,5 +1,6 @@
 //  Copyright © 2025 ADA 4th GMG. All rights reserved.
 
+import Foundation
 import Testing
 
 @testable import GMG
@@ -100,20 +101,77 @@ struct TempoTests {
         #expect(tempo.tickLength(ofSeconds: 2.0, ticksPerQuarter: 12) == 48)
     }
 
-    @Test func aSteadyMelodyGetsAConfidentSuggestion() {
-        // Quarters and eighths at 120 BPM.
-        let beat: Double = 0.5
-        let onsets: [Double] = [0, 0.5, 1.0, 1.5, 2.0, 2.25, 2.5, 2.75, 3.0, 3.5]
-            .map { $0 * (beat / 0.5) }
+    /// Onsets for a melody at `bpm`, given positions in twelfths of a beat.
+    private func onsets(bpm: Double, twelfths: [Int], startingAt origin: Double = 3)
+        -> [TimeInterval]
+    {
+        let tick: Double = (60.0 / bpm) / 12.0
+        return twelfths.map { Double($0) * tick + origin }
+    }
 
-        let suggestion = TempoEstimator.suggest(onsets: onsets)
+    /// Four bars of quarters and eighths.
+    private static let quartersAndEighths: [Int] = [
+        0, 12, 24, 36, 48, 54, 60, 66, 72, 84, 96, 108, 120, 126, 132, 144,
+    ]
 
+    @Test(arguments: [80.0, 90.0, 100.0, 110.0, 120.0, 132.0, 150.0])
+    func recoversTheTempoOfASteadyMelody(bpm: Double) {
+        let suggestion = TempoEstimator.suggest(
+            onsets: onsets(bpm: bpm, twelfths: Self.quartersAndEighths)
+        )
+
+        #expect(abs(suggestion.tempo.bpm - bpm) < 2)
         #expect(suggestion.confidence > TempoEstimator.usableConfidence)
-        #expect(suggestion.tempo.phase == 0)
+    }
+
+    /// Halving a tempo turns every eighth into a sixteenth and fits the grid
+    /// exactly as well, so snap distance alone collapses to the slowest tempo
+    /// in range. The complexity penalty is what stops that.
+    @Test func doesNotCollapseToHalfTempo() {
+        let suggestion = TempoEstimator.suggest(
+            onsets: onsets(bpm: 120, twelfths: Self.quartersAndEighths)
+        )
+        #expect(suggestion.tempo.bpm > 100)
+    }
+
+    @Test func handlesTripletsAndSyncopation() {
+        let triplets = TempoEstimator.suggest(
+            onsets: onsets(
+                bpm: 120,
+                twelfths: [0, 4, 8, 12, 16, 20, 24, 36, 48, 52, 56, 60, 72, 84, 96, 108]
+            )
+        )
+        #expect(abs(triplets.tempo.bpm - 120) < 2)
+
+        let syncopated = TempoEstimator.suggest(
+            onsets: onsets(
+                bpm: 110, twelfths: [0, 6, 18, 24, 30, 42, 48, 54, 66, 72, 78, 90, 96]
+            )
+        )
+        #expect(abs(syncopated.tempo.bpm - 110) < 2)
+    }
+
+    @Test func survivesHummingJitter() {
+        var state: UInt64 = 7
+        func wobble() -> Double {
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Double(Int64(bitPattern: state >> 11)) / Double(1 << 52) - 1.0
+        }
+
+        // ±30 ms is a realistic spread for a sung onset.
+        let jittered: [TimeInterval] = onsets(
+            bpm: 100, twelfths: Self.quartersAndEighths
+        ).map { $0 + wobble() * 0.03 }
+
+        let suggestion = TempoEstimator.suggest(onsets: jittered)
+        #expect(abs(suggestion.tempo.bpm - 100) < 2)
+        #expect(suggestion.confidence > TempoEstimator.usableConfidence)
     }
 
     @Test func onsetsWithNoPulseAreNotWorthShowing() {
-        let scattered: [Double] = [0, 0.17, 0.61, 0.68, 1.29, 1.31, 2.02, 2.7, 2.91]
+        let scattered: [Double] = [
+            0, 0.17, 0.61, 0.68, 1.29, 1.31, 2.02, 2.7, 2.91, 3.44, 3.61, 4.2,
+        ]
         #expect(
             TempoEstimator.suggest(onsets: scattered).confidence
                 < TempoEstimator.usableConfidence
@@ -124,5 +182,15 @@ struct TempoTests {
         let suggestion = TempoEstimator.suggest(onsets: [0, 0.5])
         #expect(suggestion.confidence == 0)
         #expect(suggestion.tempo.bpm == Tempo.default.bpm)
+    }
+
+    /// The phase places beat zero so the melody's own onsets land on the grid.
+    @Test func phaseAlignsTheGridToTheMelody() {
+        let suggestion = TempoEstimator.suggest(
+            onsets: onsets(bpm: 120, twelfths: Self.quartersAndEighths, startingAt: 3)
+        )
+
+        let beats: Double = (3.0 - suggestion.tempo.phase) / suggestion.tempo.secondsPerBeat
+        #expect(abs(beats - beats.rounded()) < 0.1)
     }
 }
