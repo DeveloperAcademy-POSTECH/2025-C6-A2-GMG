@@ -182,18 +182,6 @@ extension SwiftF0.Note {
 }
 
 extension Array where Element == ChordCell {
-    fileprivate func mergeConsecutive() -> Self {
-        return
-            self
-            .reduce(into: []) { merged, cell in
-                if merged.last?.chord != cell.chord {
-                    merged.append(cell)
-                }
-            }
-    }
-}
-
-extension Array where Element == ChordCell {
     fileprivate func alignFirstStartTimeToZero() -> Self {
         return
             self
