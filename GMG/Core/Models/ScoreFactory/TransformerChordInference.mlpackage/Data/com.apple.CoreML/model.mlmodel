@@ -1,10587 +1,0 @@
-ş
-
-melody_tokens*	
-ş €
-
-chord_input
-*
-{ €R
-chord_output*
-
-{è €¢£¢:
-+com.github.apple.coremltools.source_dialectTorchScript¢-
-$com.github.apple.coremltools.version8.3.0¢3
-#com.github.apple.coremltools.sourcetorch==2.5.0²º¹Ê·
-mainÀ·
-$
-melody_tokens
-
-
-ş
-!
-chord_input
-
-
-{CoreML7ê¶
-CoreML7İ¶chord_output¬
-const0
-model_pos_encoding
-
-
-ş
-€*G
-val@
-
-
-ş
-€*"
-@model_path/weights/weight.bin@*(
-name 
-
-"
-model_pos_encoding¸
-const5
-model_melody_embedding_weight
-
-
-€*C
-val<
-
-
-€*$
-@model_path/weights/weight.bin€ñ'*3
-name+
-#
-!"
-model_melody_embedding_weight¶
-const4
-model_chord_embedding_weight
-
-è
-€*C
-val<
-
-è
-€*$
-@model_path/weights/weight.binÀù7*2
-name*
-"
- "
-model_chord_embedding_weightÈ
-const=
-,model_encoder_layers_0_self_attn_q_proj_bias
-
-€*<
-val5
-
-€*$
-@model_path/weights/weight.bin€ºF*B
-name:
-2
-0".
-,model_encoder_layers_0_self_attn_q_proj_biasÚ
-constF
-.model_encoder_layers_0_self_attn_q_proj_weight
-
-€
-€*C
-val<
-
-€
-€*$
-@model_path/weights/weight.binÀÂF*D
-name<
-4
-2"0
-.model_encoder_layers_0_self_attn_q_proj_weightÈ
-const=
-,model_encoder_layers_0_self_attn_k_proj_bias
-
-€*<
-val5
-
-€*$
-@model_path/weights/weight.bin€ÃV*B
-name:
-2
-0".
-,model_encoder_layers_0_self_attn_k_proj_biasÚ
-constF
-.model_encoder_layers_0_self_attn_k_proj_weight
-
-€
-€*C
-val<
-
-€
-€*$
-@model_path/weights/weight.binÀËV*D
-name<
-4
-2"0
-.model_encoder_layers_0_self_attn_k_proj_weightÈ
-const=
-,model_encoder_layers_0_self_attn_v_proj_bias
-
-€*<
-val5
-
-€*$
-@model_path/weights/weight.bin€Ìf*B
-name:
-2
-0".
-,model_encoder_layers_0_self_attn_v_proj_biasÚ
-constF
-.model_encoder_layers_0_self_attn_v_proj_weight
-
-€
-€*C
-val<
-
-€
-€*$
-@model_path/weights/weight.binÀÔf*D
-name<
-4
-2"0
-.model_encoder_layers_0_self_attn_v_proj_weightÌ
-const?
-.model_encoder_layers_0_self_attn_out_proj_bias
-
-€*<
-val5
-
-€*$
-@model_path/weights/weight.bin€Õv*D
-name<
-4
-2"0
-.model_encoder_layers_0_self_attn_out_proj_biasŞ
-constH
-0model_encoder_layers_0_self_attn_out_proj_weight
-
-€
-€*C
-val<
-
-€
-€*$
-@model_path/weights/weight.binÀİv*F
-name>
-6
-4"2
-0model_encoder_layers_0_self_attn_out_proj_weight³
-const2
-!model_encoder_layers_0_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ş†*7
-name/
-'
-%"#
-!model_encoder_layers_0_norm1_bias·
-const4
-#model_encoder_layers_0_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀæ†*9
-name1
-)
-'"%
-#model_encoder_layers_0_norm1_weight·
-const4
-#model_encoder_layers_0_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ï†*9
-name1
-)
-'"%
-#model_encoder_layers_0_linear1_biasÉ
-const=
-%model_encoder_layers_0_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ‡*;
-name3
-+
-)"'
-%model_encoder_layers_0_linear1_weight·
-const4
-#model_encoder_layers_0_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ç*9
-name1
-)
-'"%
-#model_encoder_layers_0_linear2_biasÉ
-const=
-%model_encoder_layers_0_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ˜Ç*;
-name3
-+
-)"'
-%model_encoder_layers_0_linear2_weight³
-const2
-!model_encoder_layers_0_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€™‡*7
-name/
-'
-%"#
-!model_encoder_layers_0_norm2_bias·
-const4
-#model_encoder_layers_0_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ¡‡*9
-name1
-)
-'"%
-#model_encoder_layers_0_norm2_weightÉ
-const=
-,model_encoder_layers_1_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ª‡*B
-name:
-2
-0".
-,model_encoder_layers_1_self_attn_q_proj_biasÛ
-constF
-.model_encoder_layers_1_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ²‡*D
-name<
-4
-2"0
-.model_encoder_layers_1_self_attn_q_proj_weightÉ
-const=
-,model_encoder_layers_1_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€³—*B
-name:
-2
-0".
-,model_encoder_layers_1_self_attn_k_proj_biasÛ
-constF
-.model_encoder_layers_1_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ»—*D
-name<
-4
-2"0
-.model_encoder_layers_1_self_attn_k_proj_weightÉ
-const=
-,model_encoder_layers_1_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¼§*B
-name:
-2
-0".
-,model_encoder_layers_1_self_attn_v_proj_biasÛ
-constF
-.model_encoder_layers_1_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÄ§*D
-name<
-4
-2"0
-.model_encoder_layers_1_self_attn_v_proj_weightÍ
-const?
-.model_encoder_layers_1_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Å·*D
-name<
-4
-2"0
-.model_encoder_layers_1_self_attn_out_proj_biasß
-constH
-0model_encoder_layers_1_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÍ·*F
-name>
-6
-4"2
-0model_encoder_layers_1_self_attn_out_proj_weight³
-const2
-!model_encoder_layers_1_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ÎÇ*7
-name/
-'
-%"#
-!model_encoder_layers_1_norm1_bias·
-const4
-#model_encoder_layers_1_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀÖÇ*9
-name1
-)
-'"%
-#model_encoder_layers_1_norm1_weight·
-const4
-#model_encoder_layers_1_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ßÇ*9
-name1
-)
-'"%
-#model_encoder_layers_1_linear1_biasÉ
-const=
-%model_encoder_layers_1_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÿÇ*;
-name3
-+
-)"'
-%model_encoder_layers_1_linear1_weight·
-const4
-#model_encoder_layers_1_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€€ˆ*9
-name1
-)
-'"%
-#model_encoder_layers_1_linear2_biasÉ
-const=
-%model_encoder_layers_1_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀˆˆ*;
-name3
-+
-)"'
-%model_encoder_layers_1_linear2_weight³
-const2
-!model_encoder_layers_1_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€‰È*7
-name/
-'
-%"#
-!model_encoder_layers_1_norm2_bias·
-const4
-#model_encoder_layers_1_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ‘È*9
-name1
-)
-'"%
-#model_encoder_layers_1_norm2_weightÉ
-const=
-,model_encoder_layers_2_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€šÈ*B
-name:
-2
-0".
-,model_encoder_layers_2_self_attn_q_proj_biasÛ
-constF
-.model_encoder_layers_2_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ¢È*D
-name<
-4
-2"0
-.model_encoder_layers_2_self_attn_q_proj_weightÉ
-const=
-,model_encoder_layers_2_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€£Ø*B
-name:
-2
-0".
-,model_encoder_layers_2_self_attn_k_proj_biasÛ
-constF
-.model_encoder_layers_2_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ«Ø*D
-name<
-4
-2"0
-.model_encoder_layers_2_self_attn_k_proj_weightÉ
-const=
-,model_encoder_layers_2_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¬è*B
-name:
-2
-0".
-,model_encoder_layers_2_self_attn_v_proj_biasÛ
-constF
-.model_encoder_layers_2_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ´è*D
-name<
-4
-2"0
-.model_encoder_layers_2_self_attn_v_proj_weightÍ
-const?
-.model_encoder_layers_2_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€µø*D
-name<
-4
-2"0
-.model_encoder_layers_2_self_attn_out_proj_biasß
-constH
-0model_encoder_layers_2_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ½ø*F
-name>
-6
-4"2
-0model_encoder_layers_2_self_attn_out_proj_weight³
-const2
-!model_encoder_layers_2_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¾ˆ*7
-name/
-'
-%"#
-!model_encoder_layers_2_norm1_bias·
-const4
-#model_encoder_layers_2_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀÆˆ*9
-name1
-)
-'"%
-#model_encoder_layers_2_norm1_weight·
-const4
-#model_encoder_layers_2_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ïˆ*9
-name1
-)
-'"%
-#model_encoder_layers_2_linear1_biasÉ
-const=
-%model_encoder_layers_2_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀïˆ*;
-name3
-+
-)"'
-%model_encoder_layers_2_linear1_weight·
-const4
-#model_encoder_layers_2_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ğÈ*9
-name1
-)
-'"%
-#model_encoder_layers_2_linear2_biasÉ
-const=
-%model_encoder_layers_2_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀøÈ*;
-name3
-+
-)"'
-%model_encoder_layers_2_linear2_weight³
-const2
-!model_encoder_layers_2_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ùˆ*7
-name/
-'
-%"#
-!model_encoder_layers_2_norm2_bias·
-const4
-#model_encoder_layers_2_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ‰*9
-name1
-)
-'"%
-#model_encoder_layers_2_norm2_weightÉ
-const=
-,model_encoder_layers_3_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Š‰*B
-name:
-2
-0".
-,model_encoder_layers_3_self_attn_q_proj_biasÛ
-constF
-.model_encoder_layers_3_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ’‰*D
-name<
-4
-2"0
-.model_encoder_layers_3_self_attn_q_proj_weightÉ
-const=
-,model_encoder_layers_3_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€“™*B
-name:
-2
-0".
-,model_encoder_layers_3_self_attn_k_proj_biasÛ
-constF
-.model_encoder_layers_3_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ›™*D
-name<
-4
-2"0
-.model_encoder_layers_3_self_attn_k_proj_weightÉ
-const=
-,model_encoder_layers_3_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€œ©*B
-name:
-2
-0".
-,model_encoder_layers_3_self_attn_v_proj_biasÛ
-constF
-.model_encoder_layers_3_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ¤©*D
-name<
-4
-2"0
-.model_encoder_layers_3_self_attn_v_proj_weightÍ
-const?
-.model_encoder_layers_3_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¥¹*D
-name<
-4
-2"0
-.model_encoder_layers_3_self_attn_out_proj_biasß
-constH
-0model_encoder_layers_3_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ­¹*F
-name>
-6
-4"2
-0model_encoder_layers_3_self_attn_out_proj_weight³
-const2
-!model_encoder_layers_3_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€®É*7
-name/
-'
-%"#
-!model_encoder_layers_3_norm1_bias·
-const4
-#model_encoder_layers_3_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ¶É*9
-name1
-)
-'"%
-#model_encoder_layers_3_norm1_weight·
-const4
-#model_encoder_layers_3_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¿É*9
-name1
-)
-'"%
-#model_encoder_layers_3_linear1_biasÉ
-const=
-%model_encoder_layers_3_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀßÉ*;
-name3
-+
-)"'
-%model_encoder_layers_3_linear1_weight·
-const4
-#model_encoder_layers_3_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€à‰*9
-name1
-)
-'"%
-#model_encoder_layers_3_linear2_biasÉ
-const=
-%model_encoder_layers_3_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀè‰*;
-name3
-+
-)"'
-%model_encoder_layers_3_linear2_weight³
-const2
-!model_encoder_layers_3_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€éÉ*7
-name/
-'
-%"#
-!model_encoder_layers_3_norm2_bias·
-const4
-#model_encoder_layers_3_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀñÉ*9
-name1
-)
-'"%
-#model_encoder_layers_3_norm2_weightÉ
-const=
-,model_decoder_layers_0_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€úÉ*B
-name:
-2
-0".
-,model_decoder_layers_0_self_attn_q_proj_biasÛ
-constF
-.model_decoder_layers_0_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ‚Ê*D
-name<
-4
-2"0
-.model_decoder_layers_0_self_attn_q_proj_weightÉ
-const=
-,model_decoder_layers_0_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ƒÚ*B
-name:
-2
-0".
-,model_decoder_layers_0_self_attn_k_proj_biasÛ
-constF
-.model_decoder_layers_0_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ‹Ú*D
-name<
-4
-2"0
-.model_decoder_layers_0_self_attn_k_proj_weightÉ
-const=
-,model_decoder_layers_0_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Œê*B
-name:
-2
-0".
-,model_decoder_layers_0_self_attn_v_proj_biasÛ
-constF
-.model_decoder_layers_0_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ”ê*D
-name<
-4
-2"0
-.model_decoder_layers_0_self_attn_v_proj_weightÍ
-const?
-.model_decoder_layers_0_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€•ú*D
-name<
-4
-2"0
-.model_decoder_layers_0_self_attn_out_proj_biasß
-constH
-0model_decoder_layers_0_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀú*F
-name>
-6
-4"2
-0model_decoder_layers_0_self_attn_out_proj_weight³
-const2
-!model_decoder_layers_0_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Š*7
-name/
-'
-%"#
-!model_decoder_layers_0_norm1_bias·
-const4
-#model_decoder_layers_0_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ¦Š*9
-name1
-)
-'"%
-#model_decoder_layers_0_norm1_weightË
-const>
--model_decoder_layers_0_cross_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¯Š*C
-name;
-3
-1"/
--model_decoder_layers_0_cross_attn_q_proj_biasİ
-constG
-/model_decoder_layers_0_cross_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ·Š*E
-name=
-5
-3"1
-/model_decoder_layers_0_cross_attn_q_proj_weightË
-const>
--model_decoder_layers_0_cross_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¸š*C
-name;
-3
-1"/
--model_decoder_layers_0_cross_attn_k_proj_biasİ
-constG
-/model_decoder_layers_0_cross_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÀš*E
-name=
-5
-3"1
-/model_decoder_layers_0_cross_attn_k_proj_weightË
-const>
--model_decoder_layers_0_cross_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Áª*C
-name;
-3
-1"/
--model_decoder_layers_0_cross_attn_v_proj_biasİ
-constG
-/model_decoder_layers_0_cross_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÉª*E
-name=
-5
-3"1
-/model_decoder_layers_0_cross_attn_v_proj_weightÏ
-const@
-/model_decoder_layers_0_cross_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Êº*E
-name=
-5
-3"1
-/model_decoder_layers_0_cross_attn_out_proj_biasá
-constI
-1model_decoder_layers_0_cross_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÒº*G
-name?
-7
-5"3
-1model_decoder_layers_0_cross_attn_out_proj_weight³
-const2
-!model_decoder_layers_0_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ÓÊ*7
-name/
-'
-%"#
-!model_decoder_layers_0_norm2_bias·
-const4
-#model_decoder_layers_0_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀÛÊ*9
-name1
-)
-'"%
-#model_decoder_layers_0_norm2_weight·
-const4
-#model_decoder_layers_0_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€äÊ*9
-name1
-)
-'"%
-#model_decoder_layers_0_linear1_biasÉ
-const=
-%model_decoder_layers_0_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ„Ë*;
-name3
-+
-)"'
-%model_decoder_layers_0_linear1_weight·
-const4
-#model_decoder_layers_0_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€…‹*9
-name1
-)
-'"%
-#model_decoder_layers_0_linear2_biasÉ
-const=
-%model_decoder_layers_0_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ‹*;
-name3
-+
-)"'
-%model_decoder_layers_0_linear2_weight³
-const2
-!model_decoder_layers_0_norm3_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ë*7
-name/
-'
-%"#
-!model_decoder_layers_0_norm3_bias·
-const4
-#model_decoder_layers_0_norm3_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ–Ë*9
-name1
-)
-'"%
-#model_decoder_layers_0_norm3_weightÉ
-const=
-,model_decoder_layers_1_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ŸË*B
-name:
-2
-0".
-,model_decoder_layers_1_self_attn_q_proj_biasÛ
-constF
-.model_decoder_layers_1_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ§Ë*D
-name<
-4
-2"0
-.model_decoder_layers_1_self_attn_q_proj_weightÉ
-const=
-,model_decoder_layers_1_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¨Û*B
-name:
-2
-0".
-,model_decoder_layers_1_self_attn_k_proj_biasÛ
-constF
-.model_decoder_layers_1_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ°Û*D
-name<
-4
-2"0
-.model_decoder_layers_1_self_attn_k_proj_weightÉ
-const=
-,model_decoder_layers_1_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€±ë*B
-name:
-2
-0".
-,model_decoder_layers_1_self_attn_v_proj_biasÛ
-constF
-.model_decoder_layers_1_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ¹ë*D
-name<
-4
-2"0
-.model_decoder_layers_1_self_attn_v_proj_weightÍ
-const?
-.model_decoder_layers_1_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ºû*D
-name<
-4
-2"0
-.model_decoder_layers_1_self_attn_out_proj_biasß
-constH
-0model_decoder_layers_1_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÂû*F
-name>
-6
-4"2
-0model_decoder_layers_1_self_attn_out_proj_weight³
-const2
-!model_decoder_layers_1_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ã‹	*7
-name/
-'
-%"#
-!model_decoder_layers_1_norm1_bias·
-const4
-#model_decoder_layers_1_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀË‹	*9
-name1
-)
-'"%
-#model_decoder_layers_1_norm1_weightË
-const>
--model_decoder_layers_1_cross_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ô‹	*C
-name;
-3
-1"/
--model_decoder_layers_1_cross_attn_q_proj_biasİ
-constG
-/model_decoder_layers_1_cross_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÜ‹	*E
-name=
-5
-3"1
-/model_decoder_layers_1_cross_attn_q_proj_weightË
-const>
--model_decoder_layers_1_cross_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€İ›	*C
-name;
-3
-1"/
--model_decoder_layers_1_cross_attn_k_proj_biasİ
-constG
-/model_decoder_layers_1_cross_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀå›	*E
-name=
-5
-3"1
-/model_decoder_layers_1_cross_attn_k_proj_weightË
-const>
--model_decoder_layers_1_cross_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€æ«	*C
-name;
-3
-1"/
--model_decoder_layers_1_cross_attn_v_proj_biasİ
-constG
-/model_decoder_layers_1_cross_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀî«	*E
-name=
-5
-3"1
-/model_decoder_layers_1_cross_attn_v_proj_weightÏ
-const@
-/model_decoder_layers_1_cross_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ï»	*E
-name=
-5
-3"1
-/model_decoder_layers_1_cross_attn_out_proj_biasá
-constI
-1model_decoder_layers_1_cross_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ÷»	*G
-name?
-7
-5"3
-1model_decoder_layers_1_cross_attn_out_proj_weight³
-const2
-!model_decoder_layers_1_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€øË	*7
-name/
-'
-%"#
-!model_decoder_layers_1_norm2_bias·
-const4
-#model_decoder_layers_1_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ€Ì	*9
-name1
-)
-'"%
-#model_decoder_layers_1_norm2_weight·
-const4
-#model_decoder_layers_1_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€‰Ì	*9
-name1
-)
-'"%
-#model_decoder_layers_1_linear1_biasÉ
-const=
-%model_decoder_layers_1_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ©Ì	*;
-name3
-+
-)"'
-%model_decoder_layers_1_linear1_weight·
-const4
-#model_decoder_layers_1_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ªŒ
-*9
-name1
-)
-'"%
-#model_decoder_layers_1_linear2_biasÉ
-const=
-%model_decoder_layers_1_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ²Œ
-*;
-name3
-+
-)"'
-%model_decoder_layers_1_linear2_weight³
-const2
-!model_decoder_layers_1_norm3_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€³Ì
-*7
-name/
-'
-%"#
-!model_decoder_layers_1_norm3_bias·
-const4
-#model_decoder_layers_1_norm3_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ»Ì
-*9
-name1
-)
-'"%
-#model_decoder_layers_1_norm3_weightÉ
-const=
-,model_decoder_layers_2_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ÄÌ
-*B
-name:
-2
-0".
-,model_decoder_layers_2_self_attn_q_proj_biasÛ
-constF
-.model_decoder_layers_2_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÌÌ
-*D
-name<
-4
-2"0
-.model_decoder_layers_2_self_attn_q_proj_weightÉ
-const=
-,model_decoder_layers_2_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ÍÜ
-*B
-name:
-2
-0".
-,model_decoder_layers_2_self_attn_k_proj_biasÛ
-constF
-.model_decoder_layers_2_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÕÜ
-*D
-name<
-4
-2"0
-.model_decoder_layers_2_self_attn_k_proj_weightÉ
-const=
-,model_decoder_layers_2_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Öì
-*B
-name:
-2
-0".
-,model_decoder_layers_2_self_attn_v_proj_biasÛ
-constF
-.model_decoder_layers_2_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀŞì
-*D
-name<
-4
-2"0
-.model_decoder_layers_2_self_attn_v_proj_weightÍ
-const?
-.model_decoder_layers_2_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ßü
-*D
-name<
-4
-2"0
-.model_decoder_layers_2_self_attn_out_proj_biasß
-constH
-0model_decoder_layers_2_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀçü
-*F
-name>
-6
-4"2
-0model_decoder_layers_2_self_attn_out_proj_weight³
-const2
-!model_decoder_layers_2_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€èŒ*7
-name/
-'
-%"#
-!model_decoder_layers_2_norm1_bias·
-const4
-#model_decoder_layers_2_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀğŒ*9
-name1
-)
-'"%
-#model_decoder_layers_2_norm1_weightË
-const>
--model_decoder_layers_2_cross_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ùŒ*C
-name;
-3
-1"/
--model_decoder_layers_2_cross_attn_q_proj_biasİ
-constG
-/model_decoder_layers_2_cross_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ*E
-name=
-5
-3"1
-/model_decoder_layers_2_cross_attn_q_proj_weightË
-const>
--model_decoder_layers_2_cross_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€‚*C
-name;
-3
-1"/
--model_decoder_layers_2_cross_attn_k_proj_biasİ
-constG
-/model_decoder_layers_2_cross_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀŠ*E
-name=
-5
-3"1
-/model_decoder_layers_2_cross_attn_k_proj_weightË
-const>
--model_decoder_layers_2_cross_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€‹­*C
-name;
-3
-1"/
--model_decoder_layers_2_cross_attn_v_proj_biasİ
-constG
-/model_decoder_layers_2_cross_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ“­*E
-name=
-5
-3"1
-/model_decoder_layers_2_cross_attn_v_proj_weightÏ
-const@
-/model_decoder_layers_2_cross_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€”½*E
-name=
-5
-3"1
-/model_decoder_layers_2_cross_attn_out_proj_biasá
-constI
-1model_decoder_layers_2_cross_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀœ½*G
-name?
-7
-5"3
-1model_decoder_layers_2_cross_attn_out_proj_weight³
-const2
-!model_decoder_layers_2_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Í*7
-name/
-'
-%"#
-!model_decoder_layers_2_norm2_bias·
-const4
-#model_decoder_layers_2_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ¥Í*9
-name1
-)
-'"%
-#model_decoder_layers_2_norm2_weight·
-const4
-#model_decoder_layers_2_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€®Í*9
-name1
-)
-'"%
-#model_decoder_layers_2_linear1_biasÉ
-const=
-%model_decoder_layers_2_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÎÍ*;
-name3
-+
-)"'
-%model_decoder_layers_2_linear1_weight·
-const4
-#model_decoder_layers_2_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€Ï*9
-name1
-)
-'"%
-#model_decoder_layers_2_linear2_biasÉ
-const=
-%model_decoder_layers_2_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ×*;
-name3
-+
-)"'
-%model_decoder_layers_2_linear2_weight³
-const2
-!model_decoder_layers_2_norm3_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ØÍ*7
-name/
-'
-%"#
-!model_decoder_layers_2_norm3_bias·
-const4
-#model_decoder_layers_2_norm3_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀàÍ*9
-name1
-)
-'"%
-#model_decoder_layers_2_norm3_weightÉ
-const=
-,model_decoder_layers_3_self_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€éÍ*B
-name:
-2
-0".
-,model_decoder_layers_3_self_attn_q_proj_biasÛ
-constF
-.model_decoder_layers_3_self_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀñÍ*D
-name<
-4
-2"0
-.model_decoder_layers_3_self_attn_q_proj_weightÉ
-const=
-,model_decoder_layers_3_self_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€òİ*B
-name:
-2
-0".
-,model_decoder_layers_3_self_attn_k_proj_biasÛ
-constF
-.model_decoder_layers_3_self_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀúİ*D
-name<
-4
-2"0
-.model_decoder_layers_3_self_attn_k_proj_weightÉ
-const=
-,model_decoder_layers_3_self_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ûí*B
-name:
-2
-0".
-,model_decoder_layers_3_self_attn_v_proj_biasÛ
-constF
-.model_decoder_layers_3_self_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀƒî*D
-name<
-4
-2"0
-.model_decoder_layers_3_self_attn_v_proj_weightÍ
-const?
-.model_decoder_layers_3_self_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€„ş*D
-name<
-4
-2"0
-.model_decoder_layers_3_self_attn_out_proj_biasß
-constH
-0model_decoder_layers_3_self_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀŒş*F
-name>
-6
-4"2
-0model_decoder_layers_3_self_attn_out_proj_weight³
-const2
-!model_decoder_layers_3_norm1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€*7
-name/
-'
-%"#
-!model_decoder_layers_3_norm1_bias·
-const4
-#model_decoder_layers_3_norm1_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ•*9
-name1
-)
-'"%
-#model_decoder_layers_3_norm1_weightË
-const>
--model_decoder_layers_3_cross_attn_q_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€*C
-name;
-3
-1"/
--model_decoder_layers_3_cross_attn_q_proj_biasİ
-constG
-/model_decoder_layers_3_cross_attn_q_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ¦*E
-name=
-5
-3"1
-/model_decoder_layers_3_cross_attn_q_proj_weightË
-const>
--model_decoder_layers_3_cross_attn_k_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€§*C
-name;
-3
-1"/
--model_decoder_layers_3_cross_attn_k_proj_biasİ
-constG
-/model_decoder_layers_3_cross_attn_k_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ¯*E
-name=
-5
-3"1
-/model_decoder_layers_3_cross_attn_k_proj_weightË
-const>
--model_decoder_layers_3_cross_attn_v_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€°®*C
-name;
-3
-1"/
--model_decoder_layers_3_cross_attn_v_proj_biasİ
-constG
-/model_decoder_layers_3_cross_attn_v_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀ¸®*E
-name=
-5
-3"1
-/model_decoder_layers_3_cross_attn_v_proj_weightÏ
-const@
-/model_decoder_layers_3_cross_attn_out_proj_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€¹¾*E
-name=
-5
-3"1
-/model_decoder_layers_3_cross_attn_out_proj_biasá
-constI
-1model_decoder_layers_3_cross_attn_out_proj_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀÁ¾*G
-name?
-7
-5"3
-1model_decoder_layers_3_cross_attn_out_proj_weight³
-const2
-!model_decoder_layers_3_norm2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ÂÎ*7
-name/
-'
-%"#
-!model_decoder_layers_3_norm2_bias·
-const4
-#model_decoder_layers_3_norm2_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀÊÎ*9
-name1
-)
-'"%
-#model_decoder_layers_3_norm2_weight·
-const4
-#model_decoder_layers_3_linear1_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ÓÎ*9
-name1
-)
-'"%
-#model_decoder_layers_3_linear1_biasÉ
-const=
-%model_decoder_layers_3_linear1_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀóÎ*;
-name3
-+
-)"'
-%model_decoder_layers_3_linear1_weight·
-const4
-#model_decoder_layers_3_linear2_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ô*9
-name1
-)
-'"%
-#model_decoder_layers_3_linear2_biasÉ
-const=
-%model_decoder_layers_3_linear2_weight
-
-€
-€*D
-val=
-
-€
-€*%
-@model_path/weights/weight.binÀü*;
-name3
-+
-)"'
-%model_decoder_layers_3_linear2_weight³
-const2
-!model_decoder_layers_3_norm3_bias
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.bin€ıÎ*7
-name/
-'
-%"#
-!model_decoder_layers_3_norm3_bias·
-const4
-#model_decoder_layers_3_norm3_weight
-
-€*=
-val6
-
-€*%
-@model_path/weights/weight.binÀ…Ï*9
-name1
-)
-'"%
-#model_decoder_layers_3_norm3_weight“
-const"
-model_fc_out_bias
-
-è*=
-val6
-
-è*%
-@model_path/weights/weight.bin€Ï*'
-name
-
-"
-model_fc_out_bias¥
-const+
-model_fc_out_weight
-
-è
-€*D
-val=
-
-è
-€*%
-@model_path/weights/weight.bin€–Ï*)
-name!
-
-"
-model_fc_out_weightL
-const
-var_14
-*
-val
-
-
- *
-name
-
-	"
-op_14…
-equal
-x
-
-melody_tokens
-y
-
-
-var_14)
-key_padding_mask_1
-
-
-ş*(
-name 
-
-"
-key_padding_mask_1L
-const
-var_16
-*
-val
-
-
- *
-name
-
-	"
-op_16~
-equal
-x
-
-chord_input
-y
-
-
-var_16&
-key_padding_mask
-
-
-{*&
-name
-
-"
-key_padding_maskO
-const
-var_21
-*
-val
-
-
-
-
- @Æ*
-name
-
-	"
-op_21O
-const
-var_26
-*
-val
-
-
-
-
-¬Å'7*
-name
-
-	"
-op_26U
-const
-var_31
-*
-val
-
-
-
-ÿÿÿÿÿÿÿÿÿ*
-name
-
-	"
-op_31Z
-const
-var_57_axis_0
-*
-val
-
-
- *"
-name
-
-"
-op_57_axis_0f
-const
-var_57_batch_dims_0
-*
-val
-
-
- *(
-name 
-
-"
-op_57_batch_dims_0r
-const!
-var_57_validate_indices_0
-*
-val
-
-
- *.
-name&
-
-"
-op_57_validate_indices_0†
-gather
-axis
-
-var_57_axis_0
-indices
-
-melody_tokens1
-validate_indices
-
-var_57_validate_indices_0&
-x!
-
-model_melody_embedding_weight%
-
-batch_dims
-
-var_57_batch_dims_0$
-var_57
-
-
-ş
-€*
-name
-
-	"
-op_57O
-const
-var_58
-*
-val
-
-
-
-
-  €A*
-name
-
-	"
-op_58m
-mul
-x
-
-
-var_57
-y
-
-
-var_58%
-src_emb
-
-
-ş
-€*
-name
-
-"	
-src_embZ
-const
-var_61_axis_0
-*
-val
-
-
- *"
-name
-
-"
-op_61_axis_0f
-const
-var_61_batch_dims_0
-*
-val
-
-
- *(
-name 
-
-"
-op_61_batch_dims_0r
-const!
-var_61_validate_indices_0
-*
-val
-
-
- *.
-name&
-
-"
-op_61_validate_indices_0‚
-gather
-axis
-
-var_61_axis_0
-indices
-
-chord_input1
-validate_indices
-
-var_61_validate_indices_0%
-x 
-
-model_chord_embedding_weight%
-
-batch_dims
-
-var_61_batch_dims_0#
-var_61
-
-
-{
-€*
-name
-
-	"
-op_61O
-const
-var_62
-*
-val
-
-
-
-
-  €A*
-name
-
-	"
-op_62l
-mul
-x
-
-
-var_61
-y
-
-
-var_62$
-tgt_emb
-
-
-{
-€*
-name
-
-"	
-tgt_embz
-add
-x
-	
-src_emb
-y
-
-model_pos_encoding%
-input_1
-
-
-ş
-€*
-name
-
-"	
-input_1”
-const#
-var_69
-
-
-{
-€*I
-valB
-
-
-{
-€*%
-@model_path/weights/weight.binÀÖİ*
-name
-
-	"
-op_69m
-add
-x
-	
-tgt_emb
-y
-
-
-var_69$
-input_3
-
-
-{
-€*
-name
-
-"	
-input_3Ø
-linear8
-bias0
-.
-,model_encoder_layers_0_self_attn_q_proj_bias
-x
-	
-input_1<
-weight2
-0
-.model_encoder_layers_0_self_attn_q_proj_weight$
-var_88
-
-
-ş
-€*
-name
-
-"
-
-linear_0`
-const
-var_89
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-	"
-op_89w
-reshape
-shape
-
-
-var_89
-x
-
-
-var_88)
-var_90
-
-
-ş
-
- *
-name
-
-	"
-op_90Ø
-linear8
-bias0
-.
-,model_encoder_layers_0_self_attn_k_proj_bias
-x
-	
-input_1<
-weight2
-0
-.model_encoder_layers_0_self_attn_k_proj_weight$
-var_94
-
-
-ş
-€*
-name
-
-"
-
-linear_1`
-const
-var_95
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-	"
-op_95w
-reshape
-shape
-
-
-var_95
-x
-
-
-var_94)
-var_96
-
-
-ş
-
- *
-name
-
-	"
-op_96Ù
-linear8
-bias0
-.
-,model_encoder_layers_0_self_attn_v_proj_bias
-x
-	
-input_1<
-weight2
-0
-.model_encoder_layers_0_self_attn_v_proj_weight%
-var_100
-
-
-ş
-€*
-name
-
-"
-
-linear_2b
-const
-var_101
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_101{
-reshape
-shape
-	
-var_101
-x
-	
-var_100*
-var_102
-
-
-ş
-
- *
-name
-
-
-"
-op_102h
-const
-
-v_1_perm_0
-
-
-*!
-val
-
-
-
-
-
- * 
-name
-
-"
-
-v_1_perm_0j
-const
-var_105_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_105_transpose_x_0j
-const
-var_105_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_105_transpose_y_0Œ
-const#
-transpose_36_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_36_perm_0Œ
-const#
-transpose_37_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_37_perm_0“
-	transpose
-x
-
-
-var_96
-perm
-
-transpose_37_perm_0/
-transpose_37
-
-
-
- 
-ş*#
-name
-
-"
-transpose_105“
-	transpose
-x
-
-
-var_90
-perm
-
-transpose_36_perm_0/
-transpose_36
-
-
-
-ş
- *#
-name
-
-"
-transpose_106Õ
-matmul(
-transpose_x
-
-var_105_transpose_x_0(
-transpose_y
-
-var_105_transpose_y_0
-x
-
-transpose_36
-y
-
-transpose_37+
-var_105 
-
-
-
-ş
-ş*
-name
-
-
-"
-op_105p
-const
-_inversed_scores_1_y_0
-*
-val
-
-
-
-
-ó5>*,
-name$
-
-"
-_inversed_scores_1_y_0š
-mul
-x
-	
-var_105
-y
-
-_inversed_scores_1_y_06
-_inversed_scores_1 
-
-
-
-ş
-ş*(
-name 
-
-"
-_inversed_scores_1l
-const
-var_108_axes_0
-
-
-*
-val
-
-
-
-
-*#
-name
-
-"
-op_108_axes_0Š
-expand_dims
-axes
-
-var_108_axes_0
-x
-
-key_padding_mask_1$
-var_108
-
-
-
-ş*
-name
-
-
-"
-op_108l
-const
-var_109_axes_0
-
-
-*
-val
-
-
-
-
-*#
-name
-
-"
-op_109_axes_0…
-expand_dims
-axes
-
-var_109_axes_0
-x
-	
-var_108*
-var_109
-
-
-
-
-ş*
-name
-
-
-"
-op_109™
-select
-b
-
-_inversed_scores_1
-cond
-	
-var_109
-a
-
-
-var_21,
-scores_3 
-
-
-
-ş
-ş*
-name
-
-"
-
-scores_3|
-softmax
-axis
-
-
-var_31
-x
-
-
-scores_3+
-input_5 
-
-
-
-ş
-ş*
-name
-
-"	
-input_5w
-const#
-attn_output_1_transpose_x_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_1_transpose_x_0w
-const#
-attn_output_1_transpose_y_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_1_transpose_y_0‚
-	transpose
-x
-	
-var_102
-perm
-
-
-v_1_perm_0&
-v_1
-
-
-
-ş
- *#
-name
-
-"
-transpose_107ß
-matmul.
-transpose_x
-
-attn_output_1_transpose_x_0.
-transpose_y
-
-attn_output_1_transpose_y_0
-x
-	
-input_5
-y
-
-v_10
-attn_output_1
-
-
-
-ş
- *#
-name
-
-"
-attn_output_1o
-const
-var_114_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_114_perm_0b
-const
-var_116
-
-
-*"
-val
-
-
-
-	
-ş€*
-name
-
-
-"
-op_116
-	transpose
-x
-
-attn_output_1
-perm
-
-var_114_perm_0*
-var_114
-
-
-ş
-
- *#
-name
-
-"
-transpose_104w
-reshape
-shape
-	
-var_116
-x
-	
-var_114%
-input_7
-
-
-ş
-€*
-name
-
-"	
-input_7İ
-linear:
-bias2
-0
-.model_encoder_layers_0_self_attn_out_proj_bias
-x
-	
-input_7>
-weight4
-2
-0model_encoder_layers_0_self_attn_out_proj_weight%
-input_9
-
-
-ş
-€*
-name
-
-"
-
-linear_3q
-add
-x
-	
-input_1
-y
-	
-input_9&
-input_11
-
-
-ş
-€*
-name
-
-"
-
-input_11x
-const
-input_13_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-input_13_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_0_norm1_bias
-axes
-
-input_13_axes_0
-x
-
-
-input_11
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_0_norm1_weight&
-input_13
-
-
-ş
-€*
-name
-
-"
-
-input_13È
-linear/
-bias'
-%
-#model_encoder_layers_0_linear1_bias
-x
-
-
-input_133
-weight)
-'
-%model_encoder_layers_0_linear1_weight%
-var_129
-
-
-ş
-€*
-name
-
-"
-
-linear_4`
-relu
-x
-	
-var_129&
-input_15
-
-
-ş
-€*
-name
-
-"
-
-input_15É
-linear/
-bias'
-%
-#model_encoder_layers_0_linear2_bias
-x
-
-
-input_153
-weight)
-'
-%model_encoder_layers_0_linear2_weight&
-input_19
-
-
-ş
-€*
-name
-
-"
-
-linear_5s
-add
-x
-
-
-input_13
-y
-
-
-input_19&
-input_21
-
-
-ş
-€*
-name
-
-"
-
-input_21v
-const
-query_3_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*$
-name
-
-"
-query_3_axes_0ù
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_0_norm2_bias
-axes
-
-query_3_axes_0
-x
-
-
-input_21
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_0_norm2_weight%
-query_3
-
-
-ş
-€*
-name
-
-"	
-query_3Ù
-linear8
-bias0
-.
-,model_encoder_layers_1_self_attn_q_proj_bias
-x
-	
-query_3<
-weight2
-0
-.model_encoder_layers_1_self_attn_q_proj_weight%
-var_155
-
-
-ş
-€*
-name
-
-"
-
-linear_6b
-const
-var_156
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_156{
-reshape
-shape
-	
-var_156
-x
-	
-var_155*
-var_157
-
-
-ş
-
- *
-name
-
-
-"
-op_157Ù
-linear8
-bias0
-.
-,model_encoder_layers_1_self_attn_k_proj_bias
-x
-	
-query_3<
-weight2
-0
-.model_encoder_layers_1_self_attn_k_proj_weight%
-var_161
-
-
-ş
-€*
-name
-
-"
-
-linear_7b
-const
-var_162
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_162{
-reshape
-shape
-	
-var_162
-x
-	
-var_161*
-var_163
-
-
-ş
-
- *
-name
-
-
-"
-op_163Ù
-linear8
-bias0
-.
-,model_encoder_layers_1_self_attn_v_proj_bias
-x
-	
-query_3<
-weight2
-0
-.model_encoder_layers_1_self_attn_v_proj_weight%
-var_167
-
-
-ş
-€*
-name
-
-"
-
-linear_8b
-const
-var_168
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_168{
-reshape
-shape
-	
-var_168
-x
-	
-var_167*
-var_169
-
-
-ş
-
- *
-name
-
-
-"
-op_169h
-const
-
-v_3_perm_0
-
-
-*!
-val
-
-
-
-
-
- * 
-name
-
-"
-
-v_3_perm_0j
-const
-var_172_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_172_transpose_x_0j
-const
-var_172_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_172_transpose_y_0Œ
-const#
-transpose_38_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_38_perm_0Œ
-const#
-transpose_39_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_39_perm_0”
-	transpose
-x
-	
-var_163
-perm
-
-transpose_39_perm_0/
-transpose_39
-
-
-
- 
-ş*#
-name
-
-"
-transpose_101”
-	transpose
-x
-	
-var_157
-perm
-
-transpose_38_perm_0/
-transpose_38
-
-
-
-ş
- *#
-name
-
-"
-transpose_102Õ
-matmul(
-transpose_x
-
-var_172_transpose_x_0(
-transpose_y
-
-var_172_transpose_y_0
-x
-
-transpose_38
-y
-
-transpose_39+
-var_172 
-
-
-
-ş
-ş*
-name
-
-
-"
-op_172p
-const
-_inversed_scores_5_y_0
-*
-val
-
-
-
-
-ó5>*,
-name$
-
-"
-_inversed_scores_5_y_0š
-mul
-x
-	
-var_172
-y
-
-_inversed_scores_5_y_06
-_inversed_scores_5 
-
-
-
-ş
-ş*(
-name 
-
-"
-_inversed_scores_5™
-select
-b
-
-_inversed_scores_5
-cond
-	
-var_109
-a
-
-
-var_21,
-scores_7 
-
-
-
-ş
-ş*
-name
-
-"
-
-scores_7~
-softmax
-axis
-
-
-var_31
-x
-
-
-scores_7,
-input_23 
-
-
-
-ş
-ş*
-name
-
-"
-
-input_23w
-const#
-attn_output_3_transpose_x_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_3_transpose_x_0w
-const#
-attn_output_3_transpose_y_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_3_transpose_y_0‚
-	transpose
-x
-	
-var_169
-perm
-
-
-v_3_perm_0&
-v_3
-
-
-
-ş
- *#
-name
-
-"
-transpose_103à
-matmul.
-transpose_x
-
-attn_output_3_transpose_x_0.
-transpose_y
-
-attn_output_3_transpose_y_0
-x
-
-
-input_23
-y
-
-v_30
-attn_output_3
-
-
-
-ş
- *#
-name
-
-"
-attn_output_3o
-const
-var_181_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_181_perm_0b
-const
-var_183
-
-
-*"
-val
-
-
-
-	
-ş€*
-name
-
-
-"
-op_183
-	transpose
-x
-
-attn_output_3
-perm
-
-var_181_perm_0*
-var_181
-
-
-ş
-
- *#
-name
-
-"
-transpose_100y
-reshape
-shape
-	
-var_183
-x
-	
-var_181&
-input_25
-
-
-ş
-€*
-name
-
-"
-
-input_25ß
-linear:
-bias2
-0
-.model_encoder_layers_1_self_attn_out_proj_bias
-x
-
-
-input_25>
-weight4
-2
-0model_encoder_layers_1_self_attn_out_proj_weight&
-input_27
-
-
-ş
-€*
-name
-
-"
-
-linear_9r
-add
-x
-	
-query_3
-y
-
-
-input_27&
-input_29
-
-
-ş
-€*
-name
-
-"
-
-input_29x
-const
-input_31_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-input_31_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_1_norm1_bias
-axes
-
-input_31_axes_0
-x
-
-
-input_29
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_1_norm1_weight&
-input_31
-
-
-ş
-€*
-name
-
-"
-
-input_31É
-linear/
-bias'
-%
-#model_encoder_layers_1_linear1_bias
-x
-
-
-input_313
-weight)
-'
-%model_encoder_layers_1_linear1_weight%
-var_196
-
-
-ş
-€*
-name
-
-"
-	linear_10`
-relu
-x
-	
-var_196&
-input_33
-
-
-ş
-€*
-name
-
-"
-
-input_33Ê
-linear/
-bias'
-%
-#model_encoder_layers_1_linear2_bias
-x
-
-
-input_333
-weight)
-'
-%model_encoder_layers_1_linear2_weight&
-input_37
-
-
-ş
-€*
-name
-
-"
-	linear_11s
-add
-x
-
-
-input_31
-y
-
-
-input_37&
-input_39
-
-
-ş
-€*
-name
-
-"
-
-input_39v
-const
-query_5_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*$
-name
-
-"
-query_5_axes_0ù
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_1_norm2_bias
-axes
-
-query_5_axes_0
-x
-
-
-input_39
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_1_norm2_weight%
-query_5
-
-
-ş
-€*
-name
-
-"	
-query_5Ú
-linear8
-bias0
-.
-,model_encoder_layers_2_self_attn_q_proj_bias
-x
-	
-query_5<
-weight2
-0
-.model_encoder_layers_2_self_attn_q_proj_weight%
-var_222
-
-
-ş
-€*
-name
-
-"
-	linear_12b
-const
-var_223
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_223{
-reshape
-shape
-	
-var_223
-x
-	
-var_222*
-var_224
-
-
-ş
-
- *
-name
-
-
-"
-op_224Ú
-linear8
-bias0
-.
-,model_encoder_layers_2_self_attn_k_proj_bias
-x
-	
-query_5<
-weight2
-0
-.model_encoder_layers_2_self_attn_k_proj_weight%
-var_228
-
-
-ş
-€*
-name
-
-"
-	linear_13b
-const
-var_229
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_229{
-reshape
-shape
-	
-var_229
-x
-	
-var_228*
-var_230
-
-
-ş
-
- *
-name
-
-
-"
-op_230Ú
-linear8
-bias0
-.
-,model_encoder_layers_2_self_attn_v_proj_bias
-x
-	
-query_5<
-weight2
-0
-.model_encoder_layers_2_self_attn_v_proj_weight%
-var_234
-
-
-ş
-€*
-name
-
-"
-	linear_14b
-const
-var_235
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_235{
-reshape
-shape
-	
-var_235
-x
-	
-var_234*
-var_236
-
-
-ş
-
- *
-name
-
-
-"
-op_236h
-const
-
-v_5_perm_0
-
-
-*!
-val
-
-
-
-
-
- * 
-name
-
-"
-
-v_5_perm_0j
-const
-var_239_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_239_transpose_x_0j
-const
-var_239_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_239_transpose_y_0Œ
-const#
-transpose_40_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_40_perm_0Œ
-const#
-transpose_41_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_41_perm_0“
-	transpose
-x
-	
-var_230
-perm
-
-transpose_41_perm_0/
-transpose_41
-
-
-
- 
-ş*"
-name
-
-"
-transpose_97“
-	transpose
-x
-	
-var_224
-perm
-
-transpose_40_perm_0/
-transpose_40
-
-
-
-ş
- *"
-name
-
-"
-transpose_98Õ
-matmul(
-transpose_x
-
-var_239_transpose_x_0(
-transpose_y
-
-var_239_transpose_y_0
-x
-
-transpose_40
-y
-
-transpose_41+
-var_239 
-
-
-
-ş
-ş*
-name
-
-
-"
-op_239p
-const
-_inversed_scores_9_y_0
-*
-val
-
-
-
-
-ó5>*,
-name$
-
-"
-_inversed_scores_9_y_0š
-mul
-x
-	
-var_239
-y
-
-_inversed_scores_9_y_06
-_inversed_scores_9 
-
-
-
-ş
-ş*(
-name 
-
-"
-_inversed_scores_9›
-select
-b
-
-_inversed_scores_9
-cond
-	
-var_109
-a
-
-
-var_21-
-	scores_11 
-
-
-
-ş
-ş*
-name
-
-"
-	scores_11
-softmax
-axis
-
-
-var_31
-x
-
-	scores_11,
-input_41 
-
-
-
-ş
-ş*
-name
-
-"
-
-input_41w
-const#
-attn_output_5_transpose_x_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_5_transpose_x_0w
-const#
-attn_output_5_transpose_y_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_5_transpose_y_0
-	transpose
-x
-	
-var_236
-perm
-
-
-v_5_perm_0&
-v_5
-
-
-
-ş
- *"
-name
-
-"
-transpose_99à
-matmul.
-transpose_x
-
-attn_output_5_transpose_x_0.
-transpose_y
-
-attn_output_5_transpose_y_0
-x
-
-
-input_41
-y
-
-v_50
-attn_output_5
-
-
-
-ş
- *#
-name
-
-"
-attn_output_5o
-const
-var_248_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_248_perm_0b
-const
-var_250
-
-
-*"
-val
-
-
-
-	
-ş€*
-name
-
-
-"
-op_250
-	transpose
-x
-
-attn_output_5
-perm
-
-var_248_perm_0*
-var_248
-
-
-ş
-
- *"
-name
-
-"
-transpose_96y
-reshape
-shape
-	
-var_250
-x
-	
-var_248&
-input_43
-
-
-ş
-€*
-name
-
-"
-
-input_43à
-linear:
-bias2
-0
-.model_encoder_layers_2_self_attn_out_proj_bias
-x
-
-
-input_43>
-weight4
-2
-0model_encoder_layers_2_self_attn_out_proj_weight&
-input_45
-
-
-ş
-€*
-name
-
-"
-	linear_15r
-add
-x
-	
-query_5
-y
-
-
-input_45&
-input_47
-
-
-ş
-€*
-name
-
-"
-
-input_47x
-const
-input_49_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-input_49_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_2_norm1_bias
-axes
-
-input_49_axes_0
-x
-
-
-input_47
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_2_norm1_weight&
-input_49
-
-
-ş
-€*
-name
-
-"
-
-input_49É
-linear/
-bias'
-%
-#model_encoder_layers_2_linear1_bias
-x
-
-
-input_493
-weight)
-'
-%model_encoder_layers_2_linear1_weight%
-var_263
-
-
-ş
-€*
-name
-
-"
-	linear_16`
-relu
-x
-	
-var_263&
-input_51
-
-
-ş
-€*
-name
-
-"
-
-input_51Ê
-linear/
-bias'
-%
-#model_encoder_layers_2_linear2_bias
-x
-
-
-input_513
-weight)
-'
-%model_encoder_layers_2_linear2_weight&
-input_55
-
-
-ş
-€*
-name
-
-"
-	linear_17s
-add
-x
-
-
-input_49
-y
-
-
-input_55&
-input_57
-
-
-ş
-€*
-name
-
-"
-
-input_57v
-const
-query_7_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*$
-name
-
-"
-query_7_axes_0ù
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_2_norm2_bias
-axes
-
-query_7_axes_0
-x
-
-
-input_57
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_2_norm2_weight%
-query_7
-
-
-ş
-€*
-name
-
-"	
-query_7Ú
-linear8
-bias0
-.
-,model_encoder_layers_3_self_attn_q_proj_bias
-x
-	
-query_7<
-weight2
-0
-.model_encoder_layers_3_self_attn_q_proj_weight%
-var_289
-
-
-ş
-€*
-name
-
-"
-	linear_18b
-const
-var_290
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_290{
-reshape
-shape
-	
-var_290
-x
-	
-var_289*
-var_291
-
-
-ş
-
- *
-name
-
-
-"
-op_291Ú
-linear8
-bias0
-.
-,model_encoder_layers_3_self_attn_k_proj_bias
-x
-	
-query_7<
-weight2
-0
-.model_encoder_layers_3_self_attn_k_proj_weight%
-var_295
-
-
-ş
-€*
-name
-
-"
-	linear_19b
-const
-var_296
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_296{
-reshape
-shape
-	
-var_296
-x
-	
-var_295*
-var_297
-
-
-ş
-
- *
-name
-
-
-"
-op_297Ú
-linear8
-bias0
-.
-,model_encoder_layers_3_self_attn_v_proj_bias
-x
-	
-query_7<
-weight2
-0
-.model_encoder_layers_3_self_attn_v_proj_weight%
-var_301
-
-
-ş
-€*
-name
-
-"
-	linear_20b
-const
-var_302
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_302{
-reshape
-shape
-	
-var_302
-x
-	
-var_301*
-var_303
-
-
-ş
-
- *
-name
-
-
-"
-op_303h
-const
-
-v_7_perm_0
-
-
-*!
-val
-
-
-
-
-
- * 
-name
-
-"
-
-v_7_perm_0j
-const
-var_306_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_306_transpose_x_0j
-const
-var_306_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_306_transpose_y_0Œ
-const#
-transpose_42_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_42_perm_0Œ
-const#
-transpose_43_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_43_perm_0“
-	transpose
-x
-	
-var_297
-perm
-
-transpose_43_perm_0/
-transpose_43
-
-
-
- 
-ş*"
-name
-
-"
-transpose_93“
-	transpose
-x
-	
-var_291
-perm
-
-transpose_42_perm_0/
-transpose_42
-
-
-
-ş
- *"
-name
-
-"
-transpose_94Õ
-matmul(
-transpose_x
-
-var_306_transpose_x_0(
-transpose_y
-
-var_306_transpose_y_0
-x
-
-transpose_42
-y
-
-transpose_43+
-var_306 
-
-
-
-ş
-ş*
-name
-
-
-"
-op_306r
-const
-_inversed_scores_13_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_13_y_0
-mul
-x
-	
-var_306 
-y
-
-_inversed_scores_13_y_07
-_inversed_scores_13 
-
-
-
-ş
-ş*)
-name!
-
-"
-_inversed_scores_13œ
-select
-b
-
-_inversed_scores_13
-cond
-	
-var_109
-a
-
-
-var_21-
-	scores_15 
-
-
-
-ş
-ş*
-name
-
-"
-	scores_15
-softmax
-axis
-
-
-var_31
-x
-
-	scores_15,
-input_59 
-
-
-
-ş
-ş*
-name
-
-"
-
-input_59w
-const#
-attn_output_7_transpose_x_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_7_transpose_x_0w
-const#
-attn_output_7_transpose_y_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_7_transpose_y_0
-	transpose
-x
-	
-var_303
-perm
-
-
-v_7_perm_0&
-v_7
-
-
-
-ş
- *"
-name
-
-"
-transpose_95à
-matmul.
-transpose_x
-
-attn_output_7_transpose_x_0.
-transpose_y
-
-attn_output_7_transpose_y_0
-x
-
-
-input_59
-y
-
-v_70
-attn_output_7
-
-
-
-ş
- *#
-name
-
-"
-attn_output_7o
-const
-var_315_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_315_perm_0b
-const
-var_317
-
-
-*"
-val
-
-
-
-	
-ş€*
-name
-
-
-"
-op_317
-	transpose
-x
-
-attn_output_7
-perm
-
-var_315_perm_0*
-var_315
-
-
-ş
-
- *"
-name
-
-"
-transpose_92y
-reshape
-shape
-	
-var_317
-x
-	
-var_315&
-input_61
-
-
-ş
-€*
-name
-
-"
-
-input_61à
-linear:
-bias2
-0
-.model_encoder_layers_3_self_attn_out_proj_bias
-x
-
-
-input_61>
-weight4
-2
-0model_encoder_layers_3_self_attn_out_proj_weight&
-input_63
-
-
-ş
-€*
-name
-
-"
-	linear_21r
-add
-x
-	
-query_7
-y
-
-
-input_63&
-input_65
-
-
-ş
-€*
-name
-
-"
-
-input_65x
-const
-input_67_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-input_67_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_3_norm1_bias
-axes
-
-input_67_axes_0
-x
-
-
-input_65
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_3_norm1_weight&
-input_67
-
-
-ş
-€*
-name
-
-"
-
-input_67É
-linear/
-bias'
-%
-#model_encoder_layers_3_linear1_bias
-x
-
-
-input_673
-weight)
-'
-%model_encoder_layers_3_linear1_weight%
-var_330
-
-
-ş
-€*
-name
-
-"
-	linear_22`
-relu
-x
-	
-var_330&
-input_69
-
-
-ş
-€*
-name
-
-"
-
-input_69Ê
-linear/
-bias'
-%
-#model_encoder_layers_3_linear2_bias
-x
-
-
-input_693
-weight)
-'
-%model_encoder_layers_3_linear2_weight&
-input_73
-
-
-ş
-€*
-name
-
-"
-	linear_23s
-add
-x
-
-
-input_67
-y
-
-
-input_73&
-input_75
-
-
-ş
-€*
-name
-
-"
-
-input_75n
-const
-
-key_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ* 
-name
-
-"
-
-key_axes_0í
-
-layer_norm-
-beta%
-#
-!model_encoder_layers_3_norm2_bias
-axes
-
-
-key_axes_0
-x
-
-
-input_75
-epsilon
-
-
-var_260
-gamma'
-%
-#model_encoder_layers_3_norm2_weight!
-key
-
-
-ş
-€*
-name
-	
-"
-keyÙ
-linear8
-bias0
-.
-,model_decoder_layers_0_self_attn_q_proj_bias
-x
-	
-input_3<
-weight2
-0
-.model_decoder_layers_0_self_attn_q_proj_weight$
-var_363
-
-
-{
-€*
-name
-
-"
-	linear_24a
-const
-var_364
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_364z
-reshape
-shape
-	
-var_364
-x
-	
-var_363)
-var_365
-
-
-{
-
- *
-name
-
-
-"
-op_365Ù
-linear8
-bias0
-.
-,model_decoder_layers_0_self_attn_k_proj_bias
-x
-	
-input_3<
-weight2
-0
-.model_decoder_layers_0_self_attn_k_proj_weight$
-var_369
-
-
-{
-€*
-name
-
-"
-	linear_25a
-const
-var_370
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_370z
-reshape
-shape
-	
-var_370
-x
-	
-var_369)
-var_371
-
-
-{
-
- *
-name
-
-
-"
-op_371Ù
-linear8
-bias0
-.
-,model_decoder_layers_0_self_attn_v_proj_bias
-x
-	
-input_3<
-weight2
-0
-.model_decoder_layers_0_self_attn_v_proj_weight$
-var_375
-
-
-{
-€*
-name
-
-"
-	linear_26a
-const
-var_376
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_376z
-reshape
-shape
-	
-var_376
-x
-	
-var_375)
-var_377
-
-
-{
-
- *
-name
-
-
-"
-op_377h
-const
-
-v_9_perm_0
-
-
-*!
-val
-
-
-
-
-
- * 
-name
-
-"
-
-v_9_perm_0j
-const
-var_380_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_380_transpose_x_0j
-const
-var_380_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_380_transpose_y_0Œ
-const#
-transpose_44_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_44_perm_0Œ
-const#
-transpose_45_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_45_perm_0’
-	transpose
-x
-	
-var_371
-perm
-
-transpose_45_perm_0.
-transpose_45
-
-
-
- 
-{*"
-name
-
-"
-transpose_89’
-	transpose
-x
-	
-var_365
-perm
-
-transpose_44_perm_0.
-transpose_44
-
-
-
-{
- *"
-name
-
-"
-transpose_90Ó
-matmul(
-transpose_x
-
-var_380_transpose_x_0(
-transpose_y
-
-var_380_transpose_y_0
-x
-
-transpose_44
-y
-
-transpose_45)
-var_380
-
-
-
-{
-{*
-name
-
-
-"
-op_380r
-const
-_inversed_scores_17_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_17_y_0›
-mul
-x
-	
-var_380 
-y
-
-_inversed_scores_17_y_05
-_inversed_scores_17
-
-
-
-{
-{*)
-name!
-
-"
-_inversed_scores_17 
-const)
-var_384
-
-
-
-{
-{*N
-valG
-
-
-
-{
-{*%
-@model_path/weights/weight.bin€¯å*
-name
-
-
-"
-op_384ƒ
-add
-x
-
-_inversed_scores_17
-y
-	
-var_384+
-	scores_19
-
-
-
-{
-{*
-name
-
-"
-	scores_19l
-const
-var_386_axes_0
-
-
-*
-val
-
-
-
-
-*#
-name
-
-"
-op_386_axes_0‡
-expand_dims
-axes
-
-var_386_axes_0
-x
-
-key_padding_mask#
-var_386
-
-
-
-{*
-name
-
-
-"
-op_386l
-const
-var_387_axes_0
-
-
-*
-val
-
-
-
-
-*#
-name
-
-"
-op_387_axes_0„
-expand_dims
-axes
-
-var_387_axes_0
-x
-	
-var_386)
-var_387
-
-
-
-
-{*
-name
-
-
-"
-op_387
-select
-b
-
-	scores_19
-cond
-	
-var_387
-a
-
-
-var_21+
-	scores_21
-
-
-
-{
-{*
-name
-
-"
-	scores_21}
-softmax
-axis
-
-
-var_31
-x
-
-	scores_21*
-input_77
-
-
-
-{
-{*
-name
-
-"
-
-input_77w
-const#
-attn_output_9_transpose_x_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_9_transpose_x_0w
-const#
-attn_output_9_transpose_y_0
-*
-val
-
-
- *1
-name)
-!
-"
-attn_output_9_transpose_y_0€
-	transpose
-x
-	
-var_377
-perm
-
-
-v_9_perm_0%
-v_9
-
-
-
-{
- *"
-name
-
-"
-transpose_91ß
-matmul.
-transpose_x
-
-attn_output_9_transpose_x_0.
-transpose_y
-
-attn_output_9_transpose_y_0
-x
-
-
-input_77
-y
-
-v_9/
-attn_output_9
-
-
-
-{
- *#
-name
-
-"
-attn_output_9o
-const
-var_392_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_392_perm_0a
-const
-var_394
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_394
-	transpose
-x
-
-attn_output_9
-perm
-
-var_392_perm_0)
-var_392
-
-
-{
-
- *"
-name
-
-"
-transpose_88x
-reshape
-shape
-	
-var_394
-x
-	
-var_392%
-input_79
-
-
-{
-€*
-name
-
-"
-
-input_79ß
-linear:
-bias2
-0
-.model_decoder_layers_0_self_attn_out_proj_bias
-x
-
-
-input_79>
-weight4
-2
-0model_decoder_layers_0_self_attn_out_proj_weight%
-input_81
-
-
-{
-€*
-name
-
-"
-	linear_27q
-add
-x
-	
-input_3
-y
-
-
-input_81%
-input_83
-
-
-{
-€*
-name
-
-"
-
-input_83x
-const
-query_11_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-query_11_axes_0û
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_0_norm1_bias
-axes
-
-query_11_axes_0
-x
-
-
-input_83
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_0_norm1_weight%
-query_11
-
-
-{
-€*
-name
-
-"
-
-query_11Ü
-linear9
-bias1
-/
--model_decoder_layers_0_cross_attn_q_proj_bias
-x
-
-
-query_11=
-weight3
-1
-/model_decoder_layers_0_cross_attn_q_proj_weight$
-var_414
-
-
-{
-€*
-name
-
-"
-	linear_28a
-const
-var_415
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_415z
-reshape
-shape
-	
-var_415
-x
-	
-var_414)
-var_416
-
-
-{
-
- *
-name
-
-
-"
-op_416Ø
-linear9
-bias1
-/
--model_decoder_layers_0_cross_attn_k_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_0_cross_attn_k_proj_weight%
-var_420
-
-
-ş
-€*
-name
-
-"
-	linear_29b
-const
-var_421
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_421{
-reshape
-shape
-	
-var_421
-x
-	
-var_420*
-var_422
-
-
-ş
-
- *
-name
-
-
-"
-op_422Ø
-linear9
-bias1
-/
--model_decoder_layers_0_cross_attn_v_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_0_cross_attn_v_proj_weight%
-var_426
-
-
-ş
-€*
-name
-
-"
-	linear_30b
-const
-var_427
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_427{
-reshape
-shape
-	
-var_427
-x
-	
-var_426*
-var_428
-
-
-ş
-
- *
-name
-
-
-"
-op_428j
-const
-v_11_perm_0
-
-
-*!
-val
-
-
-
-
-
- *!
-name
-
-"
-v_11_perm_0j
-const
-var_431_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_431_transpose_x_0j
-const
-var_431_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_431_transpose_y_0Œ
-const#
-transpose_46_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_46_perm_0Œ
-const#
-transpose_47_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_47_perm_0“
-	transpose
-x
-	
-var_422
-perm
-
-transpose_47_perm_0/
-transpose_47
-
-
-
- 
-ş*"
-name
-
-"
-transpose_85’
-	transpose
-x
-	
-var_416
-perm
-
-transpose_46_perm_0.
-transpose_46
-
-
-
-{
- *"
-name
-
-"
-transpose_86Ô
-matmul(
-transpose_x
-
-var_431_transpose_x_0(
-transpose_y
-
-var_431_transpose_y_0
-x
-
-transpose_46
-y
-
-transpose_47*
-var_431
-
-
-
-{
-ş*
-name
-
-
-"
-op_431r
-const
-_inversed_scores_23_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_23_y_0œ
-mul
-x
-	
-var_431 
-y
-
-_inversed_scores_23_y_06
-_inversed_scores_23
-
-
-
-{
-ş*)
-name!
-
-"
-_inversed_scores_23›
-select
-b
-
-_inversed_scores_23
-cond
-	
-var_109
-a
-
-
-var_21,
-	scores_25
-
-
-
-{
-ş*
-name
-
-"
-	scores_25~
-softmax
-axis
-
-
-var_31
-x
-
-	scores_25+
-input_85
-
-
-
-{
-ş*
-name
-
-"
-
-input_85y
-const$
-attn_output_11_transpose_x_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_11_transpose_x_0y
-const$
-attn_output_11_transpose_y_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_11_transpose_y_0ƒ
-	transpose
-x
-	
-var_428
-perm
-
-v_11_perm_0'
-v_11
-
-
-
-ş
- *"
-name
-
-"
-transpose_87ä
-matmul/
-transpose_x 
-
-attn_output_11_transpose_x_0/
-transpose_y 
-
-attn_output_11_transpose_y_0
-x
-
-
-input_85
-y
-
-v_110
-attn_output_11
-
-
-
-{
- *$
-name
-
-"
-attn_output_11o
-const
-var_440_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_440_perm_0a
-const
-var_442
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_442
-	transpose
-x
-
-attn_output_11
-perm
-
-var_440_perm_0)
-var_440
-
-
-{
-
- *"
-name
-
-"
-transpose_84x
-reshape
-shape
-	
-var_442
-x
-	
-var_440%
-input_87
-
-
-{
-€*
-name
-
-"
-
-input_87á
-linear;
-bias3
-1
-/model_decoder_layers_0_cross_attn_out_proj_bias
-x
-
-
-input_87?
-weight5
-3
-1model_decoder_layers_0_cross_attn_out_proj_weight%
-input_89
-
-
-{
-€*
-name
-
-"
-	linear_31r
-add
-x
-
-
-query_11
-y
-
-
-input_89%
-input_91
-
-
-{
-€*
-name
-
-"
-
-input_91x
-const
-input_93_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-input_93_axes_0û
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_0_norm2_bias
-axes
-
-input_93_axes_0
-x
-
-
-input_91
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_0_norm2_weight%
-input_93
-
-
-{
-€*
-name
-
-"
-
-input_93È
-linear/
-bias'
-%
-#model_decoder_layers_0_linear1_bias
-x
-
-
-input_933
-weight)
-'
-%model_decoder_layers_0_linear1_weight$
-var_455
-
-
-{
-€*
-name
-
-"
-	linear_32_
-relu
-x
-	
-var_455%
-input_95
-
-
-{
-€*
-name
-
-"
-
-input_95É
-linear/
-bias'
-%
-#model_decoder_layers_0_linear2_bias
-x
-
-
-input_953
-weight)
-'
-%model_decoder_layers_0_linear2_weight%
-input_99
-
-
-{
-€*
-name
-
-"
-	linear_33t
-add
-x
-
-
-input_93
-y
-
-
-input_99&
-	input_101
-
-
-{
-€*
-name
-
-"
-	input_101x
-const
-query_13_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-query_13_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_0_norm3_bias
-axes
-
-query_13_axes_0
-x
-
-	input_101
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_0_norm3_weight%
-query_13
-
-
-{
-€*
-name
-
-"
-
-query_13Ú
-linear8
-bias0
-.
-,model_decoder_layers_1_self_attn_q_proj_bias
-x
-
-
-query_13<
-weight2
-0
-.model_decoder_layers_1_self_attn_q_proj_weight$
-var_483
-
-
-{
-€*
-name
-
-"
-	linear_34a
-const
-var_484
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_484z
-reshape
-shape
-	
-var_484
-x
-	
-var_483)
-var_485
-
-
-{
-
- *
-name
-
-
-"
-op_485Ú
-linear8
-bias0
-.
-,model_decoder_layers_1_self_attn_k_proj_bias
-x
-
-
-query_13<
-weight2
-0
-.model_decoder_layers_1_self_attn_k_proj_weight$
-var_489
-
-
-{
-€*
-name
-
-"
-	linear_35a
-const
-var_490
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_490z
-reshape
-shape
-	
-var_490
-x
-	
-var_489)
-var_491
-
-
-{
-
- *
-name
-
-
-"
-op_491Ú
-linear8
-bias0
-.
-,model_decoder_layers_1_self_attn_v_proj_bias
-x
-
-
-query_13<
-weight2
-0
-.model_decoder_layers_1_self_attn_v_proj_weight$
-var_495
-
-
-{
-€*
-name
-
-"
-	linear_36a
-const
-var_496
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_496z
-reshape
-shape
-	
-var_496
-x
-	
-var_495)
-var_497
-
-
-{
-
- *
-name
-
-
-"
-op_497j
-const
-v_13_perm_0
-
-
-*!
-val
-
-
-
-
-
- *!
-name
-
-"
-v_13_perm_0j
-const
-var_500_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_500_transpose_x_0j
-const
-var_500_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_500_transpose_y_0Œ
-const#
-transpose_48_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_48_perm_0Œ
-const#
-transpose_49_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_49_perm_0’
-	transpose
-x
-	
-var_491
-perm
-
-transpose_49_perm_0.
-transpose_49
-
-
-
- 
-{*"
-name
-
-"
-transpose_81’
-	transpose
-x
-	
-var_485
-perm
-
-transpose_48_perm_0.
-transpose_48
-
-
-
-{
- *"
-name
-
-"
-transpose_82Ó
-matmul(
-transpose_x
-
-var_500_transpose_x_0(
-transpose_y
-
-var_500_transpose_y_0
-x
-
-transpose_48
-y
-
-transpose_49)
-var_500
-
-
-
-{
-{*
-name
-
-
-"
-op_500r
-const
-_inversed_scores_27_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_27_y_0›
-mul
-x
-	
-var_500 
-y
-
-_inversed_scores_27_y_05
-_inversed_scores_27
-
-
-
-{
-{*)
-name!
-
-"
-_inversed_scores_27ƒ
-add
-x
-
-_inversed_scores_27
-y
-	
-var_384+
-	scores_29
-
-
-
-{
-{*
-name
-
-"
-	scores_29
-select
-b
-
-	scores_29
-cond
-	
-var_387
-a
-
-
-var_21+
-	scores_31
-
-
-
-{
-{*
-name
-
-"
-	scores_31
-softmax
-axis
-
-
-var_31
-x
-
-	scores_31+
-	input_103
-
-
-
-{
-{*
-name
-
-"
-	input_103y
-const$
-attn_output_13_transpose_x_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_13_transpose_x_0y
-const$
-attn_output_13_transpose_y_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_13_transpose_y_0‚
-	transpose
-x
-	
-var_497
-perm
-
-v_13_perm_0&
-v_13
-
-
-
-{
- *"
-name
-
-"
-transpose_83å
-matmul/
-transpose_x 
-
-attn_output_13_transpose_x_0/
-transpose_y 
-
-attn_output_13_transpose_y_0
-x
-
-	input_103
-y
-
-v_130
-attn_output_13
-
-
-
-{
- *$
-name
-
-"
-attn_output_13o
-const
-var_512_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_512_perm_0a
-const
-var_514
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_514
-	transpose
-x
-
-attn_output_13
-perm
-
-var_512_perm_0)
-var_512
-
-
-{
-
- *"
-name
-
-"
-transpose_80z
-reshape
-shape
-	
-var_514
-x
-	
-var_512&
-	input_105
-
-
-{
-€*
-name
-
-"
-	input_105á
-linear:
-bias2
-0
-.model_decoder_layers_1_self_attn_out_proj_bias
-x
-
-	input_105>
-weight4
-2
-0model_decoder_layers_1_self_attn_out_proj_weight&
-	input_107
-
-
-{
-€*
-name
-
-"
-	linear_37u
-add
-x
-
-
-query_13
-y
-
-	input_107&
-	input_109
-
-
-{
-€*
-name
-
-"
-	input_109x
-const
-query_15_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-query_15_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_1_norm1_bias
-axes
-
-query_15_axes_0
-x
-
-	input_109
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_1_norm1_weight%
-query_15
-
-
-{
-€*
-name
-
-"
-
-query_15Ü
-linear9
-bias1
-/
--model_decoder_layers_1_cross_attn_q_proj_bias
-x
-
-
-query_15=
-weight3
-1
-/model_decoder_layers_1_cross_attn_q_proj_weight$
-var_534
-
-
-{
-€*
-name
-
-"
-	linear_38a
-const
-var_535
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_535z
-reshape
-shape
-	
-var_535
-x
-	
-var_534)
-var_536
-
-
-{
-
- *
-name
-
-
-"
-op_536Ø
-linear9
-bias1
-/
--model_decoder_layers_1_cross_attn_k_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_1_cross_attn_k_proj_weight%
-var_540
-
-
-ş
-€*
-name
-
-"
-	linear_39b
-const
-var_541
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_541{
-reshape
-shape
-	
-var_541
-x
-	
-var_540*
-var_542
-
-
-ş
-
- *
-name
-
-
-"
-op_542Ø
-linear9
-bias1
-/
--model_decoder_layers_1_cross_attn_v_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_1_cross_attn_v_proj_weight%
-var_546
-
-
-ş
-€*
-name
-
-"
-	linear_40b
-const
-var_547
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_547{
-reshape
-shape
-	
-var_547
-x
-	
-var_546*
-var_548
-
-
-ş
-
- *
-name
-
-
-"
-op_548j
-const
-v_15_perm_0
-
-
-*!
-val
-
-
-
-
-
- *!
-name
-
-"
-v_15_perm_0j
-const
-var_551_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_551_transpose_x_0j
-const
-var_551_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_551_transpose_y_0Œ
-const#
-transpose_50_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_50_perm_0Œ
-const#
-transpose_51_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_51_perm_0“
-	transpose
-x
-	
-var_542
-perm
-
-transpose_51_perm_0/
-transpose_51
-
-
-
- 
-ş*"
-name
-
-"
-transpose_77’
-	transpose
-x
-	
-var_536
-perm
-
-transpose_50_perm_0.
-transpose_50
-
-
-
-{
- *"
-name
-
-"
-transpose_78Ô
-matmul(
-transpose_x
-
-var_551_transpose_x_0(
-transpose_y
-
-var_551_transpose_y_0
-x
-
-transpose_50
-y
-
-transpose_51*
-var_551
-
-
-
-{
-ş*
-name
-
-
-"
-op_551r
-const
-_inversed_scores_33_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_33_y_0œ
-mul
-x
-	
-var_551 
-y
-
-_inversed_scores_33_y_06
-_inversed_scores_33
-
-
-
-{
-ş*)
-name!
-
-"
-_inversed_scores_33›
-select
-b
-
-_inversed_scores_33
-cond
-	
-var_109
-a
-
-
-var_21,
-	scores_35
-
-
-
-{
-ş*
-name
-
-"
-	scores_35€
-softmax
-axis
-
-
-var_31
-x
-
-	scores_35,
-	input_111
-
-
-
-{
-ş*
-name
-
-"
-	input_111y
-const$
-attn_output_15_transpose_x_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_15_transpose_x_0y
-const$
-attn_output_15_transpose_y_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_15_transpose_y_0ƒ
-	transpose
-x
-	
-var_548
-perm
-
-v_15_perm_0'
-v_15
-
-
-
-ş
- *"
-name
-
-"
-transpose_79å
-matmul/
-transpose_x 
-
-attn_output_15_transpose_x_0/
-transpose_y 
-
-attn_output_15_transpose_y_0
-x
-
-	input_111
-y
-
-v_150
-attn_output_15
-
-
-
-{
- *$
-name
-
-"
-attn_output_15o
-const
-var_560_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_560_perm_0a
-const
-var_562
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_562
-	transpose
-x
-
-attn_output_15
-perm
-
-var_560_perm_0)
-var_560
-
-
-{
-
- *"
-name
-
-"
-transpose_76z
-reshape
-shape
-	
-var_562
-x
-	
-var_560&
-	input_113
-
-
-{
-€*
-name
-
-"
-	input_113ã
-linear;
-bias3
-1
-/model_decoder_layers_1_cross_attn_out_proj_bias
-x
-
-	input_113?
-weight5
-3
-1model_decoder_layers_1_cross_attn_out_proj_weight&
-	input_115
-
-
-{
-€*
-name
-
-"
-	linear_41u
-add
-x
-
-
-query_15
-y
-
-	input_115&
-	input_117
-
-
-{
-€*
-name
-
-"
-	input_117z
-const 
-input_119_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*&
-name
-
-"
-input_119_axes_0ÿ
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_1_norm2_bias
-axes
-
-input_119_axes_0
-x
-
-	input_117
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_1_norm2_weight&
-	input_119
-
-
-{
-€*
-name
-
-"
-	input_119É
-linear/
-bias'
-%
-#model_decoder_layers_1_linear1_bias
-x
-
-	input_1193
-weight)
-'
-%model_decoder_layers_1_linear1_weight$
-var_575
-
-
-{
-€*
-name
-
-"
-	linear_42a
-relu
-x
-	
-var_575&
-	input_121
-
-
-{
-€*
-name
-
-"
-	input_121Ë
-linear/
-bias'
-%
-#model_decoder_layers_1_linear2_bias
-x
-
-	input_1213
-weight)
-'
-%model_decoder_layers_1_linear2_weight&
-	input_125
-
-
-{
-€*
-name
-
-"
-	linear_43v
-add
-x
-
-	input_119
-y
-
-	input_125&
-	input_127
-
-
-{
-€*
-name
-
-"
-	input_127x
-const
-query_17_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-query_17_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_1_norm3_bias
-axes
-
-query_17_axes_0
-x
-
-	input_127
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_1_norm3_weight%
-query_17
-
-
-{
-€*
-name
-
-"
-
-query_17Ú
-linear8
-bias0
-.
-,model_decoder_layers_2_self_attn_q_proj_bias
-x
-
-
-query_17<
-weight2
-0
-.model_decoder_layers_2_self_attn_q_proj_weight$
-var_603
-
-
-{
-€*
-name
-
-"
-	linear_44a
-const
-var_604
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_604z
-reshape
-shape
-	
-var_604
-x
-	
-var_603)
-var_605
-
-
-{
-
- *
-name
-
-
-"
-op_605Ú
-linear8
-bias0
-.
-,model_decoder_layers_2_self_attn_k_proj_bias
-x
-
-
-query_17<
-weight2
-0
-.model_decoder_layers_2_self_attn_k_proj_weight$
-var_609
-
-
-{
-€*
-name
-
-"
-	linear_45a
-const
-var_610
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_610z
-reshape
-shape
-	
-var_610
-x
-	
-var_609)
-var_611
-
-
-{
-
- *
-name
-
-
-"
-op_611Ú
-linear8
-bias0
-.
-,model_decoder_layers_2_self_attn_v_proj_bias
-x
-
-
-query_17<
-weight2
-0
-.model_decoder_layers_2_self_attn_v_proj_weight$
-var_615
-
-
-{
-€*
-name
-
-"
-	linear_46a
-const
-var_616
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_616z
-reshape
-shape
-	
-var_616
-x
-	
-var_615)
-var_617
-
-
-{
-
- *
-name
-
-
-"
-op_617j
-const
-v_17_perm_0
-
-
-*!
-val
-
-
-
-
-
- *!
-name
-
-"
-v_17_perm_0j
-const
-var_620_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_620_transpose_x_0j
-const
-var_620_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_620_transpose_y_0Œ
-const#
-transpose_52_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_52_perm_0Œ
-const#
-transpose_53_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_53_perm_0’
-	transpose
-x
-	
-var_611
-perm
-
-transpose_53_perm_0.
-transpose_53
-
-
-
- 
-{*"
-name
-
-"
-transpose_73’
-	transpose
-x
-	
-var_605
-perm
-
-transpose_52_perm_0.
-transpose_52
-
-
-
-{
- *"
-name
-
-"
-transpose_74Ó
-matmul(
-transpose_x
-
-var_620_transpose_x_0(
-transpose_y
-
-var_620_transpose_y_0
-x
-
-transpose_52
-y
-
-transpose_53)
-var_620
-
-
-
-{
-{*
-name
-
-
-"
-op_620r
-const
-_inversed_scores_37_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_37_y_0›
-mul
-x
-	
-var_620 
-y
-
-_inversed_scores_37_y_05
-_inversed_scores_37
-
-
-
-{
-{*)
-name!
-
-"
-_inversed_scores_37ƒ
-add
-x
-
-_inversed_scores_37
-y
-	
-var_384+
-	scores_39
-
-
-
-{
-{*
-name
-
-"
-	scores_39
-select
-b
-
-	scores_39
-cond
-	
-var_387
-a
-
-
-var_21+
-	scores_41
-
-
-
-{
-{*
-name
-
-"
-	scores_41
-softmax
-axis
-
-
-var_31
-x
-
-	scores_41+
-	input_129
-
-
-
-{
-{*
-name
-
-"
-	input_129y
-const$
-attn_output_17_transpose_x_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_17_transpose_x_0y
-const$
-attn_output_17_transpose_y_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_17_transpose_y_0‚
-	transpose
-x
-	
-var_617
-perm
-
-v_17_perm_0&
-v_17
-
-
-
-{
- *"
-name
-
-"
-transpose_75å
-matmul/
-transpose_x 
-
-attn_output_17_transpose_x_0/
-transpose_y 
-
-attn_output_17_transpose_y_0
-x
-
-	input_129
-y
-
-v_170
-attn_output_17
-
-
-
-{
- *$
-name
-
-"
-attn_output_17o
-const
-var_632_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_632_perm_0a
-const
-var_634
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_634
-	transpose
-x
-
-attn_output_17
-perm
-
-var_632_perm_0)
-var_632
-
-
-{
-
- *"
-name
-
-"
-transpose_72z
-reshape
-shape
-	
-var_634
-x
-	
-var_632&
-	input_131
-
-
-{
-€*
-name
-
-"
-	input_131á
-linear:
-bias2
-0
-.model_decoder_layers_2_self_attn_out_proj_bias
-x
-
-	input_131>
-weight4
-2
-0model_decoder_layers_2_self_attn_out_proj_weight&
-	input_133
-
-
-{
-€*
-name
-
-"
-	linear_47u
-add
-x
-
-
-query_17
-y
-
-	input_133&
-	input_135
-
-
-{
-€*
-name
-
-"
-	input_135x
-const
-query_19_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-query_19_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_2_norm1_bias
-axes
-
-query_19_axes_0
-x
-
-	input_135
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_2_norm1_weight%
-query_19
-
-
-{
-€*
-name
-
-"
-
-query_19Ü
-linear9
-bias1
-/
--model_decoder_layers_2_cross_attn_q_proj_bias
-x
-
-
-query_19=
-weight3
-1
-/model_decoder_layers_2_cross_attn_q_proj_weight$
-var_654
-
-
-{
-€*
-name
-
-"
-	linear_48a
-const
-var_655
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_655z
-reshape
-shape
-	
-var_655
-x
-	
-var_654)
-var_656
-
-
-{
-
- *
-name
-
-
-"
-op_656Ø
-linear9
-bias1
-/
--model_decoder_layers_2_cross_attn_k_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_2_cross_attn_k_proj_weight%
-var_660
-
-
-ş
-€*
-name
-
-"
-	linear_49b
-const
-var_661
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_661{
-reshape
-shape
-	
-var_661
-x
-	
-var_660*
-var_662
-
-
-ş
-
- *
-name
-
-
-"
-op_662Ø
-linear9
-bias1
-/
--model_decoder_layers_2_cross_attn_v_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_2_cross_attn_v_proj_weight%
-var_666
-
-
-ş
-€*
-name
-
-"
-	linear_50b
-const
-var_667
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_667{
-reshape
-shape
-	
-var_667
-x
-	
-var_666*
-var_668
-
-
-ş
-
- *
-name
-
-
-"
-op_668j
-const
-v_19_perm_0
-
-
-*!
-val
-
-
-
-
-
- *!
-name
-
-"
-v_19_perm_0j
-const
-var_671_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_671_transpose_x_0j
-const
-var_671_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_671_transpose_y_0Œ
-const#
-transpose_54_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_54_perm_0Œ
-const#
-transpose_55_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_55_perm_0“
-	transpose
-x
-	
-var_662
-perm
-
-transpose_55_perm_0/
-transpose_55
-
-
-
- 
-ş*"
-name
-
-"
-transpose_69’
-	transpose
-x
-	
-var_656
-perm
-
-transpose_54_perm_0.
-transpose_54
-
-
-
-{
- *"
-name
-
-"
-transpose_70Ô
-matmul(
-transpose_x
-
-var_671_transpose_x_0(
-transpose_y
-
-var_671_transpose_y_0
-x
-
-transpose_54
-y
-
-transpose_55*
-var_671
-
-
-
-{
-ş*
-name
-
-
-"
-op_671r
-const
-_inversed_scores_43_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_43_y_0œ
-mul
-x
-	
-var_671 
-y
-
-_inversed_scores_43_y_06
-_inversed_scores_43
-
-
-
-{
-ş*)
-name!
-
-"
-_inversed_scores_43›
-select
-b
-
-_inversed_scores_43
-cond
-	
-var_109
-a
-
-
-var_21,
-	scores_45
-
-
-
-{
-ş*
-name
-
-"
-	scores_45€
-softmax
-axis
-
-
-var_31
-x
-
-	scores_45,
-	input_137
-
-
-
-{
-ş*
-name
-
-"
-	input_137y
-const$
-attn_output_19_transpose_x_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_19_transpose_x_0y
-const$
-attn_output_19_transpose_y_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_19_transpose_y_0ƒ
-	transpose
-x
-	
-var_668
-perm
-
-v_19_perm_0'
-v_19
-
-
-
-ş
- *"
-name
-
-"
-transpose_71å
-matmul/
-transpose_x 
-
-attn_output_19_transpose_x_0/
-transpose_y 
-
-attn_output_19_transpose_y_0
-x
-
-	input_137
-y
-
-v_190
-attn_output_19
-
-
-
-{
- *$
-name
-
-"
-attn_output_19o
-const
-var_680_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_680_perm_0a
-const
-var_682
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_682
-	transpose
-x
-
-attn_output_19
-perm
-
-var_680_perm_0)
-var_680
-
-
-{
-
- *"
-name
-
-"
-transpose_68z
-reshape
-shape
-	
-var_682
-x
-	
-var_680&
-	input_139
-
-
-{
-€*
-name
-
-"
-	input_139ã
-linear;
-bias3
-1
-/model_decoder_layers_2_cross_attn_out_proj_bias
-x
-
-	input_139?
-weight5
-3
-1model_decoder_layers_2_cross_attn_out_proj_weight&
-	input_141
-
-
-{
-€*
-name
-
-"
-	linear_51u
-add
-x
-
-
-query_19
-y
-
-	input_141&
-	input_143
-
-
-{
-€*
-name
-
-"
-	input_143z
-const 
-input_145_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*&
-name
-
-"
-input_145_axes_0ÿ
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_2_norm2_bias
-axes
-
-input_145_axes_0
-x
-
-	input_143
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_2_norm2_weight&
-	input_145
-
-
-{
-€*
-name
-
-"
-	input_145É
-linear/
-bias'
-%
-#model_decoder_layers_2_linear1_bias
-x
-
-	input_1453
-weight)
-'
-%model_decoder_layers_2_linear1_weight$
-var_695
-
-
-{
-€*
-name
-
-"
-	linear_52a
-relu
-x
-	
-var_695&
-	input_147
-
-
-{
-€*
-name
-
-"
-	input_147Ë
-linear/
-bias'
-%
-#model_decoder_layers_2_linear2_bias
-x
-
-	input_1473
-weight)
-'
-%model_decoder_layers_2_linear2_weight&
-	input_151
-
-
-{
-€*
-name
-
-"
-	linear_53v
-add
-x
-
-	input_145
-y
-
-	input_151&
-	input_153
-
-
-{
-€*
-name
-
-"
-	input_153x
-const
-query_21_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*%
-name
-
-"
-query_21_axes_0ü
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_2_norm3_bias
-axes
-
-query_21_axes_0
-x
-
-	input_153
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_2_norm3_weight%
-query_21
-
-
-{
-€*
-name
-
-"
-
-query_21Ú
-linear8
-bias0
-.
-,model_decoder_layers_3_self_attn_q_proj_bias
-x
-
-
-query_21<
-weight2
-0
-.model_decoder_layers_3_self_attn_q_proj_weight$
-var_723
-
-
-{
-€*
-name
-
-"
-	linear_54a
-const
-var_724
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_724z
-reshape
-shape
-	
-var_724
-x
-	
-var_723)
-var_725
-
-
-{
-
- *
-name
-
-
-"
-op_725Ú
-linear8
-bias0
-.
-,model_decoder_layers_3_self_attn_k_proj_bias
-x
-
-
-query_21<
-weight2
-0
-.model_decoder_layers_3_self_attn_k_proj_weight$
-var_729
-
-
-{
-€*
-name
-
-"
-	linear_55a
-const
-var_730
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_730z
-reshape
-shape
-	
-var_730
-x
-	
-var_729)
-var_731
-
-
-{
-
- *
-name
-
-
-"
-op_731Ú
-linear8
-bias0
-.
-,model_decoder_layers_3_self_attn_v_proj_bias
-x
-
-
-query_21<
-weight2
-0
-.model_decoder_layers_3_self_attn_v_proj_weight$
-var_735
-
-
-{
-€*
-name
-
-"
-	linear_56a
-const
-var_736
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_736z
-reshape
-shape
-	
-var_736
-x
-	
-var_735)
-var_737
-
-
-{
-
- *
-name
-
-
-"
-op_737j
-const
-v_21_perm_0
-
-
-*!
-val
-
-
-
-
-
- *!
-name
-
-"
-v_21_perm_0j
-const
-var_740_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_740_transpose_x_0j
-const
-var_740_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_740_transpose_y_0Œ
-const#
-transpose_56_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_56_perm_0Œ
-const#
-transpose_57_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_57_perm_0’
-	transpose
-x
-	
-var_731
-perm
-
-transpose_57_perm_0.
-transpose_57
-
-
-
- 
-{*"
-name
-
-"
-transpose_65’
-	transpose
-x
-	
-var_725
-perm
-
-transpose_56_perm_0.
-transpose_56
-
-
-
-{
- *"
-name
-
-"
-transpose_66Ó
-matmul(
-transpose_x
-
-var_740_transpose_x_0(
-transpose_y
-
-var_740_transpose_y_0
-x
-
-transpose_56
-y
-
-transpose_57)
-var_740
-
-
-
-{
-{*
-name
-
-
-"
-op_740r
-const
-_inversed_scores_47_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_47_y_0›
-mul
-x
-	
-var_740 
-y
-
-_inversed_scores_47_y_05
-_inversed_scores_47
-
-
-
-{
-{*)
-name!
-
-"
-_inversed_scores_47ƒ
-add
-x
-
-_inversed_scores_47
-y
-	
-var_384+
-	scores_49
-
-
-
-{
-{*
-name
-
-"
-	scores_49
-select
-b
-
-	scores_49
-cond
-	
-var_387
-a
-
-
-var_21+
-	scores_51
-
-
-
-{
-{*
-name
-
-"
-	scores_51
-softmax
-axis
-
-
-var_31
-x
-
-	scores_51+
-	input_155
-
-
-
-{
-{*
-name
-
-"
-	input_155y
-const$
-attn_output_21_transpose_x_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_21_transpose_x_0y
-const$
-attn_output_21_transpose_y_0
-*
-val
-
-
- *2
-name*
-"
- "
-attn_output_21_transpose_y_0‚
-	transpose
-x
-	
-var_737
-perm
-
-v_21_perm_0&
-v_21
-
-
-
-{
- *"
-name
-
-"
-transpose_67å
-matmul/
-transpose_x 
-
-attn_output_21_transpose_x_0/
-transpose_y 
-
-attn_output_21_transpose_y_0
-x
-
-	input_155
-y
-
-v_210
-attn_output_21
-
-
-
-{
- *$
-name
-
-"
-attn_output_21o
-const
-var_752_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_752_perm_0a
-const
-var_754
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_754
-	transpose
-x
-
-attn_output_21
-perm
-
-var_752_perm_0)
-var_752
-
-
-{
-
- *"
-name
-
-"
-transpose_64z
-reshape
-shape
-	
-var_754
-x
-	
-var_752&
-	input_157
-
-
-{
-€*
-name
-
-"
-	input_157á
-linear:
-bias2
-0
-.model_decoder_layers_3_self_attn_out_proj_bias
-x
-
-	input_157>
-weight4
-2
-0model_decoder_layers_3_self_attn_out_proj_weight&
-	input_159
-
-
-{
-€*
-name
-
-"
-	linear_57u
-add
-x
-
-
-query_21
-y
-
-	input_159&
-	input_161
-
-
-{
-€*
-name
-
-"
-	input_161r
-const
-query_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*"
-name
-
-"
-query_axes_0ó
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_3_norm1_bias
-axes
-
-query_axes_0
-x
-
-	input_161
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_3_norm1_weight"
-query
-
-
-{
-€*
-name
-
-	"
-queryÙ
-linear9
-bias1
-/
--model_decoder_layers_3_cross_attn_q_proj_bias
-x	
-
-query=
-weight3
-1
-/model_decoder_layers_3_cross_attn_q_proj_weight$
-var_774
-
-
-{
-€*
-name
-
-"
-	linear_58a
-const
-var_775
-
-
-*!
-val
-
-
-
-
-
-{ *
-name
-
-
-"
-op_775z
-reshape
-shape
-	
-var_775
-x
-	
-var_774)
-var_776
-
-
-{
-
- *
-name
-
-
-"
-op_776Ø
-linear9
-bias1
-/
--model_decoder_layers_3_cross_attn_k_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_3_cross_attn_k_proj_weight%
-var_780
-
-
-ş
-€*
-name
-
-"
-	linear_59b
-const
-var_781
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_781{
-reshape
-shape
-	
-var_781
-x
-	
-var_780*
-var_782
-
-
-ş
-
- *
-name
-
-
-"
-op_782Ø
-linear9
-bias1
-/
--model_decoder_layers_3_cross_attn_v_proj_bias
-x
-
-key=
-weight3
-1
-/model_decoder_layers_3_cross_attn_v_proj_weight%
-var_786
-
-
-ş
-€*
-name
-
-"
-	linear_60b
-const
-var_787
-
-
-*"
-val
-
-
-
-	
-ş *
-name
-
-
-"
-op_787{
-reshape
-shape
-	
-var_787
-x
-	
-var_786*
-var_788
-
-
-ş
-
- *
-name
-
-
-"
-op_788d
-const
-v_perm_0
-
-
-*!
-val
-
-
-
-
-
- *
-name
-
-"
-
-v_perm_0j
-const
-var_791_transpose_x_0
-*
-val
-
-
- **
-name"
-
-"
-op_791_transpose_x_0j
-const
-var_791_transpose_y_0
-*
-val
-
-
- **
-name"
-
-"
-op_791_transpose_y_0Œ
-const#
-transpose_58_perm_0
-
-
-*3
-val,
-
-
-
-
- ıÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_58_perm_0Œ
-const#
-transpose_59_perm_0
-
-
-*3
-val,
-
-
-
-
- ÿÿÿÿÿÿÿÿÿıÿÿÿÿÿÿÿÿ*)
-name!
-
-"
-transpose_59_perm_0“
-	transpose
-x
-	
-var_782
-perm
-
-transpose_59_perm_0/
-transpose_59
-
-
-
- 
-ş*"
-name
-
-"
-transpose_61’
-	transpose
-x
-	
-var_776
-perm
-
-transpose_58_perm_0.
-transpose_58
-
-
-
-{
- *"
-name
-
-"
-transpose_62Ô
-matmul(
-transpose_x
-
-var_791_transpose_x_0(
-transpose_y
-
-var_791_transpose_y_0
-x
-
-transpose_58
-y
-
-transpose_59*
-var_791
-
-
-
-{
-ş*
-name
-
-
-"
-op_791r
-const
-_inversed_scores_53_y_0
-*
-val
-
-
-
-
-ó5>*-
-name%
-
-"
-_inversed_scores_53_y_0œ
-mul
-x
-	
-var_791 
-y
-
-_inversed_scores_53_y_06
-_inversed_scores_53
-
-
-
-{
-ş*)
-name!
-
-"
-_inversed_scores_53•
-select
-b
-
-_inversed_scores_53
-cond
-	
-var_109
-a
-
-
-var_21)
-scores
-
-
-
-{
-ş*
-name
-
-
-"
-scores}
-softmax
-axis
-
-
-var_31
-x
-
-
-scores,
-	input_163
-
-
-
-{
-ş*
-name
-
-"
-	input_163s
-const!
-attn_output_transpose_x_0
-*
-val
-
-
- */
-name'
-
-"
-attn_output_transpose_x_0s
-const!
-attn_output_transpose_y_0
-*
-val
-
-
- */
-name'
-
-"
-attn_output_transpose_y_0}
-	transpose
-x
-	
-var_788
-perm
-
-
-v_perm_0$
-v
-
-
-
-ş
- *"
-name
-
-"
-transpose_63Ö
-matmul,
-transpose_x
-
-attn_output_transpose_x_0,
-transpose_y
-
-attn_output_transpose_y_0
-x
-
-	input_163
-
-y
-
-v-
-attn_output
-
-
-
-{
- *!
-name
-
-"
-attn_outputo
-const
-var_800_perm_0
-
-
-*!
-val
-
-
-
-
-
- *#
-name
-
-"
-op_800_perm_0a
-const
-var_802
-
-
-*!
-val
-
-
-
-
-
-{€*
-name
-
-
-"
-op_802Œ
-	transpose
-x
-
-attn_output
-perm
-
-var_800_perm_0)
-var_800
-
-
-{
-
- *"
-name
-
-"
-transpose_60z
-reshape
-shape
-	
-var_802
-x
-	
-var_800&
-	input_165
-
-
-{
-€*
-name
-
-"
-	input_165ã
-linear;
-bias3
-1
-/model_decoder_layers_3_cross_attn_out_proj_bias
-x
-
-	input_165?
-weight5
-3
-1model_decoder_layers_3_cross_attn_out_proj_weight&
-	input_167
-
-
-{
-€*
-name
-
-"
-	linear_61r
-add
-x	
-
-query
-y
-
-	input_167&
-	input_169
-
-
-{
-€*
-name
-
-"
-	input_169z
-const 
-input_171_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*&
-name
-
-"
-input_171_axes_0ÿ
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_3_norm2_bias
-axes
-
-input_171_axes_0
-x
-
-	input_169
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_3_norm2_weight&
-	input_171
-
-
-{
-€*
-name
-
-"
-	input_171É
-linear/
-bias'
-%
-#model_decoder_layers_3_linear1_bias
-x
-
-	input_1713
-weight)
-'
-%model_decoder_layers_3_linear1_weight$
-var_815
-
-
-{
-€*
-name
-
-"
-	linear_62a
-relu
-x
-	
-var_815&
-	input_173
-
-
-{
-€*
-name
-
-"
-	input_173Ë
-linear/
-bias'
-%
-#model_decoder_layers_3_linear2_bias
-x
-
-	input_1733
-weight)
-'
-%model_decoder_layers_3_linear2_weight&
-	input_177
-
-
-{
-€*
-name
-
-"
-	linear_63v
-add
-x
-
-	input_171
-y
-
-	input_177&
-	input_179
-
-
-{
-€*
-name
-
-"
-	input_179r
-const
-input_axes_0
-
-
-*'
-val 
-
-
-
-
-
-ÿÿÿÿÿÿÿÿÿ*"
-name
-
-"
-input_axes_0ó
-
-layer_norm-
-beta%
-#
-!model_decoder_layers_3_norm3_bias
-axes
-
-input_axes_0
-x
-
-	input_179
-epsilon
-
-
-var_260
-gamma'
-%
-#model_decoder_layers_3_norm3_weight"
-input
-
-
-{
-€*
-name
-
-	"
-input¦
-linear
-bias
-
-model_fc_out_bias
-x	
-
-input!
-weight
-
-model_fc_out_weight)
-chord_output
-
-
-{
-è*
-name
-
-"
-	linear_64"ç
-	buildInfoÙ"
-
-
-Æ"Ã
-8
-!
-
-"
-coremltools-version
-
-	"
-8.3.0
-@
-)
-!
-"
-coremltools-component-torch
-
-	"
-2.5.0
-E
-(
- 
-"
-coremltools-source-dialect
-
-"
-TorchScript

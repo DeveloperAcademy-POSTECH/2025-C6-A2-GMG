@@ -22,22 +22,71 @@ enum ChordInferencerError: Error {
 /// count-in, a tap, or `TempoEstimator` once the singer has confirmed it.
 /// A wrong tempo does not degrade the output gently; it hands the model a
 /// melody in the wrong rhythm.
+///
+/// Two models run here, and they are only valid as a pair. The chord model was
+/// trained on C alone, so it cannot say what key a melody is in and cannot read
+/// one it has never seen. `ChordKeyModel` — trained on all twelve — names the
+/// key, the melody is rotated so that key becomes C, the chords are read, and
+/// their roots are rotated back. The key model's mistakes are therefore part of
+/// this class's accuracy, which is why the key is voted on across the whole
+/// melody rather than trusted one window at a time.
 final class ChordInferencer {
-    private let model: TransformerChordInference
+    private let keyModel: ChordKeyModel
+    private let chordModel: ChordSlotModel
     private let vocabulary: Vocabulary
 
-    private let maxMelodyLength: Int
-    private let maxChordLength: Int
+    /// Melody rows the graph accepts. Fixed at conversion time, so it is read
+    /// from the model rather than assumed.
+    private let maxMelodyRows: Int
 
+    /// `<PAD>` in the slot melody vocabulary. A padding row is this in the
+    /// pitch column and zero in the other three.
     private let padId: Int = 0
-    private let sosId: Int = 1
-    private let eosId: Int = 2
 
-    /// How many chords the UI offers per slot.
+    /// How many chords the UI offers per bar.
     private let candidateCount: Int = 5
 
-    init() throws {
-        self.model = try TransformerChordInference()
+    /// Flattens the ranking before a chord is drawn from it. Zero turns drawing
+    /// off entirely and takes the ranking as it stands, which is what makes a
+    /// run reproducible.
+    ///
+    /// One means no flattening, and that is the default on purpose: `minP` is
+    /// the dial that matters here, and temperature mostly gets in its way.
+    /// Below one the leader grows, fewer roots clear the `minP` floor, and the
+    /// decoder collapses back to greedy — at `0.9` a steady C major melody gave
+    /// the greedy progression outright in 7 runs of 40, against 0 at `1.0`.
+    private let temperature: Float
+    /// How close to the model's first choice a chord has to be before it counts
+    /// as an alternative, as a fraction of that first choice's probability.
+    ///
+    /// A fixed number of candidates does not work here. The root distribution
+    /// is flat — a first choice around `0.3` to `0.45` with the rest of the
+    /// mass scattered behind it — so taking a fixed top few would hand the draw
+    /// three roots that are noise rather than alternatives, and the root would
+    /// come out wrong more often than right. Measuring against the leader
+    /// instead makes the decoder greedy wherever the model is decided, and only
+    /// opens up where two or three chords are genuinely close.
+    ///
+    /// Measured on this model at 40 runs of one steady C major melody: `0.6`
+    /// gave 13 distinct progressions and never the greedy one, `0.7` gave 8 and
+    /// fell back to greedy 10 times, `0.8` barely moved at all. Every setting
+    /// tried stayed inside the key — unlike the seq2seq decoder this replaced,
+    /// loosening the floor here did not produce chromatic chords, so the floor
+    /// is set for variety rather than against drift.
+    private let minP: Float
+    /// Uniform in `0..<1`. Injected so a test can pin the draw.
+    private let random: () -> Float
+
+    init(
+        temperature: Float = 1.0,
+        minP: Float = 0.6,
+        random: @escaping () -> Float = { Float.random(in: 0..<1) }
+    ) throws {
+        self.temperature = temperature
+        self.minP = minP
+        self.random = random
+        self.keyModel = try ChordKeyModel()
+        self.chordModel = try ChordSlotModel()
 
         guard
             let vocabURL = Bundle.main.url(
@@ -50,15 +99,18 @@ final class ChordInferencer {
             Vocabulary.self, from: try Data(contentsOf: vocabURL)
         )
 
-        let descriptions = model.model.modelDescription.inputDescriptionsByName
-        self.maxMelodyLength = Self.length(of: descriptions["melody_tokens"]) ?? 656
-        self.maxChordLength = Self.length(of: descriptions["chord_input"]) ?? 171
+        let descriptions = chordModel.model.modelDescription.inputDescriptionsByName
+        self.maxMelodyRows = Self.rowCount(of: descriptions["melody"]) ?? 212
     }
 
-    private static func length(of description: MLFeatureDescription?) -> Int? {
-        guard let shape = description?.multiArrayConstraint?.shape, shape.count == 2
+    /// The melody length baked into the graph, from its input description.
+    ///
+    /// The melody input is rank 3 — `(batch, rows, 4)` — and anything else means
+    /// the bundled model is not the one this code was written against.
+    private static func rowCount(of description: MLFeatureDescription?) -> Int? {
+        guard let shape = description?.multiArrayConstraint?.shape, shape.count == 3
         else { return nil }
-        return max(2, shape[1].intValue)
+        return max(1, shape[1].intValue)
     }
 
     func inference(
@@ -66,27 +118,34 @@ final class ChordInferencer {
         tempo: Tempo = .default
     ) async throws -> ChordInferencerResult {
         let events: [MelodyEvent] = melodyEvents(from: notes, tempo: tempo)
-        guard !events.isEmpty else {
+        let windows: [Window] = windows(over: events)
+        guard !windows.isEmpty else {
             return ChordInferencerResult(key: Key(root: .C), chordCells: [])
         }
 
-        var key: Key?
+        let key: Int = try await detectKey(over: windows)
+
         var cells: [ChordCell] = []
         var lastTick: Int = .min
+        var sounding: Chord?
 
-        for window in windows(over: events) {
-            let prediction = try await predict(window.events, startingAt: window.startTick)
-
-            if key == nil, let root = prediction.key {
-                key = Key(root: root)
-            }
-
+        for window in windows {
             // Windows overlap by half so the model always has context on both
             // sides; only what is past the previous window is new.
-            for chord in prediction.chords where chord.tick > lastTick {
+            for chord in try await predict(window, inKey: key) where chord.tick > lastTick {
+                lastTick = chord.tick
+
+                // Every bar carries a chord — the model has no way to say
+                // "nothing here" — so a chord that lasts four bars comes back
+                // four times. Consecutive bars agreeing is one chord held.
+                guard let leading = chord.candidates.first, leading != sounding else {
+                    continue
+                }
+                sounding = leading
+
                 cells.append(
                     ChordCell(
-                        chord: chord.candidates.first,
+                        chord: leading,
                         chordCandidates: chord.candidates,
                         startTime: tempo.seconds(
                             atTicks: chord.tick,
@@ -95,11 +154,48 @@ final class ChordInferencer {
                         duration: .zero
                     )
                 )
-                lastTick = chord.tick
             }
         }
 
-        return ChordInferencerResult(key: key ?? Key(root: .C), chordCells: cells)
+        return ChordInferencerResult(
+            key: Key(root: NoteName(pitchClass: key)), chordCells: cells
+        )
+    }
+}
+
+// MARK: - The key the rest of the run is read against
+
+extension ChordInferencer {
+    /// One key for the whole melody, voted on across its windows.
+    ///
+    /// Per window the detector is right about 0.895 of the time and per song
+    /// 0.956, measured on the training corpus. The app has the whole hummed
+    /// melody in hand, so there is no reason to take the weaker number.
+    fileprivate func detectKey(over windows: [Window]) async throws -> Int {
+        var votes: [Int: Int] = [:]
+
+        for window in windows {
+            // The detector reads the melody as it was sung. Rotating first
+            // would be circular.
+            let melody = melodyRows(
+                window.events, startingAt: window.startTick, rotatedBy: 0
+            )
+            let output = try await keyModel.prediction(
+                input: ChordKeyModelInput(melody: melody)
+            )
+
+            let logits: [Float] = output.key_logitsShapedArray.scalars
+            guard let best = logits.indices.max(by: { logits[$0] < logits[$1] })
+            else { continue }
+            votes[best, default: 0] += 1
+        }
+
+        // A tie goes to the lower pitch class, so the same melody always
+        // produces the same key.
+        return
+            votes.max { left, right in
+                left.value == right.value ? left.key > right.key : left.value < right.value
+            }?.key ?? 0
     }
 }
 
@@ -146,7 +242,7 @@ extension ChordInferencer {
     fileprivate func windows(over events: [MelodyEvent]) -> [Window] {
         let span: Int = vocabulary.windowTicks
         let hop: Int = max(1, span / 2)
-        let capacity: Int = max(1, (maxMelodyLength - 2) / 3)
+        let capacity: Int = max(1, maxMelodyRows)
 
         guard let end = events.last?.tick else { return [] }
 
@@ -169,155 +265,216 @@ extension ChordInferencer {
         return windows
     }
 
-    fileprivate func melodyTokenIds(_ events: [MelodyEvent], startTick: Int) -> [Int] {
-        var ids: [Int] = [sosId]
-        var previous: Int = 0
+    /// One row per note — `[pitch id, duration, bar, offset]` — padded out to
+    /// the length the graph was converted at.
+    ///
+    /// `semitones` is the key the melody is being rotated *out of*, so passing
+    /// the detected key puts the melody in C, which is the only key the chord
+    /// model was trained on. Passing zero leaves it alone.
+    fileprivate func melodyRows(
+        _ events: [MelodyEvent],
+        startingAt startTick: Int,
+        rotatedBy semitones: Int
+    ) -> MLMultiArray {
+        // A row of zeros is already a padding row: `<PAD>` is id 0, and the
+        // other three columns are ignored wherever the pitch column is padding.
+        var rows = MLShapedArray<Int32>(
+            repeating: Int32(padId), shape: [1, maxMelodyRows, 4]
+        )
 
-        for event in events {
-            let position: Int = event.tick - startTick
-            let delta: Int = min(vocabulary.maxTimeShift, max(0, position - previous))
-            previous = position
+        let lastBar: Int = max(0, vocabulary.windowBars - 1)
 
-            ids.append(vocabulary.melodyId("\(ChordToken.timeShiftPrefix)\(delta)"))
-            ids.append(vocabulary.melodyId("\(ChordToken.pitchPrefix)\(event.pitchClass)"))
-            ids.append(vocabulary.melodyId("\(ChordToken.durationPrefix)\(event.duration)"))
+        for (row, event) in events.prefix(maxMelodyRows).enumerated() {
+            let position: Int = max(0, event.tick - startTick)
+            let pitchClass: Int = ((event.pitchClass - semitones) % 12 + 12) % 12
+
+            rows[scalarAt: [0, row, 0]] = Int32(vocabulary.pitchId(pitchClass))
+            rows[scalarAt: [0, row, 1]] = Int32(
+                min(vocabulary.maxDuration, max(1, event.duration))
+            )
+            rows[scalarAt: [0, row, 2]] = Int32(
+                min(lastBar, position / vocabulary.ticksPerBar)
+            )
+            rows[scalarAt: [0, row, 3]] = Int32(position % vocabulary.ticksPerBar)
         }
-        ids.append(eosId)
 
-        if ids.count < maxMelodyLength {
-            ids += Array(repeating: padId, count: maxMelodyLength - ids.count)
-        }
-        return Array(ids.prefix(maxMelodyLength))
+        return MLMultiArray(rows)
     }
 }
 
-// MARK: - Constrained decoding
+// MARK: - Reading the slots
 
 extension ChordInferencer {
-    /// Chord tokens follow a fixed cycle: `<SOS> Key (TimeShift Root Type)* <EOS>`.
-    /// Holding each step to the slot it is in stops a shaky model from emitting
-    /// a sequence that cannot be read back as chords at all.
-    enum Slot {
-        case key
-        case timeShift
-        case root
-        case type
-
-        static func at(position: Int) -> Slot {
-            guard position > 1 else { return .key }
-            switch (position - 2) % 3 {
-            case 0: return .timeShift
-            case 1: return .root
-            default: return .type
-            }
-        }
-    }
-
     fileprivate struct PredictedChord {
         let tick: Int
         let candidates: [Chord]
     }
 
-    fileprivate struct Prediction {
-        let key: NoteName?
-        let chords: [PredictedChord]
-    }
-
+    /// One forward pass per window. There is no generation loop: the model
+    /// answers for every slot at once.
+    ///
+    /// The model is read at the grid it was trained on — two slots to a bar —
+    /// and the answer is then reduced to one chord per bar. Halving the slot is
+    /// what made this model worth having (it took the ceiling against the real
+    /// chord track from 0.873 to 0.983), so the grid stays; only what the score
+    /// shows is per bar. The two slots' distributions are averaged rather than
+    /// one of them being dropped: where both halves agree, that is the chord
+    /// either would have given, and where they disagree the bar is decided on
+    /// both halves' evidence instead of on the downbeat alone.
     fileprivate func predict(
-        _ events: [MelodyEvent],
-        startingAt startTick: Int
-    ) async throws -> Prediction {
-        let melodyTokens = MLMultiArray(
-            MLShapedArray<Int32>(
-                scalars: melodyTokenIds(events, startTick: startTick).map(Int32.init),
-                shape: [1, maxMelodyLength]
-            )
+        _ window: Window,
+        inKey key: Int
+    ) async throws -> [PredictedChord] {
+        let melody = melodyRows(
+            window.events, startingAt: window.startTick, rotatedBy: key
+        )
+        let output = try await chordModel.prediction(
+            input: ChordSlotModelInput(melody: melody)
         )
 
-        var chordArray = MLShapedArray<Int32>(
-            repeating: Int32(padId), shape: [1, maxChordLength]
-        )
-        chordArray[scalarAt: [0, 0]] = Int32(sosId)
+        let rootLogits: MLShapedArray<Float> = output.root_logitsShapedArray
+        let typeLogits: MLShapedArray<Float> = output.type_logitsShapedArray
 
-        var key: NoteName?
+        let slotsPerBar: Int = max(1, vocabulary.ticksPerBar / vocabulary.slotTicks)
         var chords: [PredictedChord] = []
-        var tick: Int = startTick
-        var roots: [NoteName] = []
 
-        for position in 1..<maxChordLength {
-            let output = try await model.prediction(
-                input: TransformerChordInferenceInput(
-                    melody_tokens: melodyTokens,
-                    chord_input: MLMultiArray(chordArray)
+        for firstSlot in stride(from: 0, to: vocabulary.slotsPerWindow, by: slotsPerBar) {
+            let slots: Range<Int> =
+                firstSlot..<min(
+                    firstSlot + slotsPerBar, vocabulary.slotsPerWindow
+                )
+
+            // Only the root is drawn. The type is left alone because the model
+            // is already sure of it — `0.85` to `0.95` on one quality — so
+            // drawing there buys no variety and only risks the occasional chord
+            // nobody asked for.
+            let rankedRoots = ranking(
+                of: averaged(
+                    rootLogits,
+                    over: slots,
+                    classes: vocabulary.rootLabels.count,
+                    temperature: temperature
+                )
+            )
+            let rankedTypes = ranking(
+                of: averaged(
+                    typeLogits, over: slots, classes: vocabulary.typeLabels.count
                 )
             )
 
-            let slot: Slot = Slot.at(position: position)
-            let ranked = rank(
-                output.chord_outputShapedArray,
-                at: position - 1,
-                allowing: vocabulary.ids(for: slot),
-                endingAllowed: slot == .timeShift
+            guard let chosen = draw(from: rankedRoots, sampling: true) else { continue }
+
+            // What the progression is written against has to lead the candidate
+            // list too, or the chord the UI shows is not the one that was chosen.
+            let roots: [NoteName] = promoting(chosen.id, in: rankedRoots).map {
+                // Back out of C and into the key the melody was actually in.
+                NoteName(pitchClass: ($0.id + key) % 12)
+            }
+            let types: [ChordQuality] = rankedTypes.compactMap {
+                vocabulary.typeLabel($0.id).flatMap(ChordQuality.init(label:))
+            }
+
+            let candidates: [Chord] = pair(roots, with: types)
+            guard !candidates.isEmpty else { continue }
+
+            chords.append(
+                PredictedChord(
+                    tick: window.startTick + firstSlot * vocabulary.slotTicks,
+                    candidates: candidates
+                )
             )
+        }
 
-            guard let best = ranked.first, best.id != eosId else { break }
-            chordArray[scalarAt: [0, position]] = Int32(best.id)
+        return chords
+    }
 
-            switch slot {
-            case .key:
-                key = vocabulary.chordToken(best.id).flatMap(NoteName.init(token:))
+    /// One head's class probabilities, softmaxed per slot and then averaged
+    /// across the slots of a bar.
+    ///
+    /// Averaging probabilities rather than logits is what makes this a vote:
+    /// a slot the model is unsure about spreads its weight and carries less,
+    /// while a slot it is certain about dominates the bar.
+    ///
+    /// Temperature flattens each distribution without reordering it, so it
+    /// changes nothing on its own — it only has an effect through `draw`.
+    fileprivate func averaged(
+        _ logits: MLShapedArray<Float>,
+        over slots: Range<Int>,
+        classes: Int,
+        temperature: Float = 1
+    ) -> [Float] {
+        guard classes > 0, !slots.isEmpty else { return [] }
 
-            case .timeShift:
-                tick += vocabulary.timeShift(best.id) ?? 0
+        let scale: Float = max(temperature, 0.01)
+        var totals: [Float] = Array(repeating: 0, count: classes)
 
-            case .root:
-                roots = ranked.compactMap {
-                    vocabulary.chordToken($0.id).flatMap(NoteName.init(token:))
-                }
+        for slot in slots {
+            let slice = logits[0, slot]
+            let scores: [Float] = (0..<classes).map { id in
+                slice[id].scalar ?? -.greatestFiniteMagnitude
+            }
 
-            case .type:
-                let types: [ChordQuality] = ranked.compactMap {
-                    vocabulary.chordToken($0.id).flatMap(ChordQuality.init(token:))
-                }
-                let candidates: [Chord] = pair(roots, with: types)
-                if !candidates.isEmpty {
-                    chords.append(PredictedChord(tick: tick, candidates: candidates))
-                }
-                roots = []
+            let highest: Float = scores.max() ?? 0
+            let weights: [Float] = scores.map { exp(($0 - highest) / scale) }
+            let sum: Float = weights.reduce(0, +)
+            guard sum > 0 else { continue }
+
+            for id in 0..<classes {
+                totals[id] += weights[id] / sum
             }
         }
 
-        return Prediction(key: key, chords: chords)
+        let count = Float(slots.count)
+        return totals.map { $0 / count }
     }
 
-    /// Softmax over the tokens this slot allows, best first.
-    fileprivate func rank(
-        _ logits: MLShapedArray<Float>,
-        at position: Int,
-        allowing allowed: [Int],
-        endingAllowed: Bool
-    ) -> [(id: Int, probability: Float)] {
-        var ids: [Int] = allowed
-        if endingAllowed {
-            ids.append(eosId)
-        }
-        guard !ids.isEmpty else { return [] }
-
-        let slice = logits[0, position]
-        let scores: [(id: Int, logit: Float)] = ids.map { id in
-            (id, slice[id].scalar ?? -.greatestFiniteMagnitude)
-        }
-
-        let highest: Float = scores.map(\.logit).max() ?? 0
-        let weights: [Float] = scores.map { exp($0.logit - highest) }
-        let total: Float = weights.reduce(0, +)
-        guard total > 0 else {
-            return scores.sorted { $0.logit > $1.logit }.map { ($0.id, 0) }
-        }
-
-        return zip(scores, weights)
-            .map { (id: $0.0.id, probability: $0.1 / total) }
+    /// Class ids paired with their probabilities, best first.
+    fileprivate func ranking(of probabilities: [Float]) -> [(id: Int, probability: Float)] {
+        probabilities
+            .enumerated()
+            .map { (id: $0.offset, probability: $0.element) }
             .sorted { $0.probability > $1.probability }
+    }
+
+    /// Picks one class out of the ranking.
+    ///
+    /// Drawing in proportion to probability is the whole point of temperature:
+    /// scaling the logits and then taking the maximum would give back exactly
+    /// the same progression every time, because the scaling preserves order.
+    fileprivate func draw(
+        from ranked: [(id: Int, probability: Float)],
+        sampling: Bool
+    ) -> (id: Int, probability: Float)? {
+        guard sampling, temperature > 0, let leader = ranked.first, ranked.count > 1
+        else { return ranked.first }
+
+        // The ranking is sorted, so everything worth drawing from is at the front.
+        let floor: Float = minP * leader.probability
+        let pool = ranked.prefix { $0.probability >= floor }
+        guard pool.count > 1 else { return leader }
+
+        let total: Float = pool.reduce(0) { $0 + $1.probability }
+        guard total > 0 else { return leader }
+
+        var cut: Float = min(max(random(), 0), 1) * total
+        for entry in pool {
+            cut -= entry.probability
+            if cut <= 0 { return entry }
+        }
+        return pool.last
+    }
+
+    /// The given class first, the rest left in rank order.
+    fileprivate func promoting(
+        _ chosen: Int,
+        in ranked: [(id: Int, probability: Float)]
+    ) -> [(id: Int, probability: Float)] {
+        guard let index = ranked.firstIndex(where: { $0.id == chosen }), index != 0
+        else { return ranked }
+
+        var reordered = ranked
+        reordered.insert(reordered.remove(at: index), at: 0)
+        return reordered
     }
 
     /// Roots crossed with types, best-first on both, cut to what the UI shows.
@@ -348,74 +505,62 @@ extension ChordInferencer {
 /// clamping to bounds that no longer exist.
 private struct Vocabulary: Decodable {
     let ticksPerQuarter: Int
+    let ticksPerBar: Int
     let windowTicks: Int
-    let maxTimeShift: Int
+    let windowBars: Int
     let maxDuration: Int
+    let slotTicks: Int
+    let slotsPerWindow: Int
 
-    private let chordTokens: [String]
+    /// What the two heads' class indices mean. Positions are the class ids, so
+    /// these lists are the only thing that says a `2` from the root head is a D.
+    let rootLabels: [String]
+    let typeLabels: [String]
+
     private let melodyIds: [String: Int]
-    private let timeShifts: [Int: Int]
-    private let slots: [String: [Int]]
 
     private static let unknownId: Int = 3
 
     enum CodingKeys: String, CodingKey {
         case ticksPerQuarter = "ticks_per_quarter"
+        case ticksPerBar = "ticks_per_bar"
         case windowTicks = "window_ticks"
-        case maxTimeShift = "max_time_shift"
+        case windowBars = "window_bars"
         case maxDuration = "max_duration"
-        case melodyTokens = "melody_tokens"
-        case chordTokens = "chord_tokens"
+        case slotTicks = "slot_ticks"
+        case slotsPerWindow = "slots_per_window"
+        case slotMelodyTokens = "slot_melody_tokens"
+        case rootLabels = "root_labels"
+        case typeLabels = "type_labels"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         ticksPerQuarter = try container.decode(Int.self, forKey: .ticksPerQuarter)
+        ticksPerBar = try container.decode(Int.self, forKey: .ticksPerBar)
         windowTicks = try container.decode(Int.self, forKey: .windowTicks)
-        maxTimeShift = try container.decode(Int.self, forKey: .maxTimeShift)
+        windowBars = try container.decode(Int.self, forKey: .windowBars)
         maxDuration = try container.decode(Int.self, forKey: .maxDuration)
+        slotTicks = try container.decode(Int.self, forKey: .slotTicks)
+        slotsPerWindow = try container.decode(Int.self, forKey: .slotsPerWindow)
+        rootLabels = try container.decode([String].self, forKey: .rootLabels)
+        typeLabels = try container.decode([String].self, forKey: .typeLabels)
 
-        let melodyTokens: [String] = try container.decode(
-            [String].self, forKey: .melodyTokens)
-        chordTokens = try container.decode([String].self, forKey: .chordTokens)
-
+        let slotMelodyTokens: [String] = try container.decode(
+            [String].self, forKey: .slotMelodyTokens)
         melodyIds = Dictionary(
-            melodyTokens.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first }
+            slotMelodyTokens.enumerated().map { ($1, $0) },
+            uniquingKeysWith: { first, _ in first }
         )
-
-        var shifts: [Int: Int] = [:]
-        var found: [String: [Int]] = [:]
-        let prefixes: [String] = [
-            ChordToken.keyPrefix, ChordToken.timeShiftPrefix,
-            ChordToken.rootPrefix, ChordToken.typePrefix,
-        ]
-
-        for (id, token) in chordTokens.enumerated() {
-            for prefix in prefixes where token.hasPrefix(prefix) {
-                found[prefix, default: []].append(id)
-                if prefix == ChordToken.timeShiftPrefix {
-                    shifts[id] = Int(token.dropFirst(prefix.count)) ?? 0
-                }
-            }
-        }
-        timeShifts = shifts
-        slots = found
     }
 
-    func melodyId(_ token: String) -> Int { melodyIds[token] ?? Self.unknownId }
-
-    func chordToken(_ id: Int) -> String? {
-        chordTokens.indices.contains(id) ? chordTokens[id] : nil
+    /// The melody vocabulary holds one token per pitch class and nothing else —
+    /// duration, bar and offset are numeric columns, not tokens.
+    func pitchId(_ pitchClass: Int) -> Int {
+        melodyIds["\(ChordToken.pitchPrefix)\(pitchClass)"] ?? Self.unknownId
     }
 
-    func timeShift(_ id: Int) -> Int? { timeShifts[id] }
-
-    fileprivate func ids(for slot: ChordInferencer.Slot) -> [Int] {
-        switch slot {
-        case .key: return slots[ChordToken.keyPrefix] ?? []
-        case .timeShift: return slots[ChordToken.timeShiftPrefix] ?? []
-        case .root: return slots[ChordToken.rootPrefix] ?? []
-        case .type: return slots[ChordToken.typePrefix] ?? []
-        }
+    func typeLabel(_ id: Int) -> String? {
+        typeLabels.indices.contains(id) ? typeLabels[id] : nil
     }
 }

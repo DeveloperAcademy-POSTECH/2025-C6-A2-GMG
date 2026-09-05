@@ -101,7 +101,6 @@ final class ScoreFactory {
             .filter { chordCell in
                 chordCell.startTime <= totalDuration
             }
-            .mergeConsecutive()
             .alignFirstStartTimeToZero()
             .calculateDuration(totalDuration)
             .filter { chordCell in

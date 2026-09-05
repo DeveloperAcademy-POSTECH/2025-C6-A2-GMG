@@ -88,13 +88,20 @@ extension ChordQuality {
         }
     }
 
+    /// Reads a bare quality name, as `type_labels` in the vocabulary spells it.
+    ///
+    /// The slot model's type head returns a class index, and `type_labels` says
+    /// what the index means — with no `Type_` in front of it, unlike the token
+    /// stream the seq2seq model produced.
+    init?(label: String) {
+        guard let match = ChordQuality.allCases.first(where: { $0.tokenName == label })
+        else { return nil }
+        self = match
+    }
+
     /// Reads a `Type_` token.
     init?(token: String) {
         guard token.hasPrefix(ChordToken.typePrefix) else { return nil }
-        let name: String = String(token.dropFirst(ChordToken.typePrefix.count))
-
-        guard let match = ChordQuality.allCases.first(where: { $0.tokenName == name })
-        else { return nil }
-        self = match
+        self.init(label: String(token.dropFirst(ChordToken.typePrefix.count)))
     }
 }

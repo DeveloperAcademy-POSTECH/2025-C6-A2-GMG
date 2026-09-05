@@ -45,6 +45,9 @@ struct ChordTokenTests {
         #expect(ChordQuality(token: "Type_M") == nil)
         #expect(ChordQuality(token: "Type_wat") == nil)
         #expect(ChordQuality(token: "maj") == nil)
+        // The slot path reads bare labels, and has to be just as strict.
+        #expect(ChordQuality(label: "M") == nil)
+        #expect(ChordQuality(label: "Type_maj") == nil)
     }
 
     @Test func rootTokensRoundTrip() {
@@ -67,15 +70,54 @@ struct ChordTokenTests {
         #expect(NoteName.Bb.tokenName == "A#")
     }
 
-    @Test func slotsFollowTheChordCycle() {
-        // <SOS> Key (TimeShift Root Type)* — index 0 is the start token.
-        #expect(ChordInferencer.Slot.at(position: 1) == .key)
-        #expect(ChordInferencer.Slot.at(position: 2) == .timeShift)
-        #expect(ChordInferencer.Slot.at(position: 3) == .root)
-        #expect(ChordInferencer.Slot.at(position: 4) == .type)
-        #expect(ChordInferencer.Slot.at(position: 5) == .timeShift)
-        #expect(ChordInferencer.Slot.at(position: 6) == .root)
-        #expect(ChordInferencer.Slot.at(position: 7) == .type)
+    /// The slot model returns a class index per head, and these two lists are
+    /// the only thing that says what an index means. If they and the app ever
+    /// disagree, chords come out transposed or silently dropped.
+    @Test func theBundledVocabularySpellsTypesTheWayTheAppReadsThem() throws {
+        let labels: [String] = try Self.bundledVocabulary().typeLabels
+
+        #expect(
+            labels == Self.vocabularyTypeNames,
+            "the bundled vocabulary's type_labels are no longer the list this app was written against"
+        )
+        for label in labels {
+            #expect(
+                ChordQuality(label: label) != nil,
+                "\(label) is a class of the type head but the app cannot read it"
+            )
+        }
+    }
+
+    @Test func theBundledVocabularySpellsRootsTheWayTheAppReadsThem() throws {
+        let labels: [String] = try Self.bundledVocabulary().rootLabels
+
+        #expect(labels.count == 12)
+        for (pitchClass, label) in labels.enumerated() {
+            #expect(
+                NoteName(pitchClass: pitchClass).tokenName == label,
+                "class \(pitchClass) of the root head is \(label), not \(NoteName(pitchClass: pitchClass).tokenName)"
+            )
+        }
+    }
+
+    /// Only the fields these tests read; the inferencer has its own decoder.
+    private struct VocabularyFile: Decodable {
+        let rootLabels: [String]
+        let typeLabels: [String]
+
+        enum CodingKeys: String, CodingKey {
+            case rootLabels = "root_labels"
+            case typeLabels = "type_labels"
+        }
+    }
+
+    private static func bundledVocabulary() throws -> VocabularyFile {
+        let url = try #require(
+            Bundle.main.url(
+                forResource: "TransformerChordInferenceVocab", withExtension: "json"
+            )
+        )
+        return try JSONDecoder().decode(VocabularyFile.self, from: Data(contentsOf: url))
     }
 }
 

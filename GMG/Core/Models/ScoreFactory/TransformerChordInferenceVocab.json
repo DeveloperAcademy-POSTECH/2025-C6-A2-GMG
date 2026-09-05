@@ -1,5 +1,6 @@
 {
   "ticks_per_quarter": 12,
+  "ticks_per_bar": 48,
   "window_ticks": 768,
   "max_time_shift": 192,
   "max_duration": 48,
@@ -495,5 +496,54 @@
     "Type_9",
     "Type_sus4",
     "Type_aug"
+  ],
+  "slots_per_bar": 2,
+  "window_bars": 16,
+  "slot_ticks": 24,
+  "slots_per_window": 32,
+  "slot_melody_tokens": [
+    "<PAD>",
+    "<SOS>",
+    "<EOS>",
+    "<UNK>",
+    "Pitch_0",
+    "Pitch_1",
+    "Pitch_2",
+    "Pitch_3",
+    "Pitch_4",
+    "Pitch_5",
+    "Pitch_6",
+    "Pitch_7",
+    "Pitch_8",
+    "Pitch_9",
+    "Pitch_10",
+    "Pitch_11"
+  ],
+  "root_labels": [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+  ],
+  "type_labels": [
+    "maj",
+    "m",
+    "7",
+    "m7",
+    "maj7",
+    "m7b5",
+    "dim",
+    "dim7",
+    "9",
+    "sus4",
+    "aug"
   ]
 }
