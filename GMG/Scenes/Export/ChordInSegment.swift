@@ -35,7 +35,11 @@ extension ChordInSegment {
                     cellsInSegment.insert(lastCellInPreviousSegment, at: 0)
                 } else {
                     cellsInSegment.insert(
-                        .init(chord: nil, chordCandidates: [], startTime: startTime, duration: .zero), at: 0)
+                        .init(
+                            chord: nil, chordCandidates: [], startTime: startTime, duration: .zero
+                        ),
+                        at: 0
+                    )
                 }
             } else if cellsInSegment.isEmpty,
                 let lastCellInPreviousSegment: ChordCell =

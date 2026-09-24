@@ -5,6 +5,7 @@ import SwiftData
 
 protocol ScoreRepository {
     func fetch() throws -> [Score]
+    func fetchDeleted() throws -> [Score]
     func fetch(id: UUID) throws -> Score?
     func insert(_ score: Score) throws
     func update(_ score: Score) throws
@@ -12,6 +13,7 @@ protocol ScoreRepository {
 }
 
 final class SwiftDataScoreRepository: ScoreRepository {
+
     private let storage: SwiftDataStorage
 
     private var context: ModelContext { storage.context }
@@ -21,19 +23,11 @@ final class SwiftDataScoreRepository: ScoreRepository {
     }
 
     func fetch() throws -> [Score] {
-        /// Soft Delete 되지 않은 Score만 가져오기
-        let predicate: Predicate<ScoreSchema.Score> = #Predicate { $0.isDeleted == false }
-        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init(
-            predicate: predicate,
-            sortBy: [
-                .init(\.createdAt, order: .forward)
-            ]
-        )
-        let scorePersitences: [ScoreSchema.Score] = try context.fetch(fetchDescriptor)
+        try fetch(isDeleted: false)
+    }
 
-        let scores: [Score] = scorePersitences.map { $0.toDomain() }
-
-        return scores
+    func fetchDeleted() throws -> [Score] {
+        try fetch(isDeleted: true)
     }
 
     func fetch(id: UUID) throws -> Score? {
@@ -92,6 +86,23 @@ final class SwiftDataScoreRepository: ScoreRepository {
         let scorePersistence: ScoreSchema.Score? = try context.fetch(fetchDescriptor).first
 
         return scorePersistence
+    }
+
+    private func fetch(isDeleted: Bool) throws -> [Score] {
+        let predicate: Predicate<ScoreSchema.Score> =
+            #Predicate<ScoreSchema.Score> { $0.isDeleted == isDeleted }
+
+        let fetchDescriptor: FetchDescriptor<ScoreSchema.Score> = .init(
+            predicate: predicate,
+            sortBy: [
+                .init(\.createdAt, order: .forward)
+            ]
+        )
+        let scorePersitences: [ScoreSchema.Score] = try context.fetch(fetchDescriptor)
+
+        let scores: [Score] = scorePersitences.map { $0.toDomain() }
+
+        return scores
     }
 }
 
