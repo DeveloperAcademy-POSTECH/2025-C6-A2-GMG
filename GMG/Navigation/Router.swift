@@ -7,7 +7,10 @@ enum Route: Hashable {
     case recording
     case chordProgress(score: Score)
     case export(score: Score)
-    case developer
+
+    #if DEBUG
+        case developer
+    #endif
 }
 
 struct RouteWrapper: Hashable {
@@ -87,14 +90,16 @@ final class Router {
             let intent: ExportIntent = ExportIntent(model: model)
 
             ExportView(model: model, intent: intent, router: self)
-        case .developer:
-            if let scoreRepository: ScoreRepository = diContainer.makeScoreRepository() {
-                DeveloperView(
-                    scoreRepository: scoreRepository
-                )
-            } else {
-                ErrorView(description: "Failed to create database")
-            }
+        #if DEBUG
+            case .developer:
+                if let scoreRepository: ScoreRepository = diContainer.makeScoreRepository() {
+                    DeveloperView(
+                        scoreRepository: scoreRepository
+                    )
+                } else {
+                    ErrorView(description: "Failed to create database")
+                }
+        #endif
         }
     }
 }
