@@ -1,4 +1,4 @@
-ë
+	ë
 
 melody*
 
@@ -13,15 +13,15 @@ key_logits
 †Ä¢£¢:
 +com.github.apple.coremltools.source_dialectTorchScript¢-
 $com.github.apple.coremltools.version8.3.0¢3
-#com.github.apple.coremltools.sourcetorch==2.5.0≤¸ÉåÇ
-mainÇÇ
+#com.github.apple.coremltools.sourcetorch==2.5.0≤òâ®á
+mainûá
 #
 melody
 
 
 ‘
-CoreML6–Å
-CoreML6√Åroot_logitstype_logits
+CoreML8ÏÜ
+CoreML8ﬂÜroot_logitstype_logits
 key_logits≤
 const3
 model_pitch_embedding_weight
@@ -1040,23 +1040,23 @@ key_logits≤
 
 "
 op_20_squeeze_mask_0·
-slice_by_index)
+slice_by_index
+begin
+
+var_20_begin_0)
 squeeze_mask
 
-var_20_squeeze_mask_0!
+var_20_squeeze_mask_0
+x
+
+
+melody!
 end_mask
 
 var_20_end_mask_0
 end
 
-var_20_end_0
-begin
-
-var_20_begin_0
-x
-
-
-melody
+var_20_end_0
 var_20
 
 
@@ -1176,22 +1176,36 @@ key_logits≤
 name 
 
 "
-op_68_batch_dims_0À
-gather%
-
-batch_dims
-
-var_68_batch_dims_0
+op_68_batch_dims_0r
+const!
+var_68_validate_indices_0
+*
+val
+
+
+ *.
+name&
+
+"
+op_68_validate_indices_0˛
+gather
+axis
+
+var_68_axis_0
 indices
 
 
 var_20%
 x 
 
-model_pitch_embedding_weight
-axis
-
-var_68_axis_0$
+model_pitch_embedding_weight1
+validate_indices
+
+var_68_validate_indices_0%
+
+batch_dims
+
+var_68_batch_dims_0$
 var_68
 
 
@@ -1262,23 +1276,23 @@ batch_dims
 
 "
 input_3_squeeze_mask_0Ë
-slice_by_index*
+slice_by_index
+begin
+
+input_3_begin_0*
 squeeze_mask
 
-input_3_squeeze_mask_0"
+input_3_squeeze_mask_0
+x
+
+
+melody"
 end_mask
 
 input_3_end_mask_0
 end
 
-input_3_end_0
-begin
-
-input_3_begin_0
-x
-
-
-melody
+input_3_end_0
 input_3
 
 
@@ -1308,21 +1322,35 @@ batch_dims
 name 
 
 "
-op_73_batch_dims_0œ
-gather%
-
-batch_dims
-
-var_73_batch_dims_0
+op_73_batch_dims_0r
+const!
+var_73_validate_indices_0
+*
+val
+
+
+ *.
+name&
+
+"
+op_73_validate_indices_0Ç
+gather
+axis
+
+var_73_axis_0
 indices
 	
 input_3(
 x#
 !
-model_duration_embedding_weight
-axis
-
-var_73_axis_0$
+model_duration_embedding_weight1
+validate_indices
+
+var_73_validate_indices_0%
+
+batch_dims
+
+var_73_batch_dims_0$
 var_73
 
 
@@ -1411,23 +1439,23 @@ batch_dims
 
 "
 input_5_squeeze_mask_0Ë
-slice_by_index*
+slice_by_index
+begin
+
+input_5_begin_0*
 squeeze_mask
 
-input_5_squeeze_mask_0"
+input_5_squeeze_mask_0
+x
+
+
+melody"
 end_mask
 
 input_5_end_mask_0
 end
 
-input_5_end_0
-begin
-
-input_5_begin_0
-x
-
-
-melody
+input_5_end_0
 input_5
 
 
@@ -1457,21 +1485,35 @@ batch_dims
 name 
 
 "
-op_79_batch_dims_0 
-gather%
-
-batch_dims
-
-var_79_batch_dims_0
+op_79_batch_dims_0r
+const!
+var_79_validate_indices_0
+*
+val
+
+
+ *.
+name&
+
+"
+op_79_validate_indices_0˝
+gather
+axis
+
+var_79_axis_0
 indices
 	
 input_5#
 x
 
-model_bar_embedding_weight
-axis
-
-var_79_axis_0$
+model_bar_embedding_weight1
+validate_indices
+
+var_79_validate_indices_0%
+
+batch_dims
+
+var_79_batch_dims_0$
 var_79
 
 
@@ -1560,23 +1602,23 @@ batch_dims
 
 "
 input_7_squeeze_mask_0Ë
-slice_by_index*
+slice_by_index
+begin
+
+input_7_begin_0*
 squeeze_mask
 
-input_7_squeeze_mask_0"
+input_7_squeeze_mask_0
+x
+
+
+melody"
 end_mask
 
 input_7_end_mask_0
 end
 
-input_7_end_0
-begin
-
-input_7_begin_0
-x
-
-
-melody
+input_7_end_0
 input_7
 
 
@@ -1606,21 +1648,35 @@ batch_dims
 name 
 
 "
-op_85_batch_dims_0Õ
-gather%
-
-batch_dims
-
-var_85_batch_dims_0
+op_85_batch_dims_0r
+const!
+var_85_validate_indices_0
+*
+val
+
+
+ *.
+name&
+
+"
+op_85_validate_indices_0Ä
+gather
+axis
+
+var_85_axis_0
 indices
 	
 input_7&
 x!
 
-model_offset_embedding_weight
-axis
-
-var_85_axis_0$
+model_offset_embedding_weight1
+validate_indices
+
+var_85_validate_indices_0%
+
+batch_dims
+
+var_85_batch_dims_0$
 var_85
 
 
@@ -1739,20 +1795,20 @@ batch_dims
 
 "
 query_1_interleave_0´
-concat
+concat
+axis
+
+
+var_41&
+
+interleave
+
+query_1_interleave_0
 values
 	
 input_9
 
-var_99&
-
-interleave
-
-query_1_interleave_0
-axis
-
-
-var_41%
+var_99%
 query_1
 
 
@@ -1788,20 +1844,20 @@ $"
 #
 !"
 key_padding_mask_interleave_0’
-concat5
+concat
+axis
+
+
+var_41/
+
+interleave!
+
+key_padding_mask_interleave_05
 values+
 
 melody_key_padding_mask
 
-slot_padding/
-
-interleave!
-
-key_padding_mask_interleave_0
-axis
-
-
-var_41'
+slot_padding'
 key_padding_mask
 
 
@@ -2042,13 +2098,13 @@ v_1_perm_0j
 
 "
 transpose_14_perm_0ì
-	transpose
-perm
-
-transpose_14_perm_0
+	transpose
 x
 	
-var_131/
+var_131
+perm
+
+transpose_14_perm_0/
 transpose_14
 
 
@@ -2059,13 +2115,13 @@ v_1_perm_0j
 
 "
 transpose_34ì
-	transpose
-perm
-
-transpose_13_perm_0
+	transpose
 x
 	
-var_125/
+var_125
+perm
+
+transpose_13_perm_0/
 transpose_13
 
 
@@ -2082,13 +2138,13 @@ v_1_perm_0j
 var_140_transpose_y_0
 y
 
-transpose_14(
-transpose_x
-
-var_140_transpose_x_0
+transpose_14
 x
 
-transpose_13+
+transpose_13(
+transpose_x
+
+var_140_transpose_x_0+
 var_140 
 
 
@@ -2145,13 +2201,13 @@ v_1_perm_0j
 
 "
 op_143_axes_0à
-expand_dims
-axes
-
-var_143_axes_0
+expand_dims
 x
 
-key_padding_mask$
+key_padding_mask
+axes
+
+var_143_axes_0$
 var_143
 
 
@@ -2177,13 +2233,13 @@ v_1_perm_0j
 
 "
 op_144_axes_0Ö
-expand_dims
-axes
-
-var_144_axes_0
+expand_dims
 x
 	
-var_143*
+var_143
+axes
+
+var_144_axes_0*
 var_144
 
 
@@ -2195,17 +2251,17 @@ v_1_perm_0j
 
 "
 op_144ô
-select
+select
+cond
+	
+var_144
 b
 
 _inversed_scores_1
 a
 
 
-var_26
-cond
-	
-var_144,
+var_26,
 scores_3 
 
 
@@ -2217,15 +2273,15 @@ v_1_perm_0j
 "
 
 scores_3~
-softmax
-x
-
-
-scores_3
+softmax
 axis
 
 
-var_37,
+var_37
+x
+
+
+scores_3,
 input_15 
 
 
@@ -2259,14 +2315,14 @@ v_1_perm_0j
 !
 "
 attn_output_1_transpose_y_0Å
-	transpose
+	transpose
+x
+	
+var_137
 perm
 
 
-v_1_perm_0
-x
-	
-var_137&
+v_1_perm_0&
 v_1
 
 
@@ -2283,14 +2339,14 @@ v_1_perm_0
 attn_output_1_transpose_y_0
 y
 
-v_1.
-transpose_x
-
-attn_output_1_transpose_x_0
+v_1
 x
 
 
-input_150
+input_15.
+transpose_x
+
+attn_output_1_transpose_x_00
 attn_output_1
 
 
@@ -2333,13 +2389,13 @@ v_1_perm_0
 
 "
 op_151è
-	transpose
-perm
-
-var_149_perm_0
+	transpose
 x
 
-attn_output_1*
+attn_output_1
+perm
+
+var_149_perm_0*
 var_149
 
 
@@ -2423,24 +2479,24 @@ v_1_perm_0
 "
 input_23_axes_0¸
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_21
+axes
+
+input_23_axes_00
 gamma'
 %
 #model_encoder_layers_0_norm1_weight-
 beta%
 #
-!model_encoder_layers_0_norm1_bias
-epsilon
-
-
-var_30
-axes
-
-input_23_axes_0
-x
-
-
-input_21&
+!model_encoder_layers_0_norm1_bias&
 input_23
 
 
@@ -2543,24 +2599,24 @@ layer_norm0
 "
 query_3_axes_0˘
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_31
+axes
+
+query_3_axes_00
 gamma'
 %
 #model_encoder_layers_0_norm2_weight-
 beta%
 #
-!model_encoder_layers_0_norm2_bias
-epsilon
-
-
-var_30
-axes
-
-query_3_axes_0
-x
-
-
-input_31%
+!model_encoder_layers_0_norm2_bias%
 query_3
 
 
@@ -2802,13 +2858,13 @@ v_3_perm_0j
 
 "
 transpose_16_perm_0ì
-	transpose
-perm
-
-transpose_16_perm_0
+	transpose
 x
 	
-var_198/
+var_198
+perm
+
+transpose_16_perm_0/
 transpose_16
 
 
@@ -2819,13 +2875,13 @@ v_3_perm_0j
 
 "
 transpose_30ì
-	transpose
-perm
-
-transpose_15_perm_0
+	transpose
 x
 	
-var_192/
+var_192
+perm
+
+transpose_15_perm_0/
 transpose_15
 
 
@@ -2842,13 +2898,13 @@ v_3_perm_0j
 var_207_transpose_y_0
 y
 
-transpose_16(
-transpose_x
-
-var_207_transpose_x_0
+transpose_16
 x
 
-transpose_15+
+transpose_15(
+transpose_x
+
+var_207_transpose_x_0+
 var_207 
 
 
@@ -2890,17 +2946,17 @@ v_3_perm_0j
 
 "
 _inversed_scores_5ô
-select
+select
+cond
+	
+var_144
 b
 
 _inversed_scores_5
 a
 
 
-var_26
-cond
-	
-var_144,
+var_26,
 scores_7 
 
 
@@ -2912,15 +2968,15 @@ v_3_perm_0j
 "
 
 scores_7~
-softmax
-x
-
-
-scores_7
+softmax
 axis
 
 
-var_37,
+var_37
+x
+
+
+scores_7,
 input_33 
 
 
@@ -2954,14 +3010,14 @@ v_3_perm_0j
 !
 "
 attn_output_3_transpose_y_0Å
-	transpose
+	transpose
+x
+	
+var_204
 perm
 
 
-v_3_perm_0
-x
-	
-var_204&
+v_3_perm_0&
 v_3
 
 
@@ -2978,14 +3034,14 @@ v_3_perm_0
 attn_output_3_transpose_y_0
 y
 
-v_3.
-transpose_x
-
-attn_output_3_transpose_x_0
+v_3
 x
 
 
-input_330
+input_33.
+transpose_x
+
+attn_output_3_transpose_x_00
 attn_output_3
 
 
@@ -3028,13 +3084,13 @@ v_3_perm_0
 
 "
 op_218è
-	transpose
-perm
-
-var_216_perm_0
+	transpose
 x
 
-attn_output_3*
+attn_output_3
+perm
+
+var_216_perm_0*
 var_216
 
 
@@ -3118,24 +3174,24 @@ v_3_perm_0
 "
 input_41_axes_0¸
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_39
+axes
+
+input_41_axes_00
 gamma'
 %
 #model_encoder_layers_1_norm1_weight-
 beta%
 #
-!model_encoder_layers_1_norm1_bias
-epsilon
-
-
-var_30
-axes
-
-input_41_axes_0
-x
-
-
-input_39&
+!model_encoder_layers_1_norm1_bias&
 input_41
 
 
@@ -3236,24 +3292,24 @@ layer_norm0
 "
 query_5_axes_0˘
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_49
+axes
+
+query_5_axes_00
 gamma'
 %
 #model_encoder_layers_1_norm2_weight-
 beta%
 #
-!model_encoder_layers_1_norm2_bias
-epsilon
-
-
-var_30
-axes
-
-query_5_axes_0
-x
-
-
-input_49%
+!model_encoder_layers_1_norm2_bias%
 query_5
 
 
@@ -3492,13 +3548,13 @@ v_5_perm_0j
 
 "
 transpose_18_perm_0ì
-	transpose
-perm
-
-transpose_18_perm_0
+	transpose
 x
 	
-var_265/
+var_265
+perm
+
+transpose_18_perm_0/
 transpose_18
 
 
@@ -3509,13 +3565,13 @@ v_5_perm_0j
 
 "
 transpose_26ì
-	transpose
-perm
-
-transpose_17_perm_0
+	transpose
 x
 	
-var_259/
+var_259
+perm
+
+transpose_17_perm_0/
 transpose_17
 
 
@@ -3532,13 +3588,13 @@ v_5_perm_0j
 var_274_transpose_y_0
 y
 
-transpose_18(
-transpose_x
-
-var_274_transpose_x_0
+transpose_18
 x
 
-transpose_17+
+transpose_17(
+transpose_x
+
+var_274_transpose_x_0+
 var_274 
 
 
@@ -3580,17 +3636,17 @@ v_5_perm_0j
 
 "
 _inversed_scores_9õ
-select
+select
+cond
+	
+var_144
 b
 
 _inversed_scores_9
 a
 
 
-var_26
-cond
-	
-var_144-
+var_26-
 	scores_11 
 
 
@@ -3602,13 +3658,13 @@ v_5_perm_0j
 "
 	scores_11
 softmax
-x
-
-	scores_11
 axis
 
 
-var_37,
+var_37
+x
+
+	scores_11,
 input_51 
 
 
@@ -3642,14 +3698,14 @@ v_5_perm_0j
 !
 "
 attn_output_5_transpose_y_0Å
-	transpose
+	transpose
+x
+	
+var_271
 perm
 
 
-v_5_perm_0
-x
-	
-var_271&
+v_5_perm_0&
 v_5
 
 
@@ -3666,14 +3722,14 @@ v_5_perm_0
 attn_output_5_transpose_y_0
 y
 
-v_5.
-transpose_x
-
-attn_output_5_transpose_x_0
+v_5
 x
 
 
-input_510
+input_51.
+transpose_x
+
+attn_output_5_transpose_x_00
 attn_output_5
 
 
@@ -3716,13 +3772,13 @@ v_5_perm_0
 
 "
 op_285è
-	transpose
-perm
-
-var_283_perm_0
+	transpose
 x
 
-attn_output_5*
+attn_output_5
+perm
+
+var_283_perm_0*
 var_283
 
 
@@ -3805,24 +3861,24 @@ v_5_perm_0
 "
 input_59_axes_0¸
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_57
+axes
+
+input_59_axes_00
 gamma'
 %
 #model_encoder_layers_2_norm1_weight-
 beta%
 #
-!model_encoder_layers_2_norm1_bias
-epsilon
-
-
-var_30
-axes
-
-input_59_axes_0
-x
-
-
-input_57&
+!model_encoder_layers_2_norm1_bias&
 input_59
 
 
@@ -3923,24 +3979,24 @@ layer_norm0
 "
 query_axes_0Û
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_67
+axes
+
+query_axes_00
 gamma'
 %
 #model_encoder_layers_2_norm2_weight-
 beta%
 #
-!model_encoder_layers_2_norm2_bias
-epsilon
-
-
-var_30
-axes
-
-query_axes_0
-x
-
-
-input_67#
+!model_encoder_layers_2_norm2_bias#
 query
 
 
@@ -4178,13 +4234,13 @@ layer_norm0
 
 "
 transpose_20_perm_0ì
-	transpose
-perm
-
-transpose_20_perm_0
+	transpose
 x
 	
-var_332/
+var_332
+perm
+
+transpose_20_perm_0/
 transpose_20
 
 
@@ -4195,13 +4251,13 @@ layer_norm0
 
 "
 transpose_22ì
-	transpose
-perm
-
-transpose_19_perm_0
+	transpose
 x
 	
-var_326/
+var_326
+perm
+
+transpose_19_perm_0/
 transpose_19
 
 
@@ -4218,13 +4274,13 @@ layer_norm0
 var_341_transpose_y_0
 y
 
-transpose_20(
-transpose_x
-
-var_341_transpose_x_0
+transpose_20
 x
 
-transpose_19+
+transpose_19(
+transpose_x
+
+var_341_transpose_x_0+
 var_341 
 
 
@@ -4266,17 +4322,17 @@ layer_norm0
 
 "
 _inversed_scores_13ñ
-select
+select
+cond
+	
+var_144
 b
 
 _inversed_scores_13
 a
 
 
-var_26
-cond
-	
-var_144*
+var_26*
 scores 
 
 
@@ -4288,15 +4344,15 @@ layer_norm0
 
 "
 scores|
-softmax
-x
-
-
-scores
+softmax
 axis
 
 
-var_37,
+var_37
+x
+
+
+scores,
 input_69 
 
 
@@ -4330,14 +4386,14 @@ layer_norm0
 
 "
 attn_output_transpose_y_0}
-	transpose
+	transpose
+x
+	
+var_338
 perm
 
 
-v_perm_0
-x
-	
-var_338$
+v_perm_0$
 v
 
 
@@ -4355,14 +4411,14 @@ layer_norm0
 
 y
 
-v,
-transpose_x
-
-attn_output_transpose_x_0
+v
 x
 
 
-input_69.
+input_69,
+transpose_x
+
+attn_output_transpose_x_0.
 attn_output
 
 
@@ -4405,13 +4461,13 @@ layer_norm0
 
 "
 op_352ç
-	transpose
-perm
-
-var_350_perm_0
+	transpose
 x
 
-attn_output*
+attn_output
+perm
+
+var_350_perm_0*
 var_350
 
 
@@ -4494,24 +4550,24 @@ layer_norm0
 "
 input_77_axes_0¸
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_75
+axes
+
+input_77_axes_00
 gamma'
 %
 #model_encoder_layers_3_norm1_weight-
 beta%
 #
-!model_encoder_layers_3_norm1_bias
-epsilon
-
-
-var_30
-axes
-
-input_77_axes_0
-x
-
-
-input_75&
+!model_encoder_layers_3_norm1_bias&
 input_77
 
 
@@ -4612,24 +4668,24 @@ layer_norm0
 "
 sequence_axes_0¸
 
-layer_norm0
+layer_norm
+epsilon
+
+
+var_30
+x
+
+
+input_85
+axes
+
+sequence_axes_00
 gamma'
 %
 #model_encoder_layers_3_norm2_weight-
 beta%
 #
-!model_encoder_layers_3_norm2_bias
-epsilon
-
-
-var_30
-axes
-
-sequence_axes_0
-x
-
-
-input_85&
+!model_encoder_layers_3_norm2_bias&
 sequence
 
 
@@ -4686,20 +4742,20 @@ layer_norm0
 
 "
 op_378_end_mask_0√
-slice_by_index"
-end_mask
-
-var_378_end_mask_0
-end
-
-var_378_end_0
+slice_by_index
 begin
 
 var_378_begin_0
 x
 
 
-sequence$
+sequence"
+end_mask
+
+var_378_end_mask_0
+end
+
+var_378_end_0$
 var_378
 
 
@@ -4755,20 +4811,20 @@ layer_norm0
 
 "
 op_381_end_mask_0ƒ
-slice_by_index"
-end_mask
-
-var_381_end_mask_0
-end
-
-var_381_end_0
+slice_by_index
 begin
 
 var_381_begin_0
 x
 
 
-sequence%
+sequence"
+end_mask
+
+var_381_end_mask_0
+end
+
+var_381_end_0%
 var_381
 
 
@@ -4798,14 +4854,14 @@ layer_norm0
 
 "
 	linear_24v
-softmax
-x
-
-root_logits
+softmax
 axis
 
 
-var_37#
+var_37
+x
+
+root_logits#
 var_386
 
 
@@ -4874,20 +4930,20 @@ layer_norm0
 
 "
 input_89_interleave_0Æ
-concat 
+concat
+axis
+
+
+var_37'
+
+interleave
+
+input_89_interleave_0 
 values
 	
 var_378
 	
-context'
-
-interleave
-
-input_89_interleave_0
-axis
-
-
-var_37%
+context%
 input_89
 
 
@@ -4947,13 +5003,13 @@ interleave
 
 "
 op_394_axes_0
-expand_dims
-axes
-
-var_394_axes_0
+expand_dims
 x
 	
-var_393$
+var_393
+axes
+
+var_394_axes_0$
 var_394
 
 
@@ -4976,13 +5032,13 @@ interleave
 
 "
 cast_30_dtype_0{
-cast
-dtype
-
-cast_30_dtype_0
+cast
 x
 	
-var_394$
+var_394
+dtype
+
+cast_30_dtype_0$
 cast_30
 
 
@@ -5036,16 +5092,16 @@ interleave
 "
 op_398_keep_dims_0û
 
-reduce_sum
+reduce_sum
+x
+	
+var_396
 axes
 
 var_398_axes_0$
 	keep_dims
 
-var_398_keep_dims_0
-x
-	
-var_396
+var_398_keep_dims_0
 var_398
 
 
@@ -5082,16 +5138,16 @@ reduce_sum
 "
 op_400_keep_dims_0ù
 
-reduce_sum
+reduce_sum
+x
+	
+cast_30
 axes
 
 var_400_axes_0$
 	keep_dims
 
-var_400_keep_dims_0
-x
-	
-cast_30
+var_400_keep_dims_0
 var_400
 
 
@@ -5115,15 +5171,15 @@ reduce_sum
 "
 
 const_16
-clip
-alpha
-
-
-var_23
+clip
 beta
 
 
-const_16
+const_16
+alpha
+
+
+var_23
 x
 	
 var_400
